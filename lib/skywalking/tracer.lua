@@ -15,3 +15,15 @@
 -- limitations under the License.
 -- 
 
+local Tracer = {}
+
+function Tracer.new()
+    
+end
+
+
+function Tracer.createEntrySpan(context, operationName, sw6_header_value)
+    
+end
+
+return Tracer

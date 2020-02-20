@@ -45,10 +45,12 @@ jobs:
           cd luarocks-3.3.0
           ./configure && make && sudo make install
           cd ..
-      - name: 'install LuaUnit'
+      - name: 'install dependencies'
         run: |
           sudo luarocks install luaunit
+          sudo luarocks install luasocket
       - name: 'test'
         run: |
           cd test
-          lua test.lua 
+          lua id_generator_test.lua
+          lua tracing_context_test.lua 
