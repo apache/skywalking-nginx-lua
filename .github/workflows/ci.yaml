@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: CI AND IT
+name: CI
 
 on:
   pull_request:
@@ -37,5 +37,5 @@ jobs:
           submodules: true
       - name: 'Install LUA runtime'
         run: |
-          sh lua-setup.sh
+          sh ../ci/lua-setup.sh
           lua -v
