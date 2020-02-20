@@ -16,17 +16,22 @@
 -- 
 
 local lu = require('luaunit')
-local idGen = require('id_generator')
+local Util = require('util')
 
-TestIDGenerator = {}
-    function TestIDGenerator:test()
-        local id = idGen.newID()
+TestUtil = {}
+    function TestUtil:testNewID()
+        local id = Util.newID()
 
         lu.assertNotNil(id[1])
         lu.assertNotNil(id[2])
         lu.assertNotNil(id[3])
     end
--- end TestIDGenerator
+
+    function TestUtil:testTimestamp()
+        local id = Util.timestamp()
+        lu.assertNotNil(id)
+    end
+-- end TestUtil
 
 
 os.exit( lu.LuaUnit.run() )

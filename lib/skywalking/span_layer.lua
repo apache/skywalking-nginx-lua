@@ -15,16 +15,13 @@
 -- limitations under the License.
 -- 
 
-socket=require'socket'
+Layer = {
+    NONE = {name = "NONE", value=0},
+    DB = {name = "DB", value=1},
+    RPC_FRAMEWORK = {name = "RPC_FRAMEWORK", value=2},
+    HTTP = {name = "HTTP", value=3},
+    MQ = {name = "MQ", value=4},
+    CACHE = {name = "CACHE", value=5},
+}
 
-IDGenerator = {}
-MAX_ID_PART2 = 1000000000
-MAX_ID_PART3 = 100000
-SEQ = 1
-
-function IDGenerator:newID()
-    SEQ = SEQ + 1
-    return {socket.gettime(), math.random( 0, MAX_ID_PART2), math.random( 0, MAX_ID_PART3) + SEQ}
-end
-
-return IDGenerator
+return Layer

@@ -14,6 +14,18 @@ All HTTP 1.1 requests go through Nginx could be collected by this agent.
 # Setup Doc
 TODO
 
+# APIs
+
+# Set up dev env
+All codes in the `lib/skywalking` require the `*_test.lua` to do the UnitTest. To run that, you need to install
+- Lua 5.3
+- LuaRocks
+
+The following libs are required in runtime or test cases, please use `LuaRocks` to install them.
+- luaunit
+- luasocket
+
+
 # Download
 Have no release yet.
 

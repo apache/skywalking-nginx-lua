@@ -15,26 +15,69 @@
 -- limitations under the License.
 -- 
 
-local idGen = require('id_generator')
+local Util = require('util')
 
 TracingContext = {
-    span_id_seq = 0,
     trace_id,
     segment_id,
-    -- Linked Lists
-    finished_spans = nil,
+    is_noop = false,
+
+    internal,
 }
 
-function TracingContext:new(o)
-    o = o or {} 
+function TracingContext:new()
+    local o = {}
     setmetatable(o, self)
+    self.__index = self
 
-    o.trace_id = idGen.newID();
+    o.trace_id = Util:newID();
     o.segment_id = o.trace_id
+    o.internal = Internal:new()
+    o.internal.owner = o
     return o
 end
 
 function TracingContext:createEntrySpan(operationName)
 end
+
+-------------- Internal Object-------------
+-- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
+Internal = {
+    -- span id starts from 0
+    span_id_seq,
+    -- Owner means the Context instance holding this Internal object.
+    owner,
+    -- Lists
+    -- Created span and still active
+    active_spans,
+    -- Finished spans
+    finished_spans,
+}
+
+-- Create an internal instance
+function Internal:new()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+
+    o.span_id_seq = 0
+    o.active_spans = {}
+    o.finished_spans = {}
+
+    return o
+end
+
+function Internal:addActive(span)
+    table.insert(self.active_spans, span)
+    return self.owner
+end
+
+-- Generate the next span ID.
+function Internal:nextSpanID()
+    local nextSpanId = self.span_id_seq
+    self.span_id_seq = self.span_id_seq + 1;
+    return nextSpanId
+end
+---------------------------------------------
 
 return TracingContext

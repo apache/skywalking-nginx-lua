@@ -52,5 +52,6 @@ jobs:
       - name: 'Run Tests'
         run: |
           cd lib/skywalking
-          lua id_generator_test.lua
+          lua util_test.lua
+          lua span_test.lua 
           lua tracing_context_test.lua 

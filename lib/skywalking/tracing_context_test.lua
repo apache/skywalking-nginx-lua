@@ -16,17 +16,32 @@
 -- 
 
 local lu = require('luaunit')
-local tc = require('tracing_context')
+local TC = require('tracing_context')
 
 TestTracingContext = {}
     function TestTracingContext:testNew()
-        local context = tc.new()
-
+        local context = TC:new()
+        lu.assertNotNil(context)
         lu.assertNotNil(context.segment_id[1])
         lu.assertNotNil(context.segment_id[2])
         lu.assertNotNil(context.segment_id[3])
 
         lu.assertEquals(context.trace_id, context.segment_id)
+    end
+
+    function TestTracingContext:testInternal_NextSpanSeqID()
+        local context = TC:new()
+
+        lu.assertEquals(context.internal:nextSpanID(), 0)
+    end
+
+    function TestTracingContext:testInternal_addActive()
+        local context = TC:new()
+
+        local mockSpan = {field = "ws"}
+        context.internal:addActive(mockSpan)
+
+        lu.assertEquals(#(context.internal.active_spans), 1)
     end
 -- end TestTracingContext
 
