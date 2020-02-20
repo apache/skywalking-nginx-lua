@@ -38,3 +38,17 @@ jobs:
       - uses: leafo/gh-actions-lua@v5
         with:
           luaVersion: "5.3.5"
+      - name: 'install LuaRocks'
+        run: |
+          wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
+          tar zxpf luarocks-3.3.0.tar.gz
+          cd luarocks-3.3.0
+          ./configure && make && sudo make install
+          cd ..
+      - name: 'install LuaUnit'
+        run: |
+          sudo luarocks install luaunit
+      - name: 'test'
+        run: |
+          cd test
+          lua test.lua 
