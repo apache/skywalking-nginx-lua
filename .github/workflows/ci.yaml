@@ -37,5 +37,5 @@ jobs:
           submodules: true
       - name: 'Install LUA runtime'
         run: |
-          sh ../ci/lua-setup.sh
+          sh ci/lua-setup.sh
           lua -v
