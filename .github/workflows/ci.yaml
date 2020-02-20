@@ -35,7 +35,6 @@ jobs:
       - uses: actions/checkout@v1
         with:
           submodules: true
-      - name: 'Install LUA runtime'
-        run: |
-          sh ci/lua-setup.sh
-          lua -v
+      - uses: leafo/gh-actions-lua@v5
+        with:
+          luaVersion: "5.3.5"
