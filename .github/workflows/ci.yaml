@@ -38,19 +38,19 @@ jobs:
       - uses: leafo/gh-actions-lua@v5
         with:
           luaVersion: "5.3.5"
-      - name: 'install LuaRocks'
+      - name: 'Install LuaRocks'
         run: |
           wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
           tar zxpf luarocks-3.3.0.tar.gz
           cd luarocks-3.3.0
           ./configure && make && sudo make install
           cd ..
-      - name: 'install dependencies'
+      - name: 'Install Dependencies'
         run: |
           sudo luarocks install luaunit
           sudo luarocks install luasocket
-      - name: 'test'
+      - name: 'Run Tests'
         run: |
-          cd test
+          cd lib/skywalking
           lua id_generator_test.lua
           lua tracing_context_test.lua 
