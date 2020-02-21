@@ -55,3 +55,4 @@ jobs:
           lua util_test.lua
           lua span_test.lua 
           lua tracing_context_test.lua 
+          lua segment_ref_test.lua 
