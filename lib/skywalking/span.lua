@@ -35,6 +35,9 @@ Span = {
     end_time,
     error_occurred = false,
     refs,
+    is_noop = false,
+    -- owner is a TracingContext reference
+    owner,
 }
 
 -- Create an entry span. Represent the HTTP incoming request.
@@ -145,12 +148,29 @@ function Span:new(operationName, context, parent)
     context.internal:addActive(o)
     o.start_time = Util.timestamp()
     o.refs = {}
+    o.owner = context
 
     return o
 end
 
+function Span:newNoOP()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+
+    o.is_noop = true
+    return o
+end
+
+---- All belowing are instance methods
 function Span:finish()
+    if self.is_noop then
+        return self
+    end
+
     self.end_time = Util.timestamp()
+    self.owner.internal:finishSpan(self)
+
     return self
 end
 

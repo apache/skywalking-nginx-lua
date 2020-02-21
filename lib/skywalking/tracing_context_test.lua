@@ -53,9 +53,32 @@ TestTracingContext = {}
         local finishedSpans = context.internal.finished_spans
         lu.assertEquals(#(activeSpans), 2)
         lu.assertEquals(#(finishedSpans), 0)
-
         lu.assertEquals(span1, activeSpans[1])
         lu.assertEquals(span2, activeSpans[2])
+
+        span2:finish()
+        lu.assertNotNil(span2.end_time)
+        lu.assertEquals(#(activeSpans), 1)
+        lu.assertEquals(#(finishedSpans), 1)
+
+        span1:finish()
+        lu.assertNotNil(span1.end_time)
+        lu.assertEquals(#(activeSpans), 0)
+        lu.assertEquals(#(finishedSpans), 2)
+
+        local isSegmentFinished, spanList = context:drainAfterFinished()
+        lu.assertEquals(span2, spanList[1])
+        lu.assertEquals(span1, spanList[2])
+    end
+
+    function TestTracingContext:testNewNoOP()
+        local noopContext = TC:newNoOP()
+
+        local span1 = noopContext:createEntrySpan('entry_op')
+        local span2 = noopContext:createExitSpan("exit_op", span1, "127.0.0.1")
+
+        lu.assertEquals(true, span1.is_noop)
+        lu.assertEquals(true, span2.is_noop)
     end
 -- end TestTracingContext
 

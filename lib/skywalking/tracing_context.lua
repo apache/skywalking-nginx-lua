@@ -34,7 +34,7 @@ function TracingContext:new(serviceInstID)
     self.__index = self
 
     if serviceInstID == nil then
-        return nil
+        return TracingContext:newNoOP()
     end
 
     o.trace_id = Util:newID()
@@ -45,16 +45,48 @@ function TracingContext:new(serviceInstID)
     return o
 end
 
+function TracingContext:newNoOP()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+
+    o.is_noop = true
+    return o
+end
+
 -- Delegate to Span:createEntrySpan
 -- @param contextCarrier could be nil if there is no downstream propagated context
 function TracingContext:createEntrySpan(operationName, parent, contextCarrier)
+    if self.is_noop then
+        return Span:newNoOP()
+    end
+
     return Span:createEntrySpan(operationName, self, parent, contextCarrier)
 end
 
 -- Delegate to Span:createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
 function TracingContext:createExitSpan(operationName, parent, peer, contextCarrier)
+    if self.is_noop then
+        return Span:newNoOP()
+    end
+
     return Span:createExitSpan(operationName, self, parent, peer, contextCarrier)
+end
+
+-- After all active spans finished, this segment will be treated as finished status.
+-- Notice, it is different with Java agent, a finished context is still able to recreate new span, and be checked as finished again.
+-- This gives the end user more flexibility. Unless it is a real reasonable case, don't call #drainAfterFinished multiple times.
+-- 
+-- Return (boolean isSegmentFinished, list SpanList). 
+-- SpanList has value only when the isSegmentFinished is true
+-- if isSegmentFinished == false, SpanList = nil
+function TracingContext:drainAfterFinished()
+    if self.internal.active_count ~= 0 then
+        return false, nil
+    else
+        return true, self.internal.finished_spans
+    end
 end
 
 -------------- Internal Object-------------
@@ -124,6 +156,7 @@ function Internal:finishSpan(span)
     self.active_spans[span.span_id + 1] = nil
     self.active_count = self.active_count - 1
     table.insert(self.finished_spans, span)
+
     return self.owner
 end
 
