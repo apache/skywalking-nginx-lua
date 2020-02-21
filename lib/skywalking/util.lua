@@ -15,10 +15,10 @@
 -- limitations under the License.
 -- 
 
-Util = {}
-MAX_ID_PART2 = 1000000000
-MAX_ID_PART3 = 100000
-SEQ = 1
+local Util = {}
+local MAX_ID_PART2 = 1000000000
+local MAX_ID_PART3 = 100000
+local SEQ = 1
 
 function Util:newID()
     SEQ = SEQ + 1

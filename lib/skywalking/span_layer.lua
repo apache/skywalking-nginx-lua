@@ -15,7 +15,7 @@
 -- limitations under the License.
 -- 
 
-Layer = {
+local Layer = {
     NONE = {name = "NONE", value=0},
     DB = {name = "DB", value=1},
     RPC_FRAMEWORK = {name = "RPC_FRAMEWORK", value=2},

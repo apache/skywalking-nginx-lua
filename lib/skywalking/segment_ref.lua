@@ -18,7 +18,7 @@
 local Util = require('util')
 local Base64 = require('dependencies/base64')
 
-SegmentRef = {
+local SegmentRef = {
     -- There is no multiple-threads scenario in the LUA, no only hard coded as CROSS_PROCESS
     type = 'CROSS_PROCESS',
     trace_id,

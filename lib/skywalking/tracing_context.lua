@@ -18,7 +18,7 @@
 local Util = require('util')
 local Span = require('span')
 
-TracingContext = {
+local TracingContext = {
     trace_id,
     segment_id,
     service_inst_id,
@@ -26,6 +26,25 @@ TracingContext = {
     is_noop = false,
 
     internal,
+}
+
+-------------- Internal Object-------------
+-- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
+local Internal = {
+    self_generated_trace_id,
+    -- span id starts from 0
+    span_id_seq,
+    -- Owner means the Context instance holding this Internal object.
+    owner,
+    -- The first created span.
+    first_span,
+    -- The first ref injected in this context
+    first_ref,
+    -- Created span and still active
+    active_spans,
+    active_count,
+    -- Finished spans
+    finished_spans,
 }
 
 function TracingContext:new(serviceInstID)
@@ -91,22 +110,6 @@ end
 
 -------------- Internal Object-------------
 -- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
-Internal = {
-    self_generated_trace_id,
-    -- span id starts from 0
-    span_id_seq,
-    -- Owner means the Context instance holding this Internal object.
-    owner,
-    -- The first created span.
-    first_span,
-    -- The first ref injected in this context
-    first_ref,
-    -- Created span and still active
-    active_spans,
-    active_count,
-    -- Finished spans
-    finished_spans,
-}
 
 -- Create an internal instance
 function Internal:new()

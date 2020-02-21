@@ -19,9 +19,9 @@ local spanLayer = require("span_layer")
 local Util = require('util')
 local SegmentRef = require("segment_ref")
 
-CONTEXT_CARRIER_KEY = 'sw6'
+local CONTEXT_CARRIER_KEY = 'sw6'
 
-Span = {
+local Span = {
     span_id,
     parent_span_id,
     operation_name,
