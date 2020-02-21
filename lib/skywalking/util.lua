@@ -40,6 +40,11 @@ function Util:formatID(str)
     return parts
 end
 
+-- @param id is an array with length = 3
+function Util:id2String(id)
+    return id[1] .. '.' .. id[2] .. '.' .. id[3]
+end
+
 -- A simulation implementation of Java's System.currentTimeMillis() by following the SkyWalking protocol.
 -- Return the difference as string, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
 -- But in using os.clock(), I am not sure whether it is accurate enough.

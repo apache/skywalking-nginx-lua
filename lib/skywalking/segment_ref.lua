@@ -25,13 +25,13 @@ SegmentRef = {
     segment_id,
     span_id,
     network_address,
-    network_address_id,
-    entry_service_instance_id,
-    parent_service_instance_id,
+    network_address_id = 0,
+    entry_service_instance_id = 0,
+    parent_service_instance_id = 0,
     entry_endpoint_name,
-    entry_endpoint_id,
+    entry_endpoint_id = 0,
     parent_endpoint_name,
-    parent_endpoint_id,
+    parent_endpoint_id = 0,
 }
 
 function SegmentRef:new()
@@ -74,6 +74,42 @@ function SegmentRef:fromSW6Value(value)
     end
 
     return self
+end
+
+-- Return string to represent this ref.
+function SegmentRef:serialize()
+    local encodedRef = '1'
+    encodedRef = encodedRef .. '-' .. Base64.encode(Util:id2String(self.trace_id))
+    encodedRef = encodedRef .. '-' .. Base64.encode(Util:id2String(self.segment_id))
+    encodedRef = encodedRef .. '-' .. self.span_id
+    encodedRef = encodedRef .. '-' .. self.parent_service_instance_id
+    encodedRef = encodedRef .. '-' .. self.entry_service_instance_id
+
+    local networkAddress 
+    if self.network_address_id ~= 0 then
+        networkAddress = self.network_address_id .. ''
+    else
+        networkAddress = '#' .. self.network_address
+    end
+    encodedRef = encodedRef .. '-' .. Base64.encode(networkAddress)
+
+    local entryEndpoint
+    if self.entry_endpoint_id ~= 0 then
+        entryEndpoint = self.entry_endpoint_id .. ''
+    else
+        entryEndpoint = '#' .. self.entry_endpoint_name
+    end
+    encodedRef = encodedRef .. '-' .. Base64.encode(entryEndpoint)
+
+    local parentEndpoint
+    if self.parent_endpoint_id ~= 0 then
+        parentEndpoint = self.parent_endpoint_id .. ''
+    else
+        parentEndpoint = '#' .. self.parent_endpoint_name
+    end
+    encodedRef = encodedRef .. '-' .. Base64.encode(parentEndpoint)
+
+    return encodedRef
 end
 
 return SegmentRef

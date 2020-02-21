@@ -22,7 +22,7 @@ local SpanLayer = require("span_layer")
 
 TestSpan = {}
     function TestSpan:testNewEntry()
-        local context = TC:new()
+        local context = TC:new(1)
         lu.assertNotNil(context)
 
         local span1 = Span:createEntrySpan("operation_name", context, nil, nil)
@@ -35,7 +35,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNewEntryWithContextCarrier()
-        local context = TC:new()
+        local context = TC:new(1)
         lu.assertNotNil(context)
 
         -- Typical header from the SkyWalking Java Agent test case
@@ -56,9 +56,9 @@ TestSpan = {}
         lu.assertEquals(ref.parent_service_instance_id, 1)
         lu.assertEquals(ref.entry_service_instance_id, 1)
         lu.assertEquals(ref.network_address, '127.0.0.1:8080')
-        lu.assertEquals(ref.network_address_id, nil)
+        lu.assertEquals(ref.network_address_id, 0)
         lu.assertEquals(ref.entry_endpoint_name, '/portal')
-        lu.assertEquals(ref.entry_endpoint_id, nil)
+        lu.assertEquals(ref.entry_endpoint_id, 0)
         lu.assertEquals(ref.parent_endpoint_name, nil)
         lu.assertEquals(ref.parent_endpoint_id, 123)
 
@@ -66,10 +66,11 @@ TestSpan = {}
     end
 
     function TestSpan:testNewExit()
-        local context = TC:new()
+        local context = TC:new(1)
         lu.assertNotNil(context)
 
-        local span1 = Span:createExitSpan("operation_name", context, nil, '127.0.0.1:80')
+        local contextCarrier = {}
+        local span1 = Span:createExitSpan("operation_name", context, nil, '127.0.0.1:80', contextCarrier)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.is_entry, false)
         lu.assertEquals(span1.is_exit, true)
@@ -77,10 +78,11 @@ TestSpan = {}
         lu.assertEquals(span1.peer, '127.0.0.1:80')
 
         lu.assertEquals(#(context.internal.active_spans), 1)
+        lu.assertNotNil(contextCarrier['sw6'])
     end
 
     function TestSpan:testNew()
-        local context = TC:new()
+        local context = TC:new(1)
         lu.assertNotNil(context)
 
         local span1 = Span:new("operation_name", context, nil)
@@ -94,7 +96,7 @@ TestSpan = {}
         lu.assertNotNil(span2.start_time)
 
         -- Use new context to check again
-        context = TC:new()
+        context = TC:new(1)
         lu.assertNotNil(context)
 
         span1 = Span:new("operation_name", context, nil)

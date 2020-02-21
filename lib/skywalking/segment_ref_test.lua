@@ -30,14 +30,28 @@ TestSegmentRef = {}
         lu.assertEquals(ref.parent_service_instance_id, 1)
         lu.assertEquals(ref.entry_service_instance_id, 1)
         lu.assertEquals(ref.network_address, '127.0.0.1:8080')
-        lu.assertEquals(ref.network_address_id, nil)
+        lu.assertEquals(ref.network_address_id, 0)
         lu.assertEquals(ref.entry_endpoint_name, '/portal')
-        lu.assertEquals(ref.entry_endpoint_id, nil)
+        lu.assertEquals(ref.entry_endpoint_id, 0)
         lu.assertEquals(ref.parent_endpoint_name, nil)
         lu.assertEquals(ref.parent_endpoint_id, 123)
 
         ref = SegmentRef:new():fromSW6Value('1-My40LjU=-MS')
         lu.assertNil(ref)
+    end
+
+    function TestSegmentRef:testSerialize()
+        local ref = SegmentRef:new()
+        ref.trace_id = {3, 4, 5}
+        ref.segment_id = {1, 2, 3}
+        ref.span_id = 4
+        ref.entry_service_instance_id = 1
+        ref.parent_service_instance_id = 1
+        ref.network_address = "127.0.0.1:8080"
+        ref.entry_endpoint_name = "/portal"
+        ref.parent_endpoint_id = 123
+
+        lu.assertEquals(ref:serialize(), '1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
     end
 -- end TestSegmentRef
 
