@@ -25,6 +25,21 @@ function Util:newID()
     return {Util.timestamp(), math.random( 0, MAX_ID_PART2), math.random( 0, MAX_ID_PART3) + SEQ}
 end
 
+-- Format a trace/segment id into an array.
+-- An official ID should have three parts separated by '.' and each part of it is a number
+function Util:formatID(str) 
+    local parts = Util:split(str, '.')
+    if #parts ~= 3 then
+        return nil
+    end
+
+    parts[1] = tonumber(parts[1])
+    parts[2] = tonumber(parts[2])
+    parts[3] = tonumber(parts[3])
+
+    return parts
+end
+
 -- A simulation implementation of Java's System.currentTimeMillis() by following the SkyWalking protocol.
 -- Return the difference as string, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
 -- But in using os.clock(), I am not sure whether it is accurate enough.
@@ -37,6 +52,19 @@ function Util:timestamp()
     end
 
     return os.time() * 1000 + b
+end
+
+-- Split the given string by the delimiter. The delimiter should be a literal string, such as '.', '-'
+function Util:split(str, delimiter)
+    local t = {}
+
+    for substr in string.gmatch(str, "[^".. delimiter.. "]*") do
+        if substr ~= nil and string.len(substr) > 0 then
+            table.insert(t,substr)
+        end
+    end
+
+    return t
 end
 
 

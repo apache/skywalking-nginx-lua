@@ -25,11 +25,56 @@ TestSpan = {}
         local context = TC:new()
         lu.assertNotNil(context)
 
-        local span1 = Span:createEntrySpan("operation_name", context, nil)
+        local span1 = Span:createEntrySpan("operation_name", context, nil, nil)
         lu.assertNotNil(span1)
-        lu.assertEquals(span1.isEntry, true)
-        lu.assertEquals(span1.isExit, false)
+        lu.assertEquals(span1.is_entry, true)
+        lu.assertEquals(span1.is_exit, false)
         lu.assertEquals(span1.layer, SpanLayer.NONE)
+
+        lu.assertEquals(#(context.internal.active_spans), 1)
+    end
+
+    function TestSpan:testNewEntryWithContextCarrier()
+        local context = TC:new()
+        lu.assertNotNil(context)
+
+        -- Typical header from the SkyWalking Java Agent test case
+        local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
+
+        local span1 = Span:createEntrySpan("operation_name", context, nil, header)
+        lu.assertNotNil(span1)
+        lu.assertEquals(span1.is_entry, true)
+        lu.assertEquals(span1.is_exit, false)
+        lu.assertEquals(span1.layer, SpanLayer.NONE)
+        local ref = span1.refs[1]
+        lu.assertNotNil(ref)
+        lu.assertEquals(ref.trace_id, {3, 4, 5})
+        -- Context trace id will be overrided by the ref trace id
+        lu.assertEquals(context.trace_id, {3, 4, 5})
+        lu.assertEquals(ref.segment_id, {1, 2, 3})
+        lu.assertEquals(ref.span_id, 4)
+        lu.assertEquals(ref.parent_service_instance_id, 1)
+        lu.assertEquals(ref.entry_service_instance_id, 1)
+        lu.assertEquals(ref.network_address, '127.0.0.1:8080')
+        lu.assertEquals(ref.network_address_id, nil)
+        lu.assertEquals(ref.entry_endpoint_name, '/portal')
+        lu.assertEquals(ref.entry_endpoint_id, nil)
+        lu.assertEquals(ref.parent_endpoint_name, nil)
+        lu.assertEquals(ref.parent_endpoint_id, 123)
+
+        lu.assertEquals(#(context.internal.active_spans), 1)
+    end
+
+    function TestSpan:testNewExit()
+        local context = TC:new()
+        lu.assertNotNil(context)
+
+        local span1 = Span:createExitSpan("operation_name", context, nil, '127.0.0.1:80')
+        lu.assertNotNil(span1)
+        lu.assertEquals(span1.is_entry, false)
+        lu.assertEquals(span1.is_exit, true)
+        lu.assertEquals(span1.layer, SpanLayer.NONE)
+        lu.assertEquals(span1.peer, '127.0.0.1:80')
 
         lu.assertEquals(#(context.internal.active_spans), 1)
     end

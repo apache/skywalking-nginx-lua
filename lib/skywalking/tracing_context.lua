@@ -19,6 +19,7 @@ local Util = require('util')
 
 TracingContext = {
     trace_id,
+    self_generated_trace_id,
     segment_id,
     is_noop = false,
 
@@ -30,7 +31,8 @@ function TracingContext:new()
     setmetatable(o, self)
     self.__index = self
 
-    o.trace_id = Util:newID();
+    o.trace_id = Util:newID()
+    o.self_generated_trace_id = true
     o.segment_id = o.trace_id
     o.internal = Internal:new()
     o.internal.owner = o
@@ -47,6 +49,8 @@ Internal = {
     span_id_seq,
     -- Owner means the Context instance holding this Internal object.
     owner,
+    -- The first created span.
+    first_span,
     -- Lists
     -- Created span and still active
     active_spans,
@@ -68,6 +72,9 @@ function Internal:new()
 end
 
 function Internal:addActive(span)
+    if first_span == nil then
+        first_span = span
+    end
     table.insert(self.active_spans, span)
     return self.owner
 end
