@@ -117,8 +117,8 @@ TestSpan = {}
         span1:finishWithDuration(123)
         lu.assertEquals(span1.end_time, 1234690)
 
-        span1:tag("key", "value")
-        lu.assertEquals(span1.tags[1], {key='value'})
+        span1:tag("key1", "value1")
+        lu.assertEquals(span1.tags[1].value, 'value1')
 
         lu.assertEquals(#span1.refs, 1)
         lu.assertEquals(span1.refs[1].network_address, '127.0.0.1:8080')

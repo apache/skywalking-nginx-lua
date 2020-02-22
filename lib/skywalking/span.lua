@@ -260,12 +260,13 @@ function Span:errorOccurred()
     return self
 end
 
-function Span:tag(key, value)
+function Span:tag(tagKey, tagValue)
     if self.is_noop then
         return self
     end
 
-    self.tags[key] = value
+    local tag = {key = tagKey, value = tagValue}
+    self.tags[#self.tags + 1] = tag
 
     return self
 end
