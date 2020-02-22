@@ -15,11 +15,11 @@
 -- limitations under the License.
 -- 
 
-local Tracing = {}
+local Client = {}
 
 -- Tracing timer does the service and instance register
 -- After register successfully, it sends traces and heart beat
-function Tracing:startTimer(metadata_buffer, backend_http_uri)
+function Client:startTimer(metadata_buffer, backend_http_uri)
     -- The codes of timer setup is following the OpenResty timer doc
     local delay = 3  -- in seconds
     local new_timer = ngx.timer.at
@@ -32,6 +32,13 @@ function Tracing:startTimer(metadata_buffer, backend_http_uri)
         if not premature then
             if metadata_buffer['serviceId'] == nil then
                 self:registerService(metadata_buffer, backend_http_uri)
+            end
+
+            -- Register is in the async way, if register successfully, go for instance register
+            if metadata_buffer['serviceId'] ~= nil then
+                if metadata_buffer['serviceInstId'] == nil then
+                    
+                end
             end
 
             -- do the health check
@@ -53,7 +60,7 @@ function Tracing:startTimer(metadata_buffer, backend_http_uri)
 end
 
 -- Register service
-function Tracing:registerService(metadata_buffer, backend_http_uri)
+function Client:registerService(metadata_buffer, backend_http_uri)
     local log = ngx.log
     local DEBUG = ngx.DEBUG
 
@@ -86,4 +93,4 @@ function Tracing:registerService(metadata_buffer, backend_http_uri)
     end
 end
 
-return Tracing
+return Client
