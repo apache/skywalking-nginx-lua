@@ -34,7 +34,34 @@ local SegmentRef = {
     parent_endpoint_id = 0,
 }
 
+-- Due to nesting relationship inside Segment/Span/TracingContext at the runtime,
+-- RefProtocol is created to prepare JSON format serialization.
+-- Following SkyWalking official trace protocol v2
+-- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
+local RefProtocol = {
+    -- Constant in LUA, no cross-thread
+    refType = 'CrossProcess',
+    parentTraceSegmentId,
+    parentSpanId,
+    parentServiceInstanceId,
+    networkAddress,
+    networkAddressId,
+    entryServiceInstanceId,
+    entryEndpoint,
+    entryEndpointId,
+    parentEndpoint,
+    parentEndpointId,
+}
+
 function SegmentRef:new()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+
+    return o
+end
+
+function RefProtocol:new()
     local o = {}
     setmetatable(o, self)
     self.__index = self
@@ -110,6 +137,22 @@ function SegmentRef:serialize()
     encodedRef = encodedRef .. '-' .. Base64.encode(parentEndpoint)
 
     return encodedRef
+end
+
+-- Return RefProtocol
+function SegmentRef:transform()
+    local refBuilder = RefProtocol:new()
+    refBuilder.parentTraceSegmentId = Util:id2String(self.segment_id)
+    refBuilder.parentSpanId = self.span_id
+    refBuilder.parentServiceInstanceId = self.parent_service_instance_id
+    refBuilder.networkAddress = self.network_address
+    refBuilder.networkAddressId = self.network_address_id
+    refBuilder.entryServiceInstanceId = self.entry_service_instance_id
+    refBuilder.entryEndpoint = self.entry_endpoint_name
+    refBuilder.entryEndpointId = self.entry_endpoint_id
+    refBuilder.parentEndpoint = self.parent_endpoint_name
+    refBuilder.parentEndpointId = self.parent_endpoint_id
+    return refBuilder
 end
 
 return SegmentRef

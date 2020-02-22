@@ -18,6 +18,7 @@
 
 local lu = require('luaunit')
 local SegmentRef = require('segment_ref')
+local cjson = require("cjson")
 
 TestSegmentRef = {}
     -- This test is originally from ContextCarrierV2HeaderTest in the Java agent.
@@ -52,6 +53,22 @@ TestSegmentRef = {}
         ref.parent_endpoint_id = 123
 
         lu.assertEquals(ref:serialize(), '1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
+    end
+
+    function TestSegmentRef:testTransform()
+        local ref = SegmentRef:new()
+        ref.trace_id = {3, 4, 5}
+        ref.segment_id = {1, 2, 3}
+        ref.span_id = 4
+        ref.entry_service_instance_id = 1
+        ref.parent_service_instance_id = 1
+        ref.network_address = "127.0.0.1:8080"
+        ref.entry_endpoint_name = "/portal"
+        ref.parent_endpoint_id = 123
+
+        local refProtocol = ref:transform()
+        local inJSON = cjson.encode(refProtocol)
+        lu.assertTrue(string.len(inJSON) > 0)
     end
 -- end TestSegmentRef
 

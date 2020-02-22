@@ -22,7 +22,7 @@ local SpanLayer = require("span_layer")
 
 TestSpan = {}
     function TestSpan:testNewEntry()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
         lu.assertNotNil(context)
 
         local span1 = Span:createEntrySpan("operation_name", context, nil, nil)
@@ -35,7 +35,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNewEntryWithContextCarrier()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
         lu.assertNotNil(context)
 
         -- Typical header from the SkyWalking Java Agent test case
@@ -66,7 +66,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNewExit()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
         lu.assertNotNil(context)
 
         local contextCarrier = {}
@@ -82,7 +82,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNew()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
         lu.assertNotNil(context)
 
         local span1 = Span:new("operation_name", context, nil)
@@ -96,7 +96,7 @@ TestSpan = {}
         lu.assertNotNil(span2.start_time)
 
         -- Use new context to check again
-        context = TC:new(1)
+        context = TC:new(1, 1)
         lu.assertNotNil(context)
 
         span1 = Span:new("operation_name", context, nil)
@@ -106,15 +106,41 @@ TestSpan = {}
     end
 
     function TestSpan:testProperties()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
 
-        local span1 = Span:new("operation_name", context, nil)
+        local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
+        local span1 = Span:createEntrySpan("operation_name", context, nil, header)
         span1:start(1234567)
         lu.assertEquals(span1.start_time, 1234567)
         span1:finish(2222222)
         lu.assertEquals(span1.end_time, 2222222)
         span1:finishWithDuration(123)
         lu.assertEquals(span1.end_time, 1234690)
+
+        span1:tag("key", "value")
+        lu.assertEquals(span1.tags[1], {key='value'})
+
+        lu.assertEquals(#span1.refs, 1)
+        lu.assertEquals(span1.refs[1].network_address, '127.0.0.1:8080')
+    end
+
+    function TestSpan:testTransform()
+        local context = TC:new(1, 1)
+
+        local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
+        local span1 = Span:createEntrySpan("operation_name", context, nil, header)
+        span1:start(1234567)
+        span1:finish(2222222)
+        span1:tag("key", "value")
+        span1:log(123, {logkey="logvalue", logkey1="logvalue2"})
+
+        local spanBuilder = span1:transform()
+        lu.assertEquals(#spanBuilder.refs, 1)
+        lu.assertNil(spanBuilder.spanLayer)
+        lu.assertEquals(#spanBuilder.spanType, "Entry")
+        lu.assertEquals(#spanBuilder.logs, 1)
+        lu.assertEquals(spanBuilder.logs[1].data["logkey"], "logvalue")
+        lu.assertEquals(spanBuilder.logs[1].data["logkey1"], "logvalue2")
     end
 -- end TestSpan
 

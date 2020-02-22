@@ -22,6 +22,7 @@ local Segment = require('segment')
 local TracingContext = {
     trace_id,
     segment_id,
+    service_id,
     service_inst_id,
 
     is_noop = false,
@@ -48,7 +49,7 @@ local Internal = {
     finished_spans,
 }
 
-function TracingContext:new(serviceInstID)
+function TracingContext:new(serviceId, serviceInstID)
     local o = {}
     setmetatable(o, self)
     self.__index = self
@@ -59,6 +60,7 @@ function TracingContext:new(serviceInstID)
 
     o.trace_id = Util:newID()
     o.segment_id = o.trace_id
+    o.service_id = serviceId
     o.service_inst_id = serviceInstID
     o.internal = Internal:new()
     o.internal.owner = o
@@ -112,6 +114,7 @@ function TracingContext:drainAfterFinished()
         local segment = Segment:new()
         segment.trace_id = self.trace_id
         segment.segment_id = self.segment_id
+        segment.service_id = self.service_id
         segment.service_inst_id = self.service_inst_id
         segment.spans = self.internal.finished_spans
         return true, segment

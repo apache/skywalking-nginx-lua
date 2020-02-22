@@ -20,7 +20,7 @@ local TC = require('tracing_context')
 
 TestTracingContext = {}
     function TestTracingContext:testNew()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
         lu.assertNotNil(context)
         lu.assertNotNil(context.segment_id[1])
         lu.assertNotNil(context.segment_id[2])
@@ -30,13 +30,13 @@ TestTracingContext = {}
     end
 
     function TestTracingContext:testInternal_NextSpanSeqID()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
 
         lu.assertEquals(context.internal:nextSpanID(), 0)
     end
 
     function TestTracingContext:testInternal_addActive()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
 
         local mockSpan = {span_id = 0}
         context.internal:addActive(mockSpan)
@@ -45,7 +45,7 @@ TestTracingContext = {}
     end
 
     function TestTracingContext:testSpanStack()
-        local context = TC:new(1)
+        local context = TC:new(1, 1)
         local span1 = context:createEntrySpan('entry_op')
         local span2 = context:createExitSpan("exit_op", span1, "127.0.0.1")
 
