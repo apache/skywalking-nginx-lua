@@ -19,7 +19,7 @@ local Tracing = {}
 
 -- Tracing timer does the service and instance register
 -- After register successfully, it sends traces and heart beat
-function Tracing:startTimer(metadata_buffer)
+function Tracing:startTimer(metadata_buffer, backend_http_uri)
     -- The codes of timer setup is following the OpenResty timer doc
     local delay = 3  -- in seconds
     local new_timer = ngx.timer.at
@@ -31,7 +31,7 @@ function Tracing:startTimer(metadata_buffer)
     check = function(premature)
         if not premature then
             if metadata_buffer['serviceId'] == nil then
-                self:registerService(metadata_buffer)
+                self:registerService(metadata_buffer, backend_http_uri)
             end
 
             -- do the health check
@@ -52,10 +52,11 @@ function Tracing:startTimer(metadata_buffer)
     end
 end
 
-function Tracing:registerService(metadata_buffer)
+-- Register service
+function Tracing:registerService(metadata_buffer, backend_http_uri)
     local log = ngx.log
     local DEBUG = ngx.DEBUG
-    
+
     local serviceName = metadata_buffer['serviceName']
     local cjson = require('cjson')
     local serviceRegister = require("register").newServiceRegister(serviceName)
@@ -63,7 +64,7 @@ function Tracing:registerService(metadata_buffer)
 
     local http = require('resty.http')
     local httpc = http.new()
-    local res, err = httpc:request_uri('http://127.0.0.1:8080/skywalking/register/service', {
+    local res, err = httpc:request_uri(backend_http_uri .. '/register/service', {
         method = "POST",
         body = serviceRegisterParam,
         headers = {
