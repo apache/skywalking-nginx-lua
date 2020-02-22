@@ -71,6 +71,8 @@ TestTracingContext = {}
         lu.assertEquals(span1, segment.spans[2])
 
         local segmentBuilder = segment:transform()
+        local JSON = require('cjson').encode(segmentBuilder)
+        lu.assertTrue(#JSON > 0)
     end
 
     function TestTracingContext:testNewNoOP()
