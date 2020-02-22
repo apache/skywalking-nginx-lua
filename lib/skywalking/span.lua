@@ -242,6 +242,15 @@ function Span:setComponentId(componentId)
     return self
 end
 
+function Span:setLayer(spanLayer)
+    if self.is_noop then
+        return self
+    end
+    self.layer = spanLayer
+
+    return self
+end
+
 function Span:errorOccurred()
     if self.is_noop then
         return self
@@ -256,7 +265,7 @@ function Span:tag(key, value)
         return self
     end
 
-    self.tags[#self.tags + 1] = { key=value }
+    self.tags[key] = value
 
     return self
 end
@@ -299,7 +308,7 @@ function Span:transform()
         spanBuilder.spanType = 'Local'
     end
     if self.layer ~= spanLayer.NONE then
-        spanBuilder.spanLayer = self.span_layer.name
+        spanBuilder.spanLayer = self.layer.name
     end
     spanBuilder.componentId = self.component_id
     spanBuilder.isError = self.error_occurred

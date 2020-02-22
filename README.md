@@ -5,6 +5,8 @@ Apache SkyWalking Nginx Agent
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/asfskywalking.svg?style=for-the-badge&label=Follow&logo=twitter)](https://twitter.com/AsfSkyWalking)
 
+![CI](https://github.com/apache/skywalking-nginx-lua/workflows/CI/badge.svg?branch=master)
+
 
 **SkyWalking** Nginx Agent provides the native tracing capability for Nginx powered by Nginx LUA module. 
 
