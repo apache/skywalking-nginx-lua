@@ -66,9 +66,9 @@ TestTracingContext = {}
         lu.assertEquals(#(activeSpans), 0)
         lu.assertEquals(#(finishedSpans), 2)
 
-        local isSegmentFinished, spanList = context:drainAfterFinished()
-        lu.assertEquals(span2, spanList[1])
-        lu.assertEquals(span1, spanList[2])
+        local isSegmentFinished, segment = context:drainAfterFinished()
+        lu.assertEquals(span2, segment.spans[1])
+        lu.assertEquals(span1, segment.spans[2])
     end
 
     function TestTracingContext:testNewNoOP()

@@ -104,6 +104,18 @@ TestSpan = {}
         lu.assertEquals(span1.parent_span_id, -1)
         lu.assertEquals(span1.span_id, 0)
     end
+
+    function TestSpan:testProperties()
+        local context = TC:new(1)
+
+        local span1 = Span:new("operation_name", context, nil)
+        span1:start(1234567)
+        lu.assertEquals(span1.start_time, 1234567)
+        span1:finish(2222222)
+        lu.assertEquals(span1.end_time, 2222222)
+        span1:finishWithDuration(123)
+        lu.assertEquals(span1.end_time, 1234690)
+    end
 -- end TestSpan
 
 

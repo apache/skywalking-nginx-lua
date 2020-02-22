@@ -17,6 +17,7 @@
 
 local Util = require('util')
 local Span = require('span')
+local Segment = require('segment')
 
 local TracingContext = {
     trace_id,
@@ -97,14 +98,23 @@ end
 -- Notice, it is different with Java agent, a finished context is still able to recreate new span, and be checked as finished again.
 -- This gives the end user more flexibility. Unless it is a real reasonable case, don't call #drainAfterFinished multiple times.
 -- 
--- Return (boolean isSegmentFinished, list SpanList). 
--- SpanList has value only when the isSegmentFinished is true
+-- Return (boolean isSegmentFinished, Segment segment). 
+-- Segment has value only when the isSegmentFinished is true
 -- if isSegmentFinished == false, SpanList = nil
 function TracingContext:drainAfterFinished()
+    if self.is_noop then
+        return true, Segment:new()
+    end
+
     if self.internal.active_count ~= 0 then
         return false, nil
     else
-        return true, self.internal.finished_spans
+        local segment = Segment:new()
+        segment.trace_id = self.trace_id
+        segment.segment_id = self.segment_id
+        segment.service_inst_id = self.service_inst_id
+        segment.spans = self.internal.finished_spans
+        return true, segment
     end
 end
 
@@ -158,7 +168,7 @@ function Internal:finishSpan(span)
     -- span id starts at 0, to fit LUA, we need to plus one.
     self.active_spans[span.span_id + 1] = nil
     self.active_count = self.active_count - 1
-    table.insert(self.finished_spans, span)
+    self.finished_spans[#self.finished_spans + 1] = span
 
     return self.owner
 end

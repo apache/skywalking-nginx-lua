@@ -163,12 +163,39 @@ function Span:newNoOP()
 end
 
 ---- All belowing are instance methods
-function Span:finish()
+
+-- Set start time explicitly
+function Span:start(startTime)
     if self.is_noop then
         return self
     end
 
-    self.end_time = Util.timestamp()
+    self.start_time = startTime
+
+    return self
+end
+
+function Span:finishWithDuration(duration)
+    if self.is_noop then
+        return self
+    end
+
+    self:finish(self.start_time + duration)
+    
+    return self
+end
+
+-- @param endTime, optional.
+function Span:finish(endTime)
+    if self.is_noop then
+        return self
+    end
+
+    if endTime == nil then
+        self.end_time = Util.timestamp()
+    else
+        self.end_time = endTime
+    end
     self.owner.internal:finishSpan(self)
 
     return self
