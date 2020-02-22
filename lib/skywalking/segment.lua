@@ -17,8 +17,7 @@
 
 -- Segment represents a finished tracing context
 -- Including all information to send to the SkyWalking OAP server.
-
-local cjson = require("cjson")
+local Util = require('util')
 
 local Segment = {
     trace_id,
@@ -33,6 +32,8 @@ local Segment = {
 -- Following SkyWalking official trace protocol v2
 -- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
 local SegmentProtocol = {
+    globalTraceIds,
+    traceSegmentId,
     serviceId,
     serviceInstanceId,
     spans,
@@ -46,9 +47,32 @@ function Segment:new()
     return o
 end
 
--- Transform the segment object to the 
+function SegmentProtocol:new()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+
+    o.globalTraceIds = {}
+
+    return o
+end
+
+-- Return SegmentProtocol
 function Segment:transform()
-    return cjson.encode(self)
+    local segmentBuilder = SegmentProtocol:new()
+    segmentBuilder.serviceId = self.service_id
+    segmentBuilder.globalTraceIds[1] = Util:id2String(self.trace_id)
+    segmentBuilder.traceSegmentId = Util:id2String(self.segment_id)
+    segmentBuilder.serviceId = self.service_id
+    segmentBuilder.serviceInstanceId = self.service_inst_id
+
+    segmentBuilder.spans = {}
+    for i, span in ipairs(self.spans)
+    do 
+        segmentBuilder.spans[#segmentBuilder.spans + 1] = span:transform()
+    end
+
+    return segmentBuilder
 end
 
 return Segment

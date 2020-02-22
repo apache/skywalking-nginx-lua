@@ -19,7 +19,6 @@ local lu = require('luaunit')
 local TC = require('tracing_context')
 local Span = require('span')
 local SpanLayer = require("span_layer")
-local cjson = require("cjson")
 
 TestSpan = {}
     function TestSpan:testNewEntry()
@@ -142,10 +141,6 @@ TestSpan = {}
         lu.assertEquals(#spanBuilder.logs, 1)
         lu.assertEquals(spanBuilder.logs[1].data["logkey"], "logvalue")
         lu.assertEquals(spanBuilder.logs[1].data["logkey1"], "logvalue2")
-
-        local inJSON = cjson.encode(spanBuilder)
-        lu.assertTrue(string.len(inJSON) > 0)
-        -- print(inJSON)
     end
 -- end TestSpan
 

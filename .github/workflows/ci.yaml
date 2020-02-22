@@ -48,7 +48,7 @@ jobs:
       - name: 'Install Dependencies'
         run: |
           sudo luarocks install luaunit
-          sudo luarocks install lua-cjson 2.1.0-1
+          sudo luarocks install lua-cjson
       - name: 'Run Tests'
         run: |
           cd lib/skywalking

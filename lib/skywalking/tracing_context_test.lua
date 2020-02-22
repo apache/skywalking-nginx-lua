@@ -69,6 +69,8 @@ TestTracingContext = {}
         local isSegmentFinished, segment = context:drainAfterFinished()
         lu.assertEquals(span2, segment.spans[1])
         lu.assertEquals(span1, segment.spans[2])
+
+        local segmentBuilder = segment:transform()
     end
 
     function TestTracingContext:testNewNoOP()
