@@ -216,3 +216,13 @@ The following components are provided under a MIT license. See project link for 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     base64 dependencies/base64.lua https://github.com/iskolbin/lbase64 MIT
+
+
+========================================================================
+BSD 2-Clause License
+========================================================================
+
+The following components are provided under a BSD 2-Clause License. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+
+   lua-resty-http lib/resty/http.lua lib/resty/http_headers.lua https://github.com/ledgetech/lua-resty-http BSD 2-Clause License
