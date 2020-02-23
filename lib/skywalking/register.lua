@@ -53,4 +53,14 @@ function Register:newServiceInstanceRegister(registeredServiceId, serviceInstUUI
     return serviceInstances
 end
 
+function Register:newServiceInstancePingPkg(registeredServiceInstId, serviceInstUUID, updateTime)
+    local serviceInstancePingPkg = {
+        serviceInstanceId = registeredServiceInstId,
+        time = updateTime,
+        serviceInstanceUUID = serviceInstUUID,
+    }
+
+    return serviceInstancePingPkg
+end
+
 return Register

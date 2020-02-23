@@ -14,7 +14,50 @@ This agent follows the SkyWalking tracing and header protocol. It reports tracin
 All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
 # Setup Doc
-TODO
+```
+http {
+    lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/skywalking/?.lua;;";
+
+    # Buffer represents the register inform and the queue of the finished segment 
+    lua_shared_dict tracing_buffer 100m;
+    
+    # Init is the timer setter and keeper
+    # Setup an infinite loop timer to do register and trace report.
+    init_worker_by_lua_block {
+        local metadata_buffer = ngx.shared.tracing_buffer
+
+        -- Set service name
+        metadata_buffer:set('serviceName', 'User Service Name')
+        -- Instance means the number of Nginx deloyment, does not mean the worker instances
+        metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
+
+        require("client"):startBackendTimer("http://127.0.0.1:8080")
+    }
+
+    server {
+        listen 8080;
+
+        location /ingress {
+            default_type text/html;
+
+            rewrite_by_lua_block {
+                require("tracer"):start()
+            }
+
+            -- Target upstream service
+            proxy_pass http://127.0.0.1:8080/backend;
+
+            body_filter_by_lua_block {
+                require("tracer"):finish()
+            }
+
+            log_by_lua_block {
+                require("tracer"):prepareForReport()
+            }
+        }
+    }
+}
+```
 
 # Set up dev env
 All codes in the `lib/skywalking` require the `*_test.lua` to do the UnitTest. To run that, you need to install
@@ -29,6 +72,22 @@ The following libs are required in runtime or test cases, please use `LuaRocks` 
 This LUA tracing lib is originally designed for Nginx+LUA/OpenResty ecosystems. But we write it to support more complex cases.
 If you just use this in the Ngnix, [Setup Doc](#setup-doc) should be good enough.
 The following APIs are for developers or using this lib out of the Nginx case.
+
+## Nginx APIs
+- **startTimer**, `require("client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
+- **start**, `require("tracer"):start()`. Begin the tracing before the upstream begin.
+- **finish**, `require("tracer"):finish()`. Finish the tracing for this HTTP request.
+- **prepareForReport**, `require("tracer"):prepareForReport()`. Prepare the finished segment for further report.
+
+## Tracing APIs at LUA level
+**TracingContext** is the entrance API for lua level tracing.
+- `TracingContext:new(serviceId, serviceInstID)`, create an active tracing context.
+- `TracingContext:newNoOP()`, create a no OP tracing context.
+- `TracingContext:drainAfterFinished()`, fetch the segment includes all finished spans.
+
+Create 2 kinds of span
+- `TracingContext:createEntrySpan(operationName, parent, contextCarrier)`
+- `TracingContext:createExitSpan(operationName, parent, peer, contextCarrier)`
 
 
 # Download
