@@ -142,7 +142,7 @@ end
 -- Return RefProtocol
 function SegmentRef:transform()
     local refBuilder = RefProtocol:new()
-    refBuilder.parentTraceSegmentId = Util:id2String(self.segment_id)
+    refBuilder.parentTraceSegmentId = {idParts = self.segment_id }
     refBuilder.parentSpanId = self.span_id
     refBuilder.parentServiceInstanceId = self.parent_service_instance_id
     refBuilder.networkAddress = self.network_address

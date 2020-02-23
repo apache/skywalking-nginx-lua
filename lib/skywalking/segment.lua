@@ -61,8 +61,8 @@ end
 function Segment:transform()
     local segmentBuilder = SegmentProtocol:new()
     segmentBuilder.serviceId = self.service_id
-    segmentBuilder.globalTraceIds[1] = Util:id2String(self.trace_id)
-    segmentBuilder.traceSegmentId = Util:id2String(self.segment_id)
+    segmentBuilder.globalTraceIds[1] = { idParts = self.trace_id}
+    segmentBuilder.traceSegmentId = { idParts = self.segment_id}
     segmentBuilder.serviceId = self.service_id
     segmentBuilder.serviceInstanceId = self.service_inst_id
 
