@@ -37,8 +37,12 @@ function Client:startTimer(metadata_buffer, backend_http_uri)
             -- Register is in the async way, if register successfully, go for instance register
             if metadata_buffer['serviceId'] ~= nil then
                 if metadata_buffer['serviceInstId'] == nil then
-                    
+                    self:registerServiceInstance(metadata_buffer, backend_http_uri)
                 end
+            end
+
+            -- After all register successfully, begin to send trace segments
+            if metadata_buffer['serviceInstId'] ~= nil then
             end
 
             -- do the health check
@@ -65,8 +69,9 @@ function Client:registerService(metadata_buffer, backend_http_uri)
     local DEBUG = ngx.DEBUG
 
     local serviceName = metadata_buffer['serviceName']
+    
     local cjson = require('cjson')
-    local serviceRegister = require("register").newServiceRegister(serviceName)
+    local serviceRegister = require("register"):newServiceRegister(serviceName)
     local serviceRegisterParam = cjson.encode(serviceRegister)
 
     local http = require('resty.http')
@@ -80,6 +85,7 @@ function Client:registerService(metadata_buffer, backend_http_uri)
     })
 
     if #res.body > 0 then
+        log(DEBUG, "Service register response = " .. res.body)
         local registerResults = cjson.decode(res.body)
 
         for i, result in ipairs(registerResults)
@@ -88,6 +94,45 @@ function Client:registerService(metadata_buffer, backend_http_uri)
                 local serviceId = result.value 
                 log(DEBUG, "Service registered, service id = " .. serviceId)
                 metadata_buffer['serviceId'] = serviceId
+            end
+        end
+    end
+end
+
+-- Register service instance
+function Client:registerServiceInstance(metadata_buffer, backend_http_uri)
+    local log = ngx.log
+    local DEBUG = ngx.DEBUG
+
+    local serviceInstName = 'name:' .. metadata_buffer['serviceInstanceName']
+
+    local cjson = require('cjson')
+    local serviceInstanceRegister = require("register"):newServiceInstanceRegister(
+        metadata_buffer['serviceId'], 
+        serviceInstName, 
+        ngx.now() * 1000)
+    local serviceInstanceRegisterParam = cjson.encode(serviceInstanceRegister)
+
+    local http = require('resty.http')
+    local httpc = http.new()
+    local res, err = httpc:request_uri(backend_http_uri .. '/register/serviceInstance', {
+        method = "POST",
+        body = serviceInstanceRegisterParam,
+        headers = {
+            ["Content-Type"] = "application/json",
+        },
+    })
+
+    if #res.body > 0 then
+        log(DEBUG, "Service Instance register response = " .. res.body)
+        local registerResults = cjson.decode(res.body)
+
+        for i, result in ipairs(registerResults)
+        do
+            if result.key == serviceInstName then
+                local serviceId = result.value 
+                log(DEBUG, "Service Instance registered, service instance id = " .. serviceId)
+                metadata_buffer['serviceInstId'] = serviceId
             end
         end
     end

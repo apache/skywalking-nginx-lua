@@ -168,7 +168,7 @@ function Span:new(operationName, context, parent)
     end 
 
     context.internal:addActive(o)
-    o.start_time = Util.timestamp()
+    -- o.start_time = Util.timestamp()
     o.refs = {}
     o.owner = context
     o.tags = {}

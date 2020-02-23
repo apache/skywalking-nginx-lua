@@ -15,39 +15,42 @@
 -- limitations under the License.
 -- 
 
-local Services = {
-    services
-}
-
-local Service = {
-    serviceName,
-    -- Field type is optional, default value is `normal`
-    type = 'normal'
-}
-
-local ServiceInstances = {
-    instances
-}
-
-local ServiceInstance = {
-    serviceId,
-    instanceUUID,
-    time,
-    tags,
-    properties
-}
-
 local Register = {}
 
 -- Return Services as service register parameter
-function Register:newServiceRegister(serviceName)
-    local o = {}
-    setmetatable(o, Service)
-    Service.__index = Service
+function Register:newServiceRegister(unRegisterServiceName)
+    local serv = {
+        services = {}
+    }
+    
+    local service = {
+        serviceName = unRegisterServiceName,
+        -- Field type is optional, default value is `normal`
+        type = 'normal'
+    }
 
-    o.serviceName = serviceName
+    serv.services[#serv.services + 1] = service
 
-    return o
+    return serv
+end
+
+function Register:newServiceInstanceRegister(registeredServiceId, serviceInstUUID, registerTime)
+    local serviceInstances = {
+        instances = {}
+    }
+    
+    local serviceInstance = {
+        serviceId = registeredServiceId,
+        instanceUUID = serviceInstUUID,
+        time = registerTime,
+        properties = {}
+    }
+
+    serviceInstance.properties[#serviceInstance.properties + 1] = {key = "language", value = "Lua"}
+
+    serviceInstances.instances[#serviceInstances.instances + 1] = serviceInstance
+
+    return serviceInstances
 end
 
 return Register
