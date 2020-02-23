@@ -93,6 +93,8 @@ TestSpan = {}
         local span2 = Span:new("operation_name", context, span1)
         lu.assertEquals(span2.parent_span_id, 0)
         lu.assertEquals(span2.span_id, 1)
+        lu.assertNil(span2.start_time)
+        span2:start(123456)
         lu.assertNotNil(span2.start_time)
 
         -- Use new context to check again

@@ -76,7 +76,7 @@ function Client:registerService(metadata_buffer, backend_http_uri)
 
     local http = require('resty.http')
     local httpc = http.new()
-    local res, err = httpc:request_uri(backend_http_uri .. '/register/service', {
+    local res, err = httpc:request_uri(backend_http_uri .. '/v2/service/register', {
         method = "POST",
         body = serviceRegisterParam,
         headers = {
@@ -115,7 +115,7 @@ function Client:registerServiceInstance(metadata_buffer, backend_http_uri)
 
     local http = require('resty.http')
     local httpc = http.new()
-    local res, err = httpc:request_uri(backend_http_uri .. '/register/serviceInstance', {
+    local res, err = httpc:request_uri(backend_http_uri .. '/v2/instance/register', {
         method = "POST",
         body = serviceInstanceRegisterParam,
         headers = {
