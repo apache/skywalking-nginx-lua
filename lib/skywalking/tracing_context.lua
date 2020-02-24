@@ -110,6 +110,8 @@ function TracingContext:drainAfterFinished()
 
     if self.internal.active_count ~= 0 then
         return false, nil
+    elseif #self.internal.finished_spans == 0 then
+        return false, nil
     else
         local segment = Segment:new()
         segment.trace_id = self.trace_id
