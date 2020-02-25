@@ -48,7 +48,9 @@ http {
             proxy_pass http://127.0.0.1:8080/backend;
 
             body_filter_by_lua_block {
-                require("tracer"):finish()
+                if ngx.arg[2] then
+                    require("tracer"):finish()
+                end
             }
 
             log_by_lua_block {
