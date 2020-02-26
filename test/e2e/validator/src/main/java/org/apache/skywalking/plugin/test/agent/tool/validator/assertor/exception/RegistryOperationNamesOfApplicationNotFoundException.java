@@ -30,6 +30,6 @@ public class RegistryOperationNamesOfApplicationNotFoundException extends Assert
     @Override
     public String getCauseMessage() {
         return String.format("RegistryOperationNamesOfApplicationNotFoundException %s\nexpected: %s\nactual: %s\n", applicationCode
-            .applicationCode(), applicationCode.operationName(), "NOT FOUND");
+            .serviceName(), applicationCode.operationName(), "NOT FOUND");
     }
 }

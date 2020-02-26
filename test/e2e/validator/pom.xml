@@ -109,12 +109,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M4</version>
+                    <version>${maven-failsafe-plugin.version}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.maven.surefire</groupId>
                             <artifactId>surefire-junit4</artifactId>
-                            <version>3.0.0-M4</version>
+                            <version>${maven-failsafe-plugin.version}</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -187,19 +187,21 @@
                             <alias>openresty-with-skywalking</alias>
                             <run>
                                 <ports>
-                                    <port>nginx.port:8080</port>
+                                    <port>+nginx.host:nginx.port:8080</port>
                                 </ports>
                                 <volumes>
                                     <bind>
                                         <volume>${project.build.testOutputDirectory}/logs:/var/log/nginx</volume>
                                         <volume>${project.basedir}/docker/conf.d:/var/nginx/conf.d</volume>
-                                        <volume>${project.basedir}/../../../lib/skywalking:/skywalking-nginx-lua/lib/skywalking</volume>
+                                        <volume>
+                                            ${project.basedir}/../../../lib/skywalking:/skywalking-nginx-lua/lib/skywalking
+                                        </volume>
                                     </bind>
                                 </volumes>
                                 <wait>
                                     <http>
                                         <url>
-                                            http://${docker.host.address}:${nginx.port}/ingress
+                                            http://${docker.host.address}:${nginx.port}/backend
                                         </url>
                                     </http>
                                     <time>30000</time>
@@ -223,6 +225,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <ping.url>
+                            http://${nginx.host}:${nginx.port}/ingress
+                        </ping.url>
+                    </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

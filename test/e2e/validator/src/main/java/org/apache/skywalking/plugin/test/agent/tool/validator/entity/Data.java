@@ -56,5 +56,21 @@ public interface Data {
                 return result;
             }
         }
+
+        public static Data loadData(String data) {
+            Constructor constructor = new Constructor(DataForRead.class);
+            TypeDescription configDescription = new TypeDescription(DataForRead.class);
+            configDescription.putListPropertyType("data", DataForRead.class);
+
+            Representer representer = new Representer();
+            representer.getPropertyUtils().setSkipMissingProperties(true);
+            Yaml yaml = new Yaml(constructor, representer);
+            Data result = yaml.loadAs(data, DataForRead.class);
+            if (result == null) {
+                throw new RuntimeException();
+            } else {
+                return result;
+            }
+        }
     }
 }

@@ -46,11 +46,12 @@ public class DataAssertIT {
     @Test
     public void testAssertFunction() throws InterruptedException, IOException {
         TimeUnit.SECONDS.sleep(2L);
-//        URLConnection connection = new URL(
+        System.out.println(System.getProperty("ping.url"));
+        URLConnection connection = new URL(System.getProperty("ping.url")).openConnection(); //
 //            "http://localhost:" + System.getProperty("nginx.port") + "/ingress").openConnection();
-//        connection.connect();
-//        System.out.println(connection.getContent());
-//        TimeUnit.SECONDS.sleep(4L);
+        connection.connect();
+        System.out.println(connection.getContent());
+        TimeUnit.SECONDS.sleep(4L);
 
         while (true) {
             final DataCollector collector = new DataCollector();
@@ -91,6 +92,7 @@ public class DataAssertIT {
                 if (!collector.hasSegments()) {
                     throw new NullPointerException();
                 }
+
                 System.out.println(yaml.dump(yaml.load(gson.toJson(collector.collect()))));
                 DataAssert.assertEquals(
                     Data.Loader.loadData(DataCollector.class.getResourceAsStream("/expectedData.yaml")),
