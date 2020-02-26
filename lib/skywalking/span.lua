@@ -171,8 +171,6 @@ function Span:new(operationName, context, parent)
     -- o.start_time = Util.timestamp()
     o.refs = {}
     o.owner = context
-    o.tags = {}
-    o.logs = {}
 
     return o
 end
@@ -265,6 +263,10 @@ function Span:tag(tagKey, tagValue)
         return self
     end
 
+    if self.tags == nil then
+        self.tags = {}
+    end
+
     local tag = {key = tagKey, value = tagValue}
     self.tags[#self.tags + 1] = tag
 
@@ -275,6 +277,10 @@ end
 function Span:log(timestamp, keyValuePairs)
     if self.is_noop then
         return self
+    end
+
+    if self.logs == nil then
+        self.logs = {}
     end
 
     local logEntity = {time = timestamp, data = keyValuePairs}

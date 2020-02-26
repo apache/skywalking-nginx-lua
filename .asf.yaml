@@ -16,7 +16,7 @@
 #
 
 github:
-    description: APM, Application Performance Monitoring System
+    description: The Nginx Lua agent for Apache SkyWalking
     homepage: https://skywalking.apache.org/
     labels:
       - skywalking

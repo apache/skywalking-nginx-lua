@@ -67,9 +67,12 @@ function Segment:transform()
     segmentBuilder.serviceInstanceId = self.service_inst_id
 
     segmentBuilder.spans = {}
-    for i, span in ipairs(self.spans)
-    do 
-        segmentBuilder.spans[#segmentBuilder.spans + 1] = span:transform()
+
+    if self.spans ~= nil and #self.spans > 0 then
+        for i, span in ipairs(self.spans)
+        do 
+            segmentBuilder.spans[#segmentBuilder.spans + 1] = span:transform()
+        end
     end
 
     return segmentBuilder
