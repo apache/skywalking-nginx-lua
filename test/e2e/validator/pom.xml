@@ -29,12 +29,17 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <junit.version>4.11</junit.version>
-        <guava.version>20.0</guava.version>
-        <gson.version>2.8.5</gson.version>
-        <lombok.version>1.18.10</lombok.version>
-        <snakeyaml.version>1.24</snakeyaml.version>
         <java.version>1.8</java.version>
+
+        <junit.version>4.11</junit.version>
+        <gson.version>2.8.5</gson.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>2.9.0</log4j.version>
+        <guava.version>28.1-jre</guava.version>
+        <snakeyaml.version>1.18</snakeyaml.version>
+        <gson.version>2.8.6</gson.version>
+        <lombok.version>1.18.10</lombok.version>
+
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
@@ -73,7 +78,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.0</version>
+            <version>${gson.version}</version>
         </dependency>
 
         <dependency>
@@ -90,15 +95,33 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.8.1</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.8.1</version>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -201,7 +224,7 @@
                                 <wait>
                                     <http>
                                         <url>
-                                            http://${docker.host.address}:${nginx.port}/backend
+                                            http://${docker.host.address}:${nginx.port}
                                         </url>
                                     </http>
                                     <time>30000</time>

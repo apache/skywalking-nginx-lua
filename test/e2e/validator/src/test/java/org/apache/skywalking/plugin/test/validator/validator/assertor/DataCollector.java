@@ -26,9 +26,11 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.skywalking.plugin.test.validator.validator.assertor.entity.ExpectedDataEntity;
 import org.apache.skywalking.plugin.test.validator.validator.assertor.entity.RegistryItemsEntity;
 
+@Slf4j
 public class DataCollector {
     // For SegmentItems
     private Map<String, List<JsonObject>> serviceAndSegments = Maps.newHashMap();
@@ -54,52 +56,58 @@ public class DataCollector {
 
     public DataCollector addSegmentItem(JsonElement element) {
         final JsonElement spans = element.getAsJsonObject().get("spans");
+        if (spans.getAsJsonArray().size() == 0) {
+            return this;
+        }
 
-        JsonObject object = new JsonObject();
-        object.addProperty("segmentId", "1.159.00000000000000000");
-        object.add("spans", spans);
+        try {
+            JsonObject segment = new JsonObject();
+            segment.addProperty("segmentId", "1.159.00000000000000000");
+            segment.add("spans", spans);
 
-        final int serviceId = element.getAsJsonObject().get("serviceId").getAsInt();
-        final String serviceName = serviceMap.get(serviceId);
+            final int serviceId = element.getAsJsonObject().get("serviceId").getAsInt();
+            final String serviceName = serviceMap.get(serviceId);
 
-        spans.getAsJsonArray().forEach(span -> {
-            JsonObject jsonObject = span.getAsJsonObject();
+            spans.getAsJsonArray().forEach(span -> {
+                JsonObject jsonObject = span.getAsJsonObject();
 
-            // extract operation name
-            List<String> operations = serviceAndOperations.getOrDefault(serviceName, Lists.newArrayList());
-            operations.add(jsonObject.get("operationName").getAsString());
-            serviceAndOperations.put(serviceName, operations);
+                // extract operation name
+                List<String> operations = serviceAndOperations.getOrDefault(serviceName, Lists.newArrayList());
+                operations.add(jsonObject.get("operationName").getAsString());
+                serviceAndOperations.put(serviceName, operations);
 
-            // remove unless properties
-            JsonElement refs = jsonObject.get("refs");
-            if (refs != null) {
-                if (refs.isJsonObject()) {
-                    jsonObject.remove("refs");
-                } else {
-                    refs.getAsJsonArray().forEach(el -> {
-//                        el.getAsJsonObject().remove("parentTraceSegmentId");
-                        el.getAsJsonObject().addProperty("parentTraceSegmentId", "parentTraceSegmentId");
-                    });
+                // remove unless properties
+                JsonElement refs = jsonObject.get("refs");
+                if (refs != null) {
+                    if (refs.isJsonObject()) {
+                        jsonObject.remove("refs");
+                    } else {
+                        refs.getAsJsonArray().forEach(el -> {
+                            el.getAsJsonObject().addProperty("parentTraceSegmentId", "parentTraceSegmentId");
+                        });
+                    }
                 }
-            }
-            JsonElement logs = jsonObject.get("logs");
-            if (logs != null) {
-                if (logs.isJsonObject()) {
-                    jsonObject.remove("logs");
+                JsonElement logs = jsonObject.get("logs");
+                if (logs != null) {
+                    if (logs.isJsonObject()) {
+                        jsonObject.remove("logs");
+                    }
                 }
-            }
-            JsonElement tags = jsonObject.get("tags");
-            if (tags != null) {
-                if (tags.isJsonObject()) {
-                    jsonObject.remove("tags");
+                JsonElement tags = jsonObject.get("tags");
+                if (tags != null) {
+                    if (tags.isJsonObject()) {
+                        jsonObject.remove("tags");
+                    }
                 }
-            }
-        });
+            });
 
-        List<JsonObject> segments = serviceAndSegments.getOrDefault(serviceName, Lists.newArrayList());
-        segments.add(object);
+            List<JsonObject> segments = serviceAndSegments.getOrDefault(serviceName, Lists.newArrayList());
+            segments.add(segment);
 
-        serviceAndSegments.put(serviceName, segments);
+            serviceAndSegments.put(serviceName, segments);
+        } catch (Exception e) {
+            log.error(element.toString(), e);
+        }
         return this;
     }
 
@@ -121,7 +129,6 @@ public class DataCollector {
 
     private List<JsonObject> getSegmentItems() {
         return serviceAndSegments.entrySet().stream().map(e -> {
-//            Map<String, Object> item = Maps.newHashMap();
             JsonObject item = new JsonObject();
             item.addProperty("serviceName", e.getKey());
             item.addProperty("segmentSize", e.getValue().size());

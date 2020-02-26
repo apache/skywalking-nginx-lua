@@ -17,6 +17,7 @@
 
 package org.apache.skywalking.plugin.test.validator.validator.assertor;
 
+import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,36 +29,32 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.skywalking.plugin.test.agent.tool.validator.assertor.DataAssert;
 import org.apache.skywalking.plugin.test.agent.tool.validator.entity.Data;
 import org.apache.skywalking.plugin.test.agent.tool.validator.entity.DataForRead;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.yaml.snakeyaml.Yaml;
 
-@RunWith(JUnit4.class)
+@Slf4j
 public class DataAssertIT {
-    private static Logger logger = LogManager.getLogger(DataAssertIT.class);
-    Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
     @Test
     public void testAssertFunction() throws InterruptedException, IOException {
-        TimeUnit.SECONDS.sleep(2L);
-        System.out.println(System.getProperty("ping.url"));
-        URLConnection connection = new URL(System.getProperty("ping.url")).openConnection(); //
-//            "http://localhost:" + System.getProperty("nginx.port") + "/ingress").openConnection();
-        connection.connect();
-        System.out.println(connection.getContent());
-        TimeUnit.SECONDS.sleep(4L);
+        TimeUnit.SECONDS.sleep(10L); // wait for agent registry
 
-        while (true) {
+        URLConnection connection = new URL(System.getProperty("ping.url")).openConnection();
+        connection.connect();
+        log.info("Http Response: {}", new String(ByteStreams.toByteArray(connection.getInputStream())));
+
+        TimeUnit.SECONDS.sleep(6L);
+
+        for (int times = 0; times < 30; times++) { // retry 30 times, that will spend 60s in the worst case.
             final DataCollector collector = new DataCollector();
             URL url = DataAssertIT.class.getResource("/logs/trace.log");
             List<String> lines = Files.readAllLines(new File(url.getFile()).toPath());
-            logger.info("lines : {}", lines.size());
+            log.info("lines : {}", lines.size());
 
             for (int i = 0; i < lines.size() - 1; i++) {
                 String[] pair = lines.get(i).split(" ", 2);
@@ -83,6 +80,7 @@ public class DataAssertIT {
                         collector.addSegmentItem(element);
                     }
                     default: {
+                        // TODO throw a unknown exception
                     }
                 }
             }
@@ -94,14 +92,15 @@ public class DataAssertIT {
                 }
 
                 System.out.println(yaml.dump(yaml.load(gson.toJson(collector.collect()))));
+
                 DataAssert.assertEquals(
                     Data.Loader.loadData(DataCollector.class.getResourceAsStream("/expectedData.yaml")),
-                    yaml.loadAs(gson.toJson(collector.collect()), DataForRead.class)
+                    Data.Loader.loadData(gson.toJson(collector.collect()))
                 );
                 return;
             } catch (Exception e) {
                 TimeUnit.SECONDS.sleep(2L);
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
