@@ -61,7 +61,14 @@ jobs:
           sudo apt-get install -y cpanminus
           sudo cpanm --notest Test::Nginx >build.log 2>&1 || (cat build.log && exit 1)
           git clone https://github.com/iresty/test-nginx.git test-nginx
-
+      - name: 'Run Lua Tests'
+        run: |
+          cd lib/skywalking
+          lua util_test.lua
+          lua span_test.lua
+          lua tracing_context_test.lua
+          lua segment_ref_test.lua
+          cd ..
       - name: 'Run Nginx Lua Tests'
         run: |
           export PATH=/usr/local/openresty-debug/nginx/sbin:/usr/local/openresty-debug/luajit/bin:$/usr/local/openresty-debug/bin:$PATH

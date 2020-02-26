@@ -14,9 +14,41 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
-local ngx_re = require("ngx.re")
-
 local _M = {}
+
+-- for pure Lua
+local split = function(str, delimiter)
+    local t = {}
+    for substr in string.gmatch(str, "[^".. delimiter.. "]*") do
+        if substr ~= nil and string.len(substr) > 0 then
+            table.insert(t,substr)
+        end
+    end
+    return t
+end
+
+local timestamp = function()
+    local _, b = math.modf(os.clock())
+    if b==0 then
+        b='000'
+    else
+        b=tostring(b):sub(3,5)
+    end
+
+    return os.time() * 1000 + b
+end
+
+-- for Nginx Lua
+local ok, ngx_re = pcall(require, "ngx.re")
+if ok then
+    split = ngx_re.split
+    timestamp = function()
+        return ngx.now() * 1000
+    end
+end
+
+_M.split = split
+_M.timestamp = timestamp
 
 local MAX_ID_PART2 = 1000000000
 local MAX_ID_PART3 = 100000
@@ -46,11 +78,6 @@ end
 
 math.randomseed(random_seed())
 
-local function timestamp()
-    return ngx.now() * 1000
-end
-_M.timestamp = timestamp
-
 function _M.newID()
     local seq = metadata_buffer:incr("SEQ", 1, 0)
     return {timestamp(), math.random(0, MAX_ID_PART2), math.random(0, MAX_ID_PART3) + seq}
@@ -59,7 +86,7 @@ end
 -- Format a trace/segment id into an array.
 -- An official ID should have three parts separated by '.' and each part of it is a number
 function _M.formatID(str)
-    local parts = ngx_re.split(str, '.')
+    local parts = split(str, '.')
     if #parts ~= 3 then
         return nil
     end
