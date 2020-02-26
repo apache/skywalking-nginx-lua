@@ -199,7 +199,7 @@
                                 <wait>
                                     <http>
                                         <url>
-                                            http://localhost:${nginx.port}/ingress
+                                            http://${docker.host.address}:${nginx.port}/ingress
                                         </url>
                                     </http>
                                     <time>30000</time>
@@ -223,11 +223,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <nginx.port>${nginx.port}</nginx.port>
-                    </systemPropertyVariables>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
