@@ -1,34 +1,65 @@
--- 
+--
 -- Licensed to the Apache Software Foundation (ASF) under one or more
 -- contributor license agreements.  See the NOTICE file distributed with
 -- this work for additional information regarding copyright ownership.
 -- The ASF licenses this file to You under the Apache License, Version 2.0
 -- (the "License"); you may not use this file except in compliance with
 -- the License.  You may obtain a copy of the License at
--- 
+--
 --    http://www.apache.org/licenses/LICENSE-2.0
--- 
+--
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
--- 
+--
+local ngx_re = require("ngx.re")
 
-local Util = {}
+local _M = {}
+
 local MAX_ID_PART2 = 1000000000
 local MAX_ID_PART3 = 100000
-local SEQ = 1
+local metadata_buffer = ngx.shared.tracing_buffer
 
-function Util:newID()
-    SEQ = SEQ + 1
-    return {Util.timestamp(), math.random( 0, MAX_ID_PART2), math.random( 0, MAX_ID_PART3) + SEQ}
+local random_seed = function ()
+    local seed
+    local frandom = io.open("/dev/urandom", "rb")
+    if frandom then
+        local str = frandom:read(4)
+        frandom:close()
+        if str then
+            local s = 0
+            for i = 1, 4 do
+                s = 256 * s + str:byte(i)
+            end
+            seed = s
+        end
+    end
+
+    if not seed then
+        seed = ngx.now() * 1000 + ngx.worker.pid()
+    end
+
+    return seed
+end
+
+math.randomseed(random_seed())
+
+local function timestamp()
+    return ngx.now() * 1000
+end
+_M.timestamp = timestamp
+
+function _M.newID()
+    local seq = metadata_buffer:incr("SEQ", 1, 0)
+    return {timestamp(), math.random(0, MAX_ID_PART2), math.random(0, MAX_ID_PART3) + seq}
 end
 
 -- Format a trace/segment id into an array.
 -- An official ID should have three parts separated by '.' and each part of it is a number
-function Util:formatID(str) 
-    local parts = Util:split(str, '.')
+function _M.formatID(str)
+    local parts = ngx_re.split(str, '.')
     if #parts ~= 3 then
         return nil
     end
@@ -41,36 +72,8 @@ function Util:formatID(str)
 end
 
 -- @param id is an array with length = 3
-function Util:id2String(id)
+function _M.id2String(id)
     return id[1] .. '.' .. id[2] .. '.' .. id[3]
 end
 
--- A simulation implementation of Java's System.currentTimeMillis() by following the SkyWalking protocol.
--- Return the difference as string, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
--- But in using os.clock(), I am not sure whether it is accurate enough.
-function Util:timestamp()
-    local a,b = math.modf(os.clock())
-    if b==0 then 
-        b='000' 
-    else 
-        b=tostring(b):sub(3,5) 
-    end
-
-    return os.time() * 1000 + b
-end
-
--- Split the given string by the delimiter. The delimiter should be a literal string, such as '.', '-'
-function Util:split(str, delimiter)
-    local t = {}
-
-    for substr in string.gmatch(str, "[^".. delimiter.. "]*") do
-        if substr ~= nil and string.len(substr) > 0 then
-            table.insert(t,substr)
-        end
-    end
-
-    return t
-end
-
-
-return Util
+return _M
