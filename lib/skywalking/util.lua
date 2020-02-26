@@ -53,7 +53,6 @@ _M.is_ngx_lua = ok
 
 local MAX_ID_PART2 = 1000000000
 local MAX_ID_PART3 = 100000
-local SEQ = 1
 
 local random_seed = function ()
     local seed
@@ -84,15 +83,7 @@ end
 math.randomseed(random_seed())
 
 function _M.newID()
-    local seq
-    if _M.is_ngx_lua then
-        local metadata_buffer = ngx.shared.tracing_buffer
-        seq = metadata_buffer:incr("SEQ", 1, 0)
-    else
-        SEQ = SEQ + 1
-        seq = SEQ
-    end
-    return {timestamp(), math.random(0, MAX_ID_PART2), math.random(0, MAX_ID_PART3) + seq}
+    return {timestamp(), math.random(0, MAX_ID_PART2), math.random(0, MAX_ID_PART3)}
 end
 
 -- Format a trace/segment id into an array.

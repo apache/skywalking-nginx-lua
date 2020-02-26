@@ -14,7 +14,6 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
-local ngx_re = require("ngx.re")
 local Util = require('util')
 local Base64 = require('dependencies/base64')
 
@@ -71,13 +70,13 @@ end
 
 -- Deserialize value from the propagated context and initialize the SegmentRef
 function SegmentRef:fromSW6Value(value)
-    local parts = ngx_re.split(value, '-')
+    local parts = Util.split(value, '-')
     if #parts ~= 9 then
         return nil
     end
 
-    self.trace_id = Util:formatID(Base64.decode(parts[2]))
-    self.segment_id = Util:formatID(Base64.decode(parts[3]))
+    self.trace_id = Util.formatID(Base64.decode(parts[2]))
+    self.segment_id = Util.formatID(Base64.decode(parts[3]))
     self.span_id = tonumber(parts[4])
     self.parent_service_instance_id = tonumber(parts[5])
     self.entry_service_instance_id = tonumber(parts[6])
@@ -106,8 +105,8 @@ end
 -- Return string to represent this ref.
 function SegmentRef:serialize()
     local encodedRef = '1'
-    encodedRef = encodedRef .. '-' .. Base64.encode(Util:id2String(self.trace_id))
-    encodedRef = encodedRef .. '-' .. Base64.encode(Util:id2String(self.segment_id))
+    encodedRef = encodedRef .. '-' .. Base64.encode(Util.id2String(self.trace_id))
+    encodedRef = encodedRef .. '-' .. Base64.encode(Util.id2String(self.segment_id))
     encodedRef = encodedRef .. '-' .. self.span_id
     encodedRef = encodedRef .. '-' .. self.parent_service_instance_id
     encodedRef = encodedRef .. '-' .. self.entry_service_instance_id
