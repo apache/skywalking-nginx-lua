@@ -19,10 +19,11 @@ name: CI
 on:
   pull_request:
   push:
-    branches:
+    branches: 
       - master
     tags:
       - 'v*'
+    
 
 jobs:
   CI:
@@ -48,28 +49,10 @@ jobs:
         run: |
           sudo luarocks install luaunit
           sudo luarocks install lua-cjson 2.1.0-1
-      - name: "Install OpenResty"
-        run: |
-          wget -qO - https://openresty.org/package/pubkey.gpg | sudo apt-key add -
-          sudo apt-get -y update --fix-missing
-          sudo apt-get -y install software-properties-common
-          sudo add-apt-repository -y "deb http://openresty.org/package/ubuntu $(lsb_release -sc) main"
-          sudo apt-get update
-          sudo apt-get install openresty-debug
-      - name: "Install test::nginx for testing"
-        run: |
-          sudo apt-get install -y cpanminus
-          sudo cpanm --notest Test::Nginx >build.log 2>&1 || (cat build.log && exit 1)
-          git clone https://github.com/iresty/test-nginx.git test-nginx
-      - name: 'Run Lua Tests'
+      - name: 'Run Tests'
         run: |
           cd lib/skywalking
           lua util_test.lua
-          lua span_test.lua
-          lua tracing_context_test.lua
-          lua segment_ref_test.lua
-          cd ..
-      - name: 'Run Nginx Lua Tests'
-        run: |
-          export PATH=/usr/local/openresty-debug/nginx/sbin:/usr/local/openresty-debug/luajit/bin:$/usr/local/openresty-debug/bin:$PATH
-          prove -Itest-nginx/lib -r t
+          lua span_test.lua 
+          lua tracing_context_test.lua 
+          lua segment_ref_test.lua 
