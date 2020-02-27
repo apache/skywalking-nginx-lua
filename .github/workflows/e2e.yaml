@@ -23,7 +23,6 @@ on:
       - master
     tags:
       - 'v*'
-    
 
 jobs:
   agent:
