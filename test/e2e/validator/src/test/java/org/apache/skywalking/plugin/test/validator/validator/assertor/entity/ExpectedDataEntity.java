@@ -20,24 +20,10 @@ package org.apache.skywalking.plugin.test.validator.validator.assertor.entity;
 
 import com.google.gson.JsonObject;
 import java.util.List;
+import lombok.Data;
 
+@Data
 public class ExpectedDataEntity {
-    RegistryItemsEntity registryItems;
-    List<JsonObject> segmentItems;
-
-    public void setRegistryItems(final RegistryItemsEntity registryItems) {
-        this.registryItems = registryItems;
-    }
-
-    public RegistryItemsEntity getRegistryItems() {
-        return registryItems;
-    }
-
-    public List<JsonObject> getSegmentItems() {
-        return segmentItems;
-    }
-
-    public void setSegmentItems(final List<JsonObject> segmentItems) {
-        this.segmentItems = segmentItems;
-    }
+    private RegistryItemsEntity registryItems;
+    private List<JsonObject> segmentItems;
 }

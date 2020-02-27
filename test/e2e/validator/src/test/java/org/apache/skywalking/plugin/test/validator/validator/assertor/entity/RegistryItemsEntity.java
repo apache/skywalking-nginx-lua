@@ -20,33 +20,11 @@ package org.apache.skywalking.plugin.test.validator.validator.assertor.entity;
 
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 
+@Data
 public class RegistryItemsEntity {
     private List<Map<String, Integer>> applications;
     private List<Map<String, Integer>> instances;
     private List<Map<String, List<String>>> operationNames;
-
-    public List<Map<String, Integer>> getApplications() {
-        return applications;
-    }
-
-    public void setApplications(final List<Map<String, Integer>> applications) {
-        this.applications = applications;
-    }
-
-    public List<Map<String, Integer>> getInstances() {
-        return instances;
-    }
-
-    public void setInstances(final List<Map<String, Integer>> instances) {
-        this.instances = instances;
-    }
-
-    public List<Map<String, List<String>>> getOperationNames() {
-        return operationNames;
-    }
-
-    public void setOperationNames(final List<Map<String, List<String>>> operationNames) {
-        this.operationNames = operationNames;
-    }
 }

@@ -20,35 +20,13 @@ package org.apache.skywalking.plugin.test.agent.tool.validator.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 
+@Data
 public class RegistryItemsForRead implements RegistryItems {
     private List<Map<String, String>> applications;
     private List<Map<String, String>> instances;
     private List<Map<String, List<String>>> operationNames;
-
-    public List<Map<String, String>> getApplications() {
-        return applications;
-    }
-
-    public void setApplications(List<Map<String, String>> applications) {
-        this.applications = applications;
-    }
-
-    public List<Map<String, String>> getInstances() {
-        return instances;
-    }
-
-    public void setInstances(List<Map<String, String>> instances) {
-        this.instances = instances;
-    }
-
-    public List<Map<String, List<String>>> getOperationNames() {
-        return operationNames;
-    }
-
-    public void setOperationNames(List<Map<String, List<String>>> operationNames) {
-        this.operationNames = operationNames;
-    }
 
     @Override
     public List<RegistryApplication> applications() {

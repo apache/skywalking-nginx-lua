@@ -20,6 +20,7 @@ package org.apache.skywalking.plugin.test.agent.tool.validator.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 
 public class SegmentForRead implements Segment {
     private String segmentId;
@@ -38,6 +39,7 @@ public class SegmentForRead implements Segment {
         return new ArrayList<>(spans);
     }
 
+    @Data
     public static class SegmentRefForRead implements SegmentRef {
         private String parentEndpointId;
         private String parentEndpoint;
@@ -67,50 +69,6 @@ public class SegmentForRead implements Segment {
             this.networkAddressId = ref.get("networkAddressId") == null ? null : ref.get("networkAddressId").toString();
             this.parentServiceInstanceId = ref.get("parentServiceInstanceId") == null ? null : ref.get("parentServiceInstanceId")
                                                                                                   .toString();
-        }
-
-        public void setParentEndpointId(String parentEndpointId) {
-            this.parentEndpointId = parentEndpointId;
-        }
-
-        public void setParentEndpoint(String parentEndpoint) {
-            this.parentEndpoint = parentEndpoint;
-        }
-
-        public void setNetworkAddressId(String networkAddressId) {
-            this.networkAddressId = networkAddressId;
-        }
-
-        public void setEntryEndpointId(String entryEndpointId) {
-            this.entryEndpointId = entryEndpointId;
-        }
-
-        public void setRefType(String refType) {
-            this.refType = refType;
-        }
-
-        public void setParentSpanId(String parentSpanId) {
-            this.parentSpanId = parentSpanId;
-        }
-
-        public void setParentTraceSegmentId(String parentTraceSegmentId) {
-            this.parentTraceSegmentId = parentTraceSegmentId;
-        }
-
-        public void setParentServiceInstanceId(String parentServiceInstanceId) {
-            this.parentServiceInstanceId = parentServiceInstanceId;
-        }
-
-        public void setNetworkAddress(String networkAddress) {
-            this.networkAddress = networkAddress;
-        }
-
-        public void setEntryEndpoint(String entryEndpoint) {
-            this.entryEndpoint = entryEndpoint;
-        }
-
-        public void setEntryServiceInstanceId(String entryServiceInstanceId) {
-            this.entryServiceInstanceId = entryServiceInstanceId;
         }
 
         @Override

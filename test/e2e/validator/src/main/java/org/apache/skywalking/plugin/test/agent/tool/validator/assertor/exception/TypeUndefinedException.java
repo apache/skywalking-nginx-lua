@@ -13,20 +13,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-package org.apache.skywalking.plugin.test.agent.tool;
+package org.apache.skywalking.plugin.test.agent.tool.validator.assertor.exception;
 
-public class ConfigHelper {
+public class TypeUndefinedException extends Exception {
 
-    private ConfigHelper() {
+    public TypeUndefinedException(String message) {
+        super(message);
     }
 
-    public static String caseName() {
-        return System.getProperty("caseName", "");
-    }
-
-    public static String testCaseBaseDir() {
-        return System.getProperty("testCasePath", "");
-    }
 }

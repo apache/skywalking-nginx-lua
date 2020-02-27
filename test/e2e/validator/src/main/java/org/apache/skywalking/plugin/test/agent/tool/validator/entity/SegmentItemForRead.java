@@ -19,35 +19,13 @@ package org.apache.skywalking.plugin.test.agent.tool.validator.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
+@Data
 public class SegmentItemForRead implements SegmentItem {
     private String serviceName;
     private String segmentSize;
     private List<SegmentForRead> segments;
-
-    public List<SegmentForRead> getSegments() {
-        return segments;
-    }
-
-    public void setSegments(List<SegmentForRead> segments) {
-        this.segments = segments;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public String getSegmentSize() {
-        return segmentSize;
-    }
-
-    public void setSegmentSize(String segmentSize) {
-        this.segmentSize = segmentSize;
-    }
 
     @Override
     public String serviceName() {

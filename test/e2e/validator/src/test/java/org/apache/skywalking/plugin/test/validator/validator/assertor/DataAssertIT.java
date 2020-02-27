@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.skywalking.plugin.test.agent.tool.validator.assertor.DataAssert;
+import org.apache.skywalking.plugin.test.agent.tool.validator.assertor.exception.TypeUndefinedException;
 import org.apache.skywalking.plugin.test.agent.tool.validator.entity.Data;
 import org.apache.skywalking.plugin.test.agent.tool.validator.entity.DataForRead;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class DataAssertIT {
     private static final Gson gson = new Gson();
 
     @Test
-    public void testAssertFunction() throws InterruptedException, IOException {
+    public void testAssertFunction() throws InterruptedException, IOException, TypeUndefinedException {
         TimeUnit.SECONDS.sleep(10L); // wait for agent registry
 
         URLConnection connection = new URL(System.getProperty("ping.url")).openConnection();
@@ -78,20 +79,18 @@ public class DataAssertIT {
                     }
                     case Type.SEGMENTS: {
                         collector.addSegmentItem(element);
+                        break;
                     }
                     default: {
-                        // TODO throw a unknown exception
+                        throw new TypeUndefinedException("Type " + pair[0] + " undefined.");
                     }
                 }
             }
 
-            Yaml yaml = new Yaml();
             try {
                 if (!collector.hasSegments()) {
                     throw new NullPointerException();
                 }
-
-                System.out.println(yaml.dump(yaml.load(gson.toJson(collector.collect()))));
 
                 DataAssert.assertEquals(
                     Data.Loader.loadData(DataCollector.class.getResourceAsStream("/expectedData.yaml")),
