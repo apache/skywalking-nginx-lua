@@ -1,19 +1,19 @@
--- 
+--
 -- Licensed to the Apache Software Foundation (ASF) under one or more
 -- contributor license agreements.  See the NOTICE file distributed with
 -- this work for additional information regarding copyright ownership.
 -- The ASF licenses this file to You under the Apache License, Version 2.0
 -- (the "License"); you may not use this file except in compliance with
 -- the License.  You may obtain a copy of the License at
--- 
+--
 --    http://www.apache.org/licenses/LICENSE-2.0
--- 
+--
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
--- 
+--
 
 local Util = require('util')
 local Span = require('span')
@@ -58,7 +58,7 @@ function TracingContext:new(serviceId, serviceInstID)
         return TracingContext:newNoOP()
     end
 
-    o.trace_id = Util:newID()
+    o.trace_id = Util.newID()
     o.segment_id = o.trace_id
     o.service_id = serviceId
     o.service_inst_id = serviceInstID
@@ -99,8 +99,8 @@ end
 -- After all active spans finished, this segment will be treated as finished status.
 -- Notice, it is different with Java agent, a finished context is still able to recreate new span, and be checked as finished again.
 -- This gives the end user more flexibility. Unless it is a real reasonable case, don't call #drainAfterFinished multiple times.
--- 
--- Return (boolean isSegmentFinished, Segment segment). 
+--
+-- Return (boolean isSegmentFinished, Segment segment).
 -- Segment has value only when the isSegmentFinished is true
 -- if isSegmentFinished == false, SpanList = nil
 function TracingContext:drainAfterFinished()
@@ -163,7 +163,7 @@ function Internal:addActive(span)
         self.first_span = span
     end
 
-    -- span id starts at 0, to fit LUA, we need to plus one.    
+    -- span id starts at 0, to fit LUA, we need to plus one.
     self.active_spans[span.span_id + 1] = span
     self.active_count = self.active_count + 1
     return self.owner
