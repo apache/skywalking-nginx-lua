@@ -94,3 +94,24 @@ GET /t
 true
 --- no_error_log
 [error]
+
+
+
+=== TEST 4: formatID
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua_block {
+            local util = require('util')
+            local id = util.newID()
+            local id_str = util.id2String(id)
+            local parts = util.formatID(id_str)
+            ngx.say(#parts)
+        }
+    }
+--- request
+GET /t
+--- response_body
+3
+--- no_error_log
+[error]

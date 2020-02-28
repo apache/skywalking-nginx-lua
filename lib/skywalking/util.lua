@@ -89,7 +89,11 @@ end
 -- Format a trace/segment id into an array.
 -- An official ID should have three parts separated by '.' and each part of it is a number
 function _M.formatID(str)
-    local parts = split(str, '.')
+    local regex = '.'
+    if _M.is_ngx_lua then
+        regex = [[\.]]
+    end
+    local parts = split(str, regex)
     if #parts ~= 3 then
         return nil
     end
