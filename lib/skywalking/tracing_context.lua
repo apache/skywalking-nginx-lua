@@ -57,7 +57,7 @@ function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrie
         return Span:newNoOP()
     end
 
-    return Span:createEntrySpan(operationName, self, parent, contextCarrier)
+    return Span:createEntrySpan(operationName, tracingContext, parent, contextCarrier)
 end
 
 -- Delegate to Span:createExitSpan
@@ -67,7 +67,7 @@ function _M.createExitSpan(tracingContext, operationName, parent, peer, contextC
         return Span:newNoOP()
     end
 
-    return Span:createExitSpan(operationName, self, parent, peer, contextCarrier)
+    return Span:createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
 end
 
 -- After all active spans finished, this segment will be treated as finished status.
