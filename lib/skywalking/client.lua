@@ -41,7 +41,7 @@ function Client:startBackendTimer(backend_http_uri)
             serviceId = metadata_buffer:get('serviceId')
             if (serviceId ~= nil and serviceId ~= 0) then
                 local serviceInstId = metadata_buffer:get('serviceInstId')
-                if (serviceInstId == nil and serviceInstId == 0)  then
+                if (serviceInstId == nil or serviceInstId == 0)  then
                     self:registerServiceInstance(metadata_buffer, backend_http_uri)
                 end
             end
