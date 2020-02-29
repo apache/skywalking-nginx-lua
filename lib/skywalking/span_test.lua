@@ -1,19 +1,19 @@
--- 
+--
 -- Licensed to the Apache Software Foundation (ASF) under one or more
 -- contributor license agreements.  See the NOTICE file distributed with
 -- this work for additional information regarding copyright ownership.
 -- The ASF licenses this file to You under the Apache License, Version 2.0
 -- (the "License"); you may not use this file except in compliance with
 -- the License.  You may obtain a copy of the License at
--- 
+--
 --    http://www.apache.org/licenses/LICENSE-2.0
--- 
+--
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
--- 
+--
 
 local lu = require('luaunit')
 local TC = require('tracing_context')
@@ -22,7 +22,7 @@ local SpanLayer = require("span_layer")
 
 TestSpan = {}
     function TestSpan:testNewEntry()
-        local context = TC:new(1, 1)
+        local context = TC.new(1, 1)
         lu.assertNotNil(context)
 
         local span1 = Span:createEntrySpan("operation_name", context, nil, nil)
@@ -35,7 +35,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNewEntryWithContextCarrier()
-        local context = TC:new(1, 1)
+        local context = TC.new(1, 1)
         lu.assertNotNil(context)
 
         -- Typical header from the SkyWalking Java Agent test case
@@ -66,7 +66,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNewExit()
-        local context = TC:new(1, 1)
+        local context = TC.new(1, 1)
         lu.assertNotNil(context)
 
         local contextCarrier = {}
@@ -82,7 +82,7 @@ TestSpan = {}
     end
 
     function TestSpan:testNew()
-        local context = TC:new(1, 1)
+        local context = TC.new(1, 1)
         lu.assertNotNil(context)
 
         local span1 = Span:new("operation_name", context, nil)
@@ -98,7 +98,7 @@ TestSpan = {}
         lu.assertNotNil(span2.start_time)
 
         -- Use new context to check again
-        context = TC:new(1, 1)
+        context = TC.new(1, 1)
         lu.assertNotNil(context)
 
         span1 = Span:new("operation_name", context, nil)
@@ -108,7 +108,7 @@ TestSpan = {}
     end
 
     function TestSpan:testProperties()
-        local context = TC:new(1, 1)
+        local context = TC.new(1, 1)
 
         local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
         local span1 = Span:createEntrySpan("operation_name", context, nil, header)
@@ -127,7 +127,7 @@ TestSpan = {}
     end
 
     function TestSpan:testTransform()
-        local context = TC:new(1, 1)
+        local context = TC.new(1, 1)
 
         local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
         local span1 = Span:createEntrySpan("operation_name", context, nil, header)
