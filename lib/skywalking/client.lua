@@ -33,22 +33,22 @@ function Client:startBackendTimer(backend_http_uri)
     check = function(premature)
         if not premature then
             local serviceId = metadata_buffer:get('serviceId')
-            if serviceId == nil then
+            if (serviceId == nil or serviceId == 0) then
                 self:registerService(metadata_buffer, backend_http_uri)
             end
 
             -- Register is in the async way, if register successfully, go for instance register
             serviceId = metadata_buffer:get('serviceId')
-            if serviceId ~= nil then
+            if (serviceId ~= nil and serviceId ~= 0) then
                 local serviceInstId = metadata_buffer:get('serviceInstId')
-                if serviceInstId == nil then
+                if (serviceInstId == nil or serviceInstId == 0)  then
                     self:registerServiceInstance(metadata_buffer, backend_http_uri)
                 end
             end
 
             -- After all register successfully, begin to send trace segments
             local serviceInstId = metadata_buffer:get('serviceInstId')
-            if serviceInstId ~= nil then
+            if (serviceInstId ~= nil and serviceInstId ~= 0) then
                 self:reportTraces(metadata_buffer, backend_http_uri)
                 self:ping(metadata_buffer, backend_http_uri)
             end
