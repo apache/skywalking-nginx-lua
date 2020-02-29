@@ -26,7 +26,7 @@ function Tracer:startBackendTimer()
     local serviceName = metadata_buffer:get("serviceName")
     local serviceInstId = metadata_buffer:get("serviceInstId")
     local serviceId = metadata_buffer:get('serviceId')
-    if serviceInstId ~= nil then
+    if (serviceInstId ~= nil and serviceInstId ~= 0) then
         tracingContext = TC:new(serviceId, serviceInstId)
     else
         tracingContext = TC:newNoOP()
