@@ -18,68 +18,42 @@
 local Util = require('util')
 local Span = require('span')
 local Segment = require('segment')
+local TC_Internal = require('tracing_context_internal')
 
-local TracingContext = {
-    trace_id,
-    segment_id,
-    service_id,
-    service_inst_id,
+local _M = {}
 
-    is_noop = false,
+-- local TracingContext = {
+--     trace_id,
+--     segment_id,
+--     service_id,
+--     service_inst_id,
+--     is_noop = false,
+--     internal,
+-- }
 
-    internal,
-}
-
--------------- Internal Object-------------
--- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
-local Internal = {
-    self_generated_trace_id,
-    -- span id starts from 0
-    span_id_seq,
-    -- Owner means the Context instance holding this Internal object.
-    owner,
-    -- The first created span.
-    first_span,
-    -- The first ref injected in this context
-    first_ref,
-    -- Created span and still active
-    active_spans,
-    active_count,
-    -- Finished spans
-    finished_spans,
-}
-
-function TracingContext:new(serviceId, serviceInstID)
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    if serviceInstID == nil then
-        return TracingContext:newNoOP()
-    end
-
-    o.trace_id = Util.newID()
-    o.segment_id = o.trace_id
-    o.service_id = serviceId
-    o.service_inst_id = serviceInstID
-    o.internal = Internal:new()
-    o.internal.owner = o
-    return o
+function _M.newNoOP()
+    return {is_noop = true}
 end
 
-function TracingContext:newNoOP()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
+function _M.new(serviceId, serviceInstID)
+    if serviceInstID == nil then
+        return _M.newNoOP()
+    end
 
-    o.is_noop = true
-    return o
+    local tracing_context = {}
+    tracing_context.trace_id = Util.newID()
+    tracing_context.segment_id = tracing_context.trace_id
+    tracing_context.service_id = serviceId
+    tracing_context.service_inst_id = serviceInstID
+    tracing_context.internal = TC_Internal.new()
+    tracing_context.internal.owner = tracing_context
+    return tracing_context
 end
 
 -- Delegate to Span:createEntrySpan
 -- @param contextCarrier could be nil if there is no downstream propagated context
-function TracingContext:createEntrySpan(operationName, parent, contextCarrier)
-    if self.is_noop then
+function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrier)
+    if tracingContext.is_noop then
         return Span:newNoOP()
     end
 
@@ -88,8 +62,8 @@ end
 
 -- Delegate to Span:createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
-function TracingContext:createExitSpan(operationName, parent, peer, contextCarrier)
-    if self.is_noop then
+function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier)
+    if tracingContext.is_noop then
         return Span:newNoOP()
     end
 
@@ -103,87 +77,22 @@ end
 -- Return (boolean isSegmentFinished, Segment segment).
 -- Segment has value only when the isSegmentFinished is true
 -- if isSegmentFinished == false, SpanList = nil
-function TracingContext:drainAfterFinished()
-    if self.is_noop then
+function _M.drainAfterFinished(tracingContext)
+    if tracingContext.is_noop then
         return true, Segment:new()
     end
 
-    if self.internal.active_count ~= 0 then
-        return false, nil
-    elseif #self.internal.finished_spans == 0 then
+    if tracingContext.internal.active_count ~= 0 then
         return false, nil
     else
         local segment = Segment:new()
-        segment.trace_id = self.trace_id
-        segment.segment_id = self.segment_id
-        segment.service_id = self.service_id
-        segment.service_inst_id = self.service_inst_id
-        segment.spans = self.internal.finished_spans
+        segment.trace_id = tracingContext.trace_id
+        segment.segment_id = tracingContext.segment_id
+        segment.service_id = tracingContext.service_id
+        segment.service_inst_id = tracingContext.service_inst_id
+        segment.spans = tracingContext.internal.finished_spans
         return true, segment
     end
 end
 
--------------- Internal Object-------------
--- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
-
--- Create an internal instance
-function Internal:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    o.self_generated_trace_id = true
-    o.span_id_seq = 0
-    o.active_spans = {}
-    o.active_count = 0
-    o.finished_spans = {}
-
-    return o
-end
-
--- add the segment ref if this is the first ref of this context
-function Internal:addRefIfFirst(ref)
-    if self.self_generated_trace_id == true then
-        self.self_generated_trace_id = false
-        self.owner.trace_id = ref.trace_id
-        self.first_ref = ref
-    end
-end
-
-function Internal:hasRef()
-    return first_ref ~= nil
-end
-
-function Internal:getFirstRef()
-    return first_ref
-end
-
-function Internal:addActive(span)
-    if self.first_span == nil then
-        self.first_span = span
-    end
-
-    -- span id starts at 0, to fit LUA, we need to plus one.
-    self.active_spans[span.span_id + 1] = span
-    self.active_count = self.active_count + 1
-    return self.owner
-end
-
-function Internal:finishSpan(span)
-    -- span id starts at 0, to fit LUA, we need to plus one.
-    self.active_spans[span.span_id + 1] = nil
-    self.active_count = self.active_count - 1
-    self.finished_spans[#self.finished_spans + 1] = span
-
-    return self.owner
-end
-
--- Generate the next span ID.
-function Internal:nextSpanID()
-    local nextSpanId = self.span_id_seq
-    self.span_id_seq = self.span_id_seq + 1;
-    return nextSpanId
-end
----------------------------------------------
-
-return TracingContext
+return _M
