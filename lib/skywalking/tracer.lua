@@ -59,7 +59,7 @@ function Tracer:startBackendTimer()
     ------------------------------------------------------
     local upstreamServerName = serviceName .. "-nginx:upstream_ip:port"
     ------------------------------------------------------
-    local exitSpan = tracingContext:createExitSpan(upstreamUri, entrySpan, upstreamServerName, contextCarrier)
+    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan, upstreamServerName, contextCarrier)
     exitSpan:start(ngx.now() * 1000)
     exitSpan:setComponentId(nginxComponentId)
     exitSpan:setLayer(Layer.HTTP)
@@ -85,7 +85,7 @@ end
 function Tracer:prepareForReport()
     if ngx.ctx.entrySpan ~= nil then
         ngx.ctx.entrySpan:finish(ngx.now() * 1000)
-        local status, segment = ngx.ctx.tracingContext:drainAfterFinished()
+        local status, segment = TC.drainAfterFinished(ngx.ctx.tracingContext)
         if status then
             local segmentJson = require('cjson').encode(segment:transform())
             ngx.log(ngx.DEBUG, 'segment = ' .. segmentJson)
