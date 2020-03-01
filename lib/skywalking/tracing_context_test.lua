@@ -17,6 +17,7 @@
 
 local lu = require('luaunit')
 local TC = require('tracing_context')
+local Segment = require('segment')
 
 TestTracingContext = {}
     function TestTracingContext:testNew()
@@ -70,7 +71,7 @@ TestTracingContext = {}
         lu.assertEquals(span2, segment.spans[1])
         lu.assertEquals(span1, segment.spans[2])
 
-        local segmentBuilder = segment:transform()
+        local segmentBuilder = Segment.transform(segment)
         local JSON = require('cjson').encode(segmentBuilder)
         lu.assertTrue(#JSON > 0)
     end

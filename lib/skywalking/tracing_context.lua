@@ -17,7 +17,6 @@
 
 local Util = require('util')
 local Span = require('span')
-local Segment = require('segment')
 
 -------------- Internal Object-------------
 local Internal = {}
@@ -152,13 +151,13 @@ end
 -- if isSegmentFinished == false, SpanList = nil
 function _M.drainAfterFinished(tracingContext)
     if tracingContext.is_noop then
-        return true, Segment:new()
+        return true, {}
     end
 
     if tracingContext.internal.active_count ~= 0 then
         return false, nil
     else
-        local segment = Segment:new()
+        local segment = {}
         segment.trace_id = tracingContext.trace_id
         segment.segment_id = tracingContext.segment_id
         segment.service_id = tracingContext.service_id
