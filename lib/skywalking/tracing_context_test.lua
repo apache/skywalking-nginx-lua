@@ -17,7 +17,6 @@
 
 local lu = require('luaunit')
 local TC = require('tracing_context')
-local TC_Internal = require('tracing_context_internal')
 
 TestTracingContext = {}
     function TestTracingContext:testNew()
@@ -33,14 +32,14 @@ TestTracingContext = {}
     function TestTracingContext:testInternal_NextSpanSeqID()
         local context = TC.new(1, 1)
 
-        lu.assertEquals(TC_Internal.nextSpanID(context.internal), 0)
+        lu.assertEquals(context.internal.nextSpanID(context.internal), 0)
     end
 
     function TestTracingContext:testInternal_addActive()
         local context = TC.new(1, 1)
 
         local mockSpan = {span_id = 0}
-        TC_Internal.addActive(context.internal, mockSpan)
+        context.internal.addActive(context.internal, mockSpan)
 
         lu.assertEquals(#context.internal.active_spans, 1)
     end

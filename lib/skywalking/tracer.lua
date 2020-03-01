@@ -27,9 +27,9 @@ function Tracer:startBackendTimer()
     local serviceInstId = metadata_buffer:get("serviceInstId")
     local serviceId = metadata_buffer:get('serviceId')
     if (serviceInstId ~= nil and serviceInstId ~= 0) then
-        tracingContext = TC:new(serviceId, serviceInstId)
+        tracingContext = TC.new(serviceId, serviceInstId)
     else
-        tracingContext = TC:newNoOP()
+        tracingContext = TC.newNoOP()
     end
 
     -- Constant pre-defined in SkyWalking main repo
@@ -38,7 +38,7 @@ function Tracer:startBackendTimer()
 
     local contextCarrier = {}
     contextCarrier["sw6"] = ngx.req.get_headers()["sw6"]
-    local entrySpan = tracingContext:createEntrySpan(ngx.var.uri, nil, contextCarrier)
+    local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
     entrySpan:start(ngx.now() * 1000)
     entrySpan:setComponentId(nginxComponentId)
     entrySpan:setLayer(Layer.HTTP)

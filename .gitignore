@@ -13,9 +13,10 @@ packages/
 /dist/
 /docker/snapshot/*.gz
 .mvn/wrapper/*.jar
-.factorypath  
-.vscode 
+.factorypath
+.vscode
 .checkstyle
 .externalToolBuilders
 /test/plugin/dist
 /test/plugin/workspace
+/t/servroot/

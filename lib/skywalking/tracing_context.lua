@@ -18,7 +18,80 @@
 local Util = require('util')
 local Span = require('span')
 local Segment = require('segment')
-local TC_Internal = require('tracing_context_internal')
+
+-------------- Internal Object-------------
+local Internal = {}
+-- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
+-- local Internal = {
+--     self_generated_trace_id,
+--     -- span id starts from 0
+--     span_id_seq,
+--     -- Owner means the Context instance holding this Internal object.
+--     owner,
+--     -- The first created span.
+--     first_span,
+--     -- The first ref injected in this context
+--     first_ref,
+--     -- Created span and still active
+--     active_spans,
+--     active_count,
+--     -- Finished spans
+--     finished_spans,
+-- }
+
+
+-- add the segment ref if this is the first ref of this context
+local function addRefIfFirst(internal, ref)
+    if internal.self_generated_trace_id == true then
+        internal.self_generated_trace_id = false
+        internal.owner.trace_id = ref.trace_id
+        internal.first_ref = ref
+    end
+end
+
+local function addActive(internal, span)
+    if internal.first_span == nil then
+        internal.first_span = span
+    end
+
+    -- span id starts at 0, to fit LUA, we need to plus one.
+    internal.active_spans[span.span_id + 1] = span
+    internal.active_count = internal.active_count + 1
+    return internal.owner
+end
+
+local function finishSpan(internal, span)
+    -- span id starts at 0, to fit LUA, we need to plus one.
+    internal.active_spans[span.span_id + 1] = nil
+    internal.active_count = internal.active_count - 1
+    internal.finished_spans[#internal.finished_spans + 1] = span
+
+    return internal.owner
+end
+
+-- Generate the next span ID.
+local function nextSpanID(internal)
+    local nextSpanId = internal.span_id_seq
+    internal.span_id_seq = internal.span_id_seq + 1
+    return nextSpanId
+end
+
+-- Create an internal instance
+function Internal.new()
+    local internal = {}
+
+    internal.self_generated_trace_id = true
+    internal.span_id_seq = 0
+    internal.active_spans = {}
+    internal.active_count = 0
+    internal.finished_spans = {}
+    internal.addRefIfFirst = addRefIfFirst
+    internal.addActive = addActive
+    internal.finishSpan = finishSpan
+    internal.nextSpanID = nextSpanID
+    return internal
+end
+
 
 local _M = {}
 
@@ -45,7 +118,7 @@ function _M.new(serviceId, serviceInstID)
     tracing_context.segment_id = tracing_context.trace_id
     tracing_context.service_id = serviceId
     tracing_context.service_inst_id = serviceInstID
-    tracing_context.internal = TC_Internal.new()
+    tracing_context.internal = Internal.new()
     tracing_context.internal.owner = tracing_context
     return tracing_context
 end
