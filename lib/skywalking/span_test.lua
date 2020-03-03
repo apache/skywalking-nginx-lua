@@ -48,10 +48,10 @@ TestSpan = {}
         lu.assertEquals(span1.layer, SpanLayer.NONE)
         local ref = span1.refs[1]
         lu.assertNotNil(ref)
-        lu.assertEquals(ref.trace_id, {3, 4, 5})
+        lu.assertEquals(ref.trace_id, {"3", "4", "5"})
         -- Context trace id will be overrided by the ref trace id
-        lu.assertEquals(context.trace_id, {3, 4, 5})
-        lu.assertEquals(ref.segment_id, {1, 2, 3})
+        lu.assertEquals(context.trace_id, {"3", "4", "5"})
+        lu.assertEquals(ref.segment_id, {"1", "2", "3"})
         lu.assertEquals(ref.span_id, 4)
         lu.assertEquals(ref.parent_service_instance_id, 1)
         lu.assertEquals(ref.entry_service_instance_id, 1)
