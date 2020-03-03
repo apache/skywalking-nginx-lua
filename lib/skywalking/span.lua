@@ -21,51 +21,52 @@ local SegmentRef = require("segment_ref")
 
 local CONTEXT_CARRIER_KEY = 'sw6'
 
-local Span = {
-    span_id,
-    parent_span_id,
-    operation_name,
-    tags,
-    logs,
-    layer = spanLayer.NONE,
-    is_entry = false,
-    is_exit = false,
-    peer,
-    start_time,
-    end_time,
-    error_occurred = false,
-    component_id,
-    refs,
-    is_noop = false,
-    -- owner is a TracingContext reference
-    owner,
-}
+local _M = {}
+-- local Span = {
+--     span_id,
+--     parent_span_id,
+--     operation_name,
+--     tags,
+--     logs,
+--     layer = spanLayer.NONE,
+--     is_entry = false,
+--     is_exit = false,
+--     peer,
+--     start_time,
+--     end_time,
+--     error_occurred = false,
+--     component_id,
+--     refs,
+--     is_noop = false,
+--     -- owner is a TracingContext reference
+--     owner,
+-- }
 
 -- Due to nesting relationship inside Segment/Span/TracingContext at the runtime,
 -- SpanProtocol is created to prepare JSON format serialization.
 -- Following SkyWalking official trace protocol v2
 -- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
-local SpanProtocol = {
-    spanId,
-    parentSpanId,
-    startTime,
-    endTime,
-    -- Array of RefProtocol
-    refs,
-    operationName,
-    peer,
-    spanType,
-    spanLayer,
-    componentId,
-    isError,
-    tags,
-    logs,
-}
+-- local SpanProtocol = {
+--     spanId,
+--     parentSpanId,
+--     startTime,
+--     endTime,
+--     -- Array of RefProtocol
+--     refs,
+--     operationName,
+--     peer,
+--     spanType,
+--     spanLayer,
+--     componentId,
+--     isError,
+--     tags,
+--     logs,
+-- }
 
 -- Create an entry span. Represent the HTTP incoming request.
 -- @param contextCarrier, HTTP request header, which could carry the `sw6` context
-function Span:createEntrySpan(operationName, context, parent, contextCarrier)
-    local span = self:new(operationName, context, parent)
+function _M.createEntrySpan(operationName, context, parent, contextCarrier)
+    local span = _M.new(operationName, context, parent)
     span.is_entry = true
 
     if contextCarrier ~= nil then
@@ -85,8 +86,8 @@ function Span:createEntrySpan(operationName, context, parent, contextCarrier)
 end
 
 -- Create an exit span. Represent the HTTP outgoing request.
-function Span:createExitSpan(operationName, context, parent, peer, contextCarrier)
-    local span = self:new(operationName, context, parent)
+function _M.createExitSpan(operationName, context, parent, peer, contextCarrier)
+    local span = _M.new(operationName, context, parent)
     span.is_exit = true
     span.peer = peer
 
@@ -144,186 +145,178 @@ end
 
 -- Create an local span. Local span is usually not used.
 -- Typically, only one entry span and one exit span in the Nginx tracing segment.
-function Span:createLocalSpan(operationName, context, parent)
-    local span = self:new(operationName, context, parent)
+function _M.createLocalSpan(operationName, context, parent)
+    local span = _M.new(operationName, context, parent)
     return span
 end
 
 -- Create a default span.
 -- Usually, this method wouldn't be called by outside directly.
 -- Read newEntrySpan, newExitSpan and newLocalSpan for more details
-function Span:new(operationName, context, parent)
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
+function _M.new(operationName, context, parent)
+    local span = _M.newNoOP()
+    span.is_noop = false
 
-    o.operation_name = operationName
-    o.span_id = context.internal.nextSpanID(context.internal)
+    span.operation_name = operationName
+    span.span_id = context.internal.nextSpanID(context.internal)
 
     if parent == nil then
         -- As the root span, the parent span id is -1
-        o.parent_span_id = -1
+        span.parent_span_id = -1
     else
-        o.parent_span_id = parent.span_id
+        span.parent_span_id = parent.span_id
     end
 
-    context.internal.addActive(context.internal, o)
-    -- o.start_time = Util.timestamp()
-    o.refs = {}
-    o.owner = context
+    context.internal.addActive(context.internal, span)
+    -- span.start_time = Util.timestamp()
+    span.refs = {}
+    span.owner = context
 
-    return o
+    return span
 end
 
-function Span:newNoOP()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    o.is_noop = true
-    return o
-end
-
-function SpanProtocol:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    return o
+function _M.newNoOP()
+    return {
+        layer = spanLayer.NONE,
+        is_entry = false,
+        is_exit = false,
+        error_occurred = false,
+        is_noop = true
+    }
 end
 
 ---- All belowing are instance methods
 
 -- Set start time explicitly
-function Span:start(startTime)
-    if self.is_noop then
-        return self
+function _M.start(span, startTime)
+    if span.is_noop then
+        return span
     end
 
-    self.start_time = startTime
+    span.start_time = startTime
 
-    return self
+    return span
 end
 
-function Span:finishWithDuration(duration)
-    if self.is_noop then
-        return self
+function _M.finishWithDuration(span, duration)
+    if span.is_noop then
+        return span
     end
 
-    self:finish(self.start_time + duration)
+    _M.finish(span, span.start_time + duration)
 
-    return self
+    return span
 end
 
 -- @param endTime, optional.
-function Span:finish(endTime)
-    if self.is_noop then
-        return self
+function _M.finish(span, endTime)
+    if span.is_noop then
+        return span
     end
 
     if endTime == nil then
-        self.end_time = Util.timestamp()
+        span.end_time = Util.timestamp()
     else
-        self.end_time = endTime
+        span.end_time = endTime
     end
-    self.owner.internal.finishSpan(self.owner.internal, self)
+    span.owner.internal.finishSpan(span.owner.internal, span)
 
-    return self
+    return span
 end
 
-function Span:setComponentId(componentId)
-    if self.is_noop then
-        return self
+function _M.setComponentId(span, componentId)
+    if span.is_noop then
+        return span
     end
-    self.component_id = componentId
+    span.component_id = componentId
 
-    return self
+    return span
 end
 
-function Span:setLayer(spanLayer)
-    if self.is_noop then
-        return self
+function _M.setLayer(span, span_layer)
+    if span.is_noop then
+        return span
     end
-    self.layer = spanLayer
+    span.layer = span_layer
 
-    return self
+    return span
 end
 
-function Span:errorOccurred()
-    if self.is_noop then
-        return self
+function _M.errorOccurred(span)
+    if span.is_noop then
+        return span
     end
-    self.error_occurred = true
+    span.error_occurred = true
 
-    return self
+    return span
 end
 
-function Span:tag(tagKey, tagValue)
-    if self.is_noop then
-        return self
+function _M.tag(span, tagKey, tagValue)
+    if span.is_noop then
+        return span
     end
 
-    if self.tags == nil then
-        self.tags = {}
+    if span.tags == nil then
+        span.tags = {}
     end
 
     local tag = {key = tagKey, value = tagValue}
-    self.tags[#self.tags + 1] = tag
+    span.tags[#span.tags + 1] = tag
 
-    return self
+    return span
 end
 
 -- @param keyValuePairs, keyValuePairs is a typical {key=value, key1=value1}
-function Span:log(timestamp, keyValuePairs)
-    if self.is_noop then
-        return self
+function _M.log(span, timestamp, keyValuePairs)
+    if span.is_noop then
+        return span
     end
 
-    if self.logs == nil then
-        self.logs = {}
+    if span.logs == nil then
+        span.logs = {}
     end
 
     local logEntity = {time = timestamp, data = keyValuePairs}
-    self.logs[#self.logs + 1] = logEntity
+    span.logs[#span.logs + 1] = logEntity
 
-    return self
+    return span
 end
 
 -- Return SpanProtocol
-function Span:transform()
-    local spanBuilder = SpanProtocol:new()
-    spanBuilder.spanId = self.span_id
-    spanBuilder.parentSpanId = self.parent_span_id
-    spanBuilder.startTime = self.start_time
-    spanBuilder.endTime = self.end_time
+function _M.transform(span)
+    local spanBuilder = {}
+    spanBuilder.spanId = span.span_id
+    spanBuilder.parentSpanId = span.parent_span_id
+    spanBuilder.startTime = span.start_time
+    spanBuilder.endTime = span.end_time
     -- Array of RefProtocol
-    if #self.refs > 0 then
+    if #span.refs > 0 then
         spanBuilder.refs = {}
-        for i, ref in ipairs(self.refs)
+        for i, ref in ipairs(span.refs)
         do
             spanBuilder.refs[#spanBuilder.refs + 1] = SegmentRef.transform(ref)
         end
     end
 
-    spanBuilder.operationName = self.operation_name
-    spanBuilder.peer = self.peer
-    if self.is_entry then
+    spanBuilder.operationName = span.operation_name
+    spanBuilder.peer = span.peer
+    if span.is_entry then
         spanBuilder.spanType = 'Entry'
-    elseif self.is_exit then
+    elseif span.is_exit then
         spanBuilder.spanType = 'Exit'
     else
         spanBuilder.spanType = 'Local'
     end
-    if self.layer ~= spanLayer.NONE then
-        spanBuilder.spanLayer = self.layer.name
+    if span.layer ~= spanLayer.NONE then
+        spanBuilder.spanLayer = span.layer.name
     end
-    spanBuilder.componentId = self.component_id
-    spanBuilder.isError = self.error_occurred
+    spanBuilder.componentId = span.component_id
+    spanBuilder.isError = span.error_occurred
 
-    spanBuilder.tags = self.tags
-    spanBuilder.logs = self.logs
+    spanBuilder.tags = span.tags
+    spanBuilder.logs = span.logs
 
     return spanBuilder
 end
 
-return Span
+return _M

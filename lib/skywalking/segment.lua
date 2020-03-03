@@ -17,6 +17,7 @@
 
 -- Segment represents a finished tracing context
 -- Including all information to send to the SkyWalking OAP server.
+local Span = require('span')
 
 local _M = {}
 -- local Segment = {
@@ -54,7 +55,7 @@ function _M.transform(segment)
     if segment.spans ~= nil and #segment.spans > 0 then
         for i, span in ipairs(segment.spans)
         do
-            segmentBuilder.spans[#segmentBuilder.spans + 1] = span:transform()
+            segmentBuilder.spans[#segmentBuilder.spans + 1] = Span.transform(span)
         end
     end
 

@@ -14,6 +14,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
+local Span = require('span')
 
 local Tracer = {}
 
@@ -39,12 +40,12 @@ function Tracer:startBackendTimer()
     local contextCarrier = {}
     contextCarrier["sw6"] = ngx.req.get_headers()["sw6"]
     local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
-    entrySpan:start(ngx.now() * 1000)
-    entrySpan:setComponentId(nginxComponentId)
-    entrySpan:setLayer(Layer.HTTP)
+    Span.start(entrySpan, ngx.now() * 1000)
+    Span.setComponentId(entrySpan, nginxComponentId)
+    Span.setLayer(entrySpan, Layer.HTTP)
 
-    entrySpan:tag('http.method', ngx.req.get_method())
-    entrySpan:tag('http.params', ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri )
+    Span.tag(entrySpan, 'http.method', ngx.req.get_method())
+    Span.tag(entrySpan, 'http.params', ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri )
 
     contextCarrier = {}
     -- Use the same URI to represent incoming and forwarding requests
@@ -60,9 +61,9 @@ function Tracer:startBackendTimer()
     local upstreamServerName = serviceName .. "-nginx:upstream_ip:port"
     ------------------------------------------------------
     local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan, upstreamServerName, contextCarrier)
-    exitSpan:start(ngx.now() * 1000)
-    exitSpan:setComponentId(nginxComponentId)
-    exitSpan:setLayer(Layer.HTTP)
+    Span.start(exitSpan, ngx.now() * 1000)
+    Span.setComponentId(exitSpan, nginxComponentId)
+    Span.setLayer(exitSpan, Layer.HTTP)
 
     for name, value in pairs(contextCarrier) do
         ngx.req.set_header(name, value)
@@ -77,7 +78,7 @@ end
 function Tracer:finish()
     -- Finish the exit span when received the first response package from upstream
     if ngx.ctx.exitSpan ~= nil then
-        ngx.ctx.exitSpan:finish(ngx.now() * 1000)
+        Span.finish(ngx.ctx.exitSpan, ngx.now() * 1000)
         ngx.ctx.exitSpan = nil
     end
 end
@@ -86,7 +87,7 @@ function Tracer:prepareForReport()
     local TC = require('tracing_context')
     local Segment = require('segment')
     if ngx.ctx.entrySpan ~= nil then
-        ngx.ctx.entrySpan:finish(ngx.now() * 1000)
+        Span.finish(ngx.ctx.entrySpan, ngx.now() * 1000)
         local status, segment = TC.drainAfterFinished(ngx.ctx.tracingContext)
         if status then
             local segmentJson = require('cjson').encode(Segment.transform(segment))

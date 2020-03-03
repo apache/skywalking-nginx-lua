@@ -8,9 +8,9 @@ Apache SkyWalking Nginx Agent
 ![CI](https://github.com/apache/skywalking-nginx-lua/workflows/CI/badge.svg?branch=master)
 
 
-[**SkyWalking**](https://github.com/apache/skywalking) Nginx Agent provides the native tracing capability for Nginx powered by Nginx LUA module. 
+[**SkyWalking**](https://github.com/apache/skywalking) Nginx Agent provides the native tracing capability for Nginx powered by Nginx LUA module.
 
-This agent follows the SkyWalking tracing and header protocol. It reports tracing data to SkyWalking APM through HTTP protocol. 
+This agent follows the SkyWalking tracing and header protocol. It reports tracing data to SkyWalking APM through HTTP protocol.
 All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
 # Setup Doc
@@ -18,9 +18,9 @@ All HTTP 1.1 requests go through Nginx could be collected by this agent.
 http {
     lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/skywalking/?.lua;;";
 
-    # Buffer represents the register inform and the queue of the finished segment 
+    # Buffer represents the register inform and the queue of the finished segment
     lua_shared_dict tracing_buffer 100m;
-    
+
     # Init is the timer setter and keeper
     # Setup an infinite loop timer to do register and trace report.
     init_worker_by_lua_block {
@@ -105,13 +105,13 @@ The following APIs are for developers or using this lib out of the Nginx case.
 
 ## Tracing APIs at LUA level
 **TracingContext** is the entrance API for lua level tracing.
-- `TracingContext:new(serviceId, serviceInstID)`, create an active tracing context.
-- `TracingContext:newNoOP()`, create a no OP tracing context.
-- `TracingContext:drainAfterFinished()`, fetch the segment includes all finished spans.
+- `TracingContext.new(serviceId, serviceInstID)`, create an active tracing context.
+- `TracingContext.newNoOP()`, create a no OP tracing context.
+- `TracingContext.drainAfterFinished()`, fetch the segment includes all finished spans.
 
 Create 2 kinds of span
-- `TracingContext:createEntrySpan(operationName, parent, contextCarrier)`
-- `TracingContext:createExitSpan(operationName, parent, peer, contextCarrier)`
+- `TracingContext.createEntrySpan(operationName, parent, contextCarrier)`
+- `TracingContext.createExitSpan(operationName, parent, peer, contextCarrier)`
 
 
 # Download

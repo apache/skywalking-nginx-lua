@@ -122,24 +122,24 @@ function _M.new(serviceId, serviceInstID)
     return tracing_context
 end
 
--- Delegate to Span:createEntrySpan
+-- Delegate to Span.createEntrySpan
 -- @param contextCarrier could be nil if there is no downstream propagated context
 function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrier)
     if tracingContext.is_noop then
-        return Span:newNoOP()
+        return Span.newNoOP()
     end
 
-    return Span:createEntrySpan(operationName, tracingContext, parent, contextCarrier)
+    return Span.createEntrySpan(operationName, tracingContext, parent, contextCarrier)
 end
 
--- Delegate to Span:createExitSpan
+-- Delegate to Span.createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
 function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier)
     if tracingContext.is_noop then
-        return Span:newNoOP()
+        return Span.newNoOP()
     end
 
-    return Span:createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
+    return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
 end
 
 -- After all active spans finished, this segment will be treated as finished status.

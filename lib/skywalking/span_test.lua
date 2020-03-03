@@ -25,7 +25,7 @@ TestSpan = {}
         local context = TC.new(1, 1)
         lu.assertNotNil(context)
 
-        local span1 = Span:createEntrySpan("operation_name", context, nil, nil)
+        local span1 = Span.createEntrySpan("operation_name", context, nil, nil)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.is_entry, true)
         lu.assertEquals(span1.is_exit, false)
@@ -41,7 +41,7 @@ TestSpan = {}
         -- Typical header from the SkyWalking Java Agent test case
         local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
 
-        local span1 = Span:createEntrySpan("operation_name", context, nil, header)
+        local span1 = Span.createEntrySpan("operation_name", context, nil, header)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.is_entry, true)
         lu.assertEquals(span1.is_exit, false)
@@ -70,7 +70,7 @@ TestSpan = {}
         lu.assertNotNil(context)
 
         local contextCarrier = {}
-        local span1 = Span:createExitSpan("operation_name", context, nil, '127.0.0.1:80', contextCarrier)
+        local span1 = Span.createExitSpan("operation_name", context, nil, '127.0.0.1:80', contextCarrier)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.is_entry, false)
         lu.assertEquals(span1.is_exit, true)
@@ -85,23 +85,23 @@ TestSpan = {}
         local context = TC.new(1, 1)
         lu.assertNotNil(context)
 
-        local span1 = Span:new("operation_name", context, nil)
+        local span1 = Span.new("operation_name", context, nil)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.parent_span_id, -1)
         lu.assertEquals(span1.span_id, 0)
         lu.assertEquals(span1.operation_name, "operation_name")
-        local span2 = Span:new("operation_name", context, span1)
+        local span2 = Span.new("operation_name", context, span1)
         lu.assertEquals(span2.parent_span_id, 0)
         lu.assertEquals(span2.span_id, 1)
         lu.assertNil(span2.start_time)
-        span2:start(123456)
+        Span.start(span2, 123456)
         lu.assertNotNil(span2.start_time)
 
         -- Use new context to check again
         context = TC.new(1, 1)
         lu.assertNotNil(context)
 
-        span1 = Span:new("operation_name", context, nil)
+        span1 = Span.new("operation_name", context, nil)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.parent_span_id, -1)
         lu.assertEquals(span1.span_id, 0)
@@ -111,15 +111,15 @@ TestSpan = {}
         local context = TC.new(1, 1)
 
         local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
-        local span1 = Span:createEntrySpan("operation_name", context, nil, header)
-        span1:start(1234567)
+        local span1 = Span.createEntrySpan("operation_name", context, nil, header)
+        Span.start(span1, 1234567)
         lu.assertEquals(span1.start_time, 1234567)
-        span1:finish(2222222)
+        Span.finish(span1, 2222222)
         lu.assertEquals(span1.end_time, 2222222)
-        span1:finishWithDuration(123)
+        Span.finishWithDuration(span1, 123)
         lu.assertEquals(span1.end_time, 1234690)
 
-        span1:tag("key1", "value1")
+        Span.tag(span1, "key1", "value1")
         lu.assertEquals(span1.tags[1].value, 'value1')
 
         lu.assertEquals(#span1.refs, 1)
@@ -130,13 +130,13 @@ TestSpan = {}
         local context = TC.new(1, 1)
 
         local header = {sw6='1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz'}
-        local span1 = Span:createEntrySpan("operation_name", context, nil, header)
-        span1:start(1234567)
-        span1:finish(2222222)
-        span1:tag("key", "value")
-        span1:log(123, {logkey="logvalue", logkey1="logvalue2"})
+        local span1 = Span.createEntrySpan("operation_name", context, nil, header)
+        Span.start(span1, 1234567)
+        Span.finish(span1, 2222222)
+        Span.tag(span1, "key", "value")
+        Span.log(span1, 123, {logkey="logvalue", logkey1="logvalue2"})
 
-        local spanBuilder = span1:transform()
+        local spanBuilder = Span.transform(span1)
         lu.assertEquals(#spanBuilder.refs, 1)
         lu.assertNil(spanBuilder.spanLayer)
         lu.assertEquals(spanBuilder.spanType, "Entry")

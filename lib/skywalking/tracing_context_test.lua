@@ -18,6 +18,7 @@
 local lu = require('luaunit')
 local TC = require('tracing_context')
 local Segment = require('segment')
+local Span = require('span')
 
 TestTracingContext = {}
     function TestTracingContext:testNew()
@@ -57,12 +58,12 @@ TestTracingContext = {}
         lu.assertEquals(span1, activeSpans[1])
         lu.assertEquals(span2, activeSpans[2])
 
-        span2:finish()
+        Span.finish(span2)
         lu.assertNotNil(span2.end_time)
         lu.assertEquals(#(activeSpans), 1)
         lu.assertEquals(#(finishedSpans), 1)
 
-        span1:finish()
+        Span.finish(span1)
         lu.assertNotNil(span1.end_time)
         lu.assertEquals(#(activeSpans), 0)
         lu.assertEquals(#(finishedSpans), 2)
