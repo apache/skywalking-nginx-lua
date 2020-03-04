@@ -97,7 +97,7 @@ function Span:createExitSpan(operationName, context, parent, peer, contextCarrie
         injectableRef.segment_id = context.segment_id
         injectableRef.span_id = span.span_id
         -- injectableRef.network_address_id wouldn't be set. Right now, there is no network_address register mechanism
-        injectableRef.network_address = '#' .. peer
+        injectableRef.network_address = peer
 
         local entryServiceInstanceId
         local entryEndpointName
