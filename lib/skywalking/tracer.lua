@@ -17,7 +17,7 @@
 
 local Tracer = {}
 
-function Tracer:startBackendTimer()
+function Tracer:start(upstream_name)
     local metadata_buffer = ngx.shared.tracing_buffer
     local TC = require('tracing_context')
     local Layer = require('span_layer')
@@ -50,14 +50,8 @@ function Tracer:startBackendTimer()
     -- Use the same URI to represent incoming and forwarding requests
     -- Change it if you need.
     local upstreamUri = ngx.var.uri
-    ------------------------------------------------------
-    -- NOTICE, this should be changed manually
-    -- This variable represents the upstream logic address
-    -- Please set them as service logic name or DNS name
-    --
-    -- TODO, currently, we can't have the upstream real network address
-    ------------------------------------------------------
-    local upstreamServerName = serviceName .. "-nginx:upstream_ip:port"
+
+    local upstreamServerName = upstream_name
     ------------------------------------------------------
     local exitSpan = tracingContext:createExitSpan(upstreamUri, entrySpan, upstreamServerName, contextCarrier)
     exitSpan:start(ngx.now() * 1000)
