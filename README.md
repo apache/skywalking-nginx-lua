@@ -41,7 +41,14 @@ http {
             default_type text/html;
 
             rewrite_by_lua_block {
-                require("tracer"):start()
+                ------------------------------------------------------
+                -- NOTICE, this should be changed manually
+                -- This variable represents the upstream logic address
+                -- Please set them as service logic name or DNS name
+                --
+                -- TODO, currently, we ca not have the upstream real network address
+                ------------------------------------------------------
+                require("tracer"):start("upstream service")
             }
 
             -- Target upstream service
