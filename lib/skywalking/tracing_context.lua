@@ -151,7 +151,7 @@ end
 -- if isSegmentFinished == false, SpanList = nil
 function _M.drainAfterFinished(tracingContext)
     if tracingContext.is_noop then
-        return true, {}
+        return false, nil
     end
 
     if tracingContext.internal.active_count ~= 0 then

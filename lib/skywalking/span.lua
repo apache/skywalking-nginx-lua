@@ -168,7 +168,6 @@ function _M.new(operationName, context, parent)
     end
 
     context.internal.addActive(context.internal, span)
-    -- span.start_time = Util.timestamp()
     span.refs = {}
     span.owner = context
 
