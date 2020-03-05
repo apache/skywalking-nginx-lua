@@ -98,10 +98,6 @@ function _M.formatID(str)
         return nil
     end
 
-    parts[1] = tonumber(parts[1])
-    parts[2] = tonumber(parts[2])
-    parts[3] = tonumber(parts[3])
-
     return parts
 end
 

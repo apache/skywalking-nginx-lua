@@ -19,7 +19,7 @@ segmentItems:
             isError: false
             parentSpanId: 0
             componentId: 6000
-            peer: 'User_Service_Name-nginx:upstream_ip:port'
+            peer: 'User_Service_Name-nginx:upstream_ip2:port2'
             spanLayer: HTTP
           - operationName: /tier2/lb
             startTime: gt 0
