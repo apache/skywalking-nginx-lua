@@ -1,19 +1,19 @@
--- 
+--
 -- Licensed to the Apache Software Foundation (ASF) under one or more
 -- contributor license agreements.  See the NOTICE file distributed with
 -- this work for additional information regarding copyright ownership.
 -- The ASF licenses this file to You under the Apache License, Version 2.0
 -- (the "License"); you may not use this file except in compliance with
 -- the License.  You may obtain a copy of the License at
--- 
+--
 --    http://www.apache.org/licenses/LICENSE-2.0
--- 
+--
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
--- 
+--
 
 
 local lu = require('luaunit')
@@ -23,7 +23,7 @@ local cjson = require("cjson")
 TestSegmentRef = {}
     -- This test is originally from ContextCarrierV2HeaderTest in the Java agent.
     function TestSegmentRef:testFromSW6Value()
-        local ref = SegmentRef:new():fromSW6Value('1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
+        local ref = SegmentRef.fromSW6Value('1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
         lu.assertNotNil(ref)
         lu.assertEquals(ref.trace_id, {"3", "4", "5"})
         lu.assertEquals(ref.segment_id, {"1", "2", "3"})
@@ -37,12 +37,12 @@ TestSegmentRef = {}
         lu.assertEquals(ref.parent_endpoint_name, nil)
         lu.assertEquals(ref.parent_endpoint_id, 123)
 
-        ref = SegmentRef:new():fromSW6Value('1-My40LjU=-MS')
+        ref = SegmentRef.fromSW6Value('1-My40LjU=-MS')
         lu.assertNil(ref)
     end
 
     function TestSegmentRef:testSerialize()
-        local ref = SegmentRef:new()
+        local ref = SegmentRef.new()
         ref.trace_id = {3, 4, 5}
         ref.segment_id = {1, 2, 3}
         ref.span_id = 4
@@ -52,11 +52,11 @@ TestSegmentRef = {}
         ref.entry_endpoint_name = "/portal"
         ref.parent_endpoint_id = 123
 
-        lu.assertEquals(ref:serialize(), '1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
+        lu.assertEquals(SegmentRef.serialize(ref), '1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
     end
 
     function TestSegmentRef:testTransform()
-        local ref = SegmentRef:new()
+        local ref = SegmentRef.new()
         ref.trace_id = {3, 4, 5}
         ref.segment_id = {1, 2, 3}
         ref.span_id = 4
@@ -66,7 +66,7 @@ TestSegmentRef = {}
         ref.entry_endpoint_name = "/portal"
         ref.parent_endpoint_id = 123
 
-        local refProtocol = ref:transform()
+        local refProtocol = SegmentRef.transform(ref)
         local inJSON = cjson.encode(refProtocol)
         lu.assertTrue(string.len(inJSON) > 0)
     end

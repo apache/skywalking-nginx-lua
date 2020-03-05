@@ -17,65 +17,49 @@
 
 -- Segment represents a finished tracing context
 -- Including all information to send to the SkyWalking OAP server.
-local Util = require('util')
+local Span = require('span')
 
-local Segment = {
-    trace_id,
-    segment_id,
-    service_id,
-    service_inst_id,
-    spans,
-}
+local _M = {}
+-- local Segment = {
+--     trace_id,
+--     segment_id,
+--     service_id,
+--     service_inst_id,
+--     spans,
+-- }
 
 -- Due to nesting relationship inside Segment/Span/TracingContext at the runtime,
 -- SegmentProtocol is created to prepare JSON format serialization.
 -- Following SkyWalking official trace protocol v2
 -- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
-local SegmentProtocol = {
-    globalTraceIds,
-    traceSegmentId,
-    serviceId,
-    serviceInstanceId,
-    spans,
-}
-
-function Segment:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    return o
-end
-
-function SegmentProtocol:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    o.globalTraceIds = {}
-
-    return o
-end
+-- local SegmentProtocol = {
+--     globalTraceIds,
+--     traceSegmentId,
+--     serviceId,
+--     serviceInstanceId,
+--     spans,
+-- }
 
 -- Return SegmentProtocol
-function Segment:transform()
-    local segmentBuilder = SegmentProtocol:new()
-    segmentBuilder.serviceId = self.service_id
-    segmentBuilder.globalTraceIds[1] = { idParts = self.trace_id}
-    segmentBuilder.traceSegmentId = { idParts = self.segment_id}
-    segmentBuilder.serviceId = self.service_id
-    segmentBuilder.serviceInstanceId = self.service_inst_id
+function _M.transform(segment)
+    local segmentBuilder = {}
+    segmentBuilder.serviceId = segment.service_id
+    segmentBuilder.globalTraceIds = {}
+    segmentBuilder.globalTraceIds[1] = {idParts = segment.trace_id}
+    segmentBuilder.traceSegmentId = {idParts = segment.segment_id}
+    segmentBuilder.serviceId = segment.service_id
+    segmentBuilder.serviceInstanceId = segment.service_inst_id
 
     segmentBuilder.spans = {}
 
-    if self.spans ~= nil and #self.spans > 0 then
-        for i, span in ipairs(self.spans)
-        do 
-            segmentBuilder.spans[#segmentBuilder.spans + 1] = span:transform()
+    if segment.spans ~= nil and #segment.spans > 0 then
+        for i, span in ipairs(segment.spans)
+        do
+            segmentBuilder.spans[#segmentBuilder.spans + 1] = Span.transform(span)
         end
     end
 
     return segmentBuilder
 end
 
-return Segment
+return _M

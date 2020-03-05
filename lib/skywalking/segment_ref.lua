@@ -16,142 +16,147 @@
 --
 local Util = require('util')
 local Base64 = require('dependencies/base64')
+local encode_base64 = Base64.encode
+local decode_base64 = Base64.decode
 
-local SegmentRef = {
-    -- There is no multiple-threads scenario in the LUA, no only hard coded as CROSS_PROCESS
-    type = 'CROSS_PROCESS',
-    trace_id,
-    segment_id,
-    span_id,
-    network_address,
-    network_address_id = 0,
-    entry_service_instance_id = 0,
-    parent_service_instance_id = 0,
-    entry_endpoint_name,
-    entry_endpoint_id = 0,
-    parent_endpoint_name,
-    parent_endpoint_id = 0,
-}
-
--- Due to nesting relationship inside Segment/Span/TracingContext at the runtime,
--- RefProtocol is created to prepare JSON format serialization.
--- Following SkyWalking official trace protocol v2
--- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
-local RefProtocol = {
-    -- Constant in LUA, no cross-thread
-    refType = 'CrossProcess',
-    parentTraceSegmentId,
-    parentSpanId,
-    parentServiceInstanceId,
-    networkAddress,
-    networkAddressId,
-    entryServiceInstanceId,
-    entryEndpoint,
-    entryEndpointId,
-    parentEndpoint,
-    parentEndpointId,
-}
-
-function SegmentRef:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-
-    return o
+if Util.is_ngx_lua then
+    encode_base64 = ngx.encode_base64
+    decode_base64 = ngx.decode_base64
 end
 
-function RefProtocol:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
+local _M = {}
+-- local SegmentRef = {
+--     -- There is no multiple-threads scenario in the LUA, no only hard coded as CROSS_PROCESS
+--     type = 'CROSS_PROCESS',
+--     trace_id,
+--     segment_id,
+--     span_id,
+--     network_address,
+--     network_address_id = 0,
+--     entry_service_instance_id = 0,
+--     parent_service_instance_id = 0,
+--     entry_endpoint_name,
+--     entry_endpoint_id = 0,
+--     parent_endpoint_name,
+--     parent_endpoint_id = 0,
+-- }
 
-    return o
+function _M.new()
+    return {
+        type = 'CROSS_PROCESS',
+        network_address_id = 0,
+        entry_service_instance_id = 0,
+        parent_service_instance_id = 0,
+        entry_endpoint_id = 0,
+        parent_endpoint_id = 0,
+    }
 end
 
 -- Deserialize value from the propagated context and initialize the SegmentRef
-function SegmentRef:fromSW6Value(value)
+function _M.fromSW6Value(value)
+    local ref = _M.new()
+
     local parts = Util.split(value, '-')
     if #parts ~= 9 then
         return nil
     end
 
-    self.trace_id = Util.formatID(Base64.decode(parts[2]))
-    self.segment_id = Util.formatID(Base64.decode(parts[3]))
-    self.span_id = tonumber(parts[4])
-    self.parent_service_instance_id = tonumber(parts[5])
-    self.entry_service_instance_id = tonumber(parts[6])
-    local peerStr = Base64.decode(parts[7])
+    ref.trace_id = Util.formatID(decode_base64(parts[2]))
+    ref.segment_id = Util.formatID(decode_base64(parts[3]))
+    ref.span_id = tonumber(parts[4])
+    ref.parent_service_instance_id = tonumber(parts[5])
+    ref.entry_service_instance_id = tonumber(parts[6])
+    local peerStr = decode_base64(parts[7])
     if string.sub(peerStr, 1, 1) == '#' then
-        self.network_address = string.sub(peerStr, 2)
+        ref.network_address = string.sub(peerStr, 2)
     else
-        self.network_address_id = tonumber(peerStr)
+        ref.network_address_id = tonumber(peerStr)
     end
-    local entryEndpointStr = Base64.decode(parts[8])
+    local entryEndpointStr = decode_base64(parts[8])
     if string.sub(entryEndpointStr, 1, 1) == '#' then
-        self.entry_endpoint_name = string.sub(entryEndpointStr, 2)
+        ref.entry_endpoint_name = string.sub(entryEndpointStr, 2)
     else
-        self.entry_endpoint_id = tonumber(entryEndpointStr)
+        ref.entry_endpoint_id = tonumber(entryEndpointStr)
     end
-    local parentEndpointStr = Base64.decode(parts[9])
+    local parentEndpointStr = decode_base64(parts[9])
     if string.sub(parentEndpointStr, 1, 1) == '#' then
-        self.parent_endpoint_name = string.sub(parentEndpointStr, 2)
+        ref.parent_endpoint_name = string.sub(parentEndpointStr, 2)
     else
-        self.parent_endpoint_id = tonumber(parentEndpointStr)
+        ref.parent_endpoint_id = tonumber(parentEndpointStr)
     end
 
-    return self
+    return ref
 end
 
 -- Return string to represent this ref.
-function SegmentRef:serialize()
+function _M.serialize(ref)
     local encodedRef = '1'
-    encodedRef = encodedRef .. '-' .. Base64.encode(Util.id2String(self.trace_id))
-    encodedRef = encodedRef .. '-' .. Base64.encode(Util.id2String(self.segment_id))
-    encodedRef = encodedRef .. '-' .. self.span_id
-    encodedRef = encodedRef .. '-' .. self.parent_service_instance_id
-    encodedRef = encodedRef .. '-' .. self.entry_service_instance_id
+    encodedRef = encodedRef .. '-' .. encode_base64(Util.id2String(ref.trace_id))
+    encodedRef = encodedRef .. '-' .. encode_base64(Util.id2String(ref.segment_id))
+    encodedRef = encodedRef .. '-' .. ref.span_id
+    encodedRef = encodedRef .. '-' .. ref.parent_service_instance_id
+    encodedRef = encodedRef .. '-' .. ref.entry_service_instance_id
 
     local networkAddress
-    if self.network_address_id ~= 0 then
-        networkAddress = self.network_address_id .. ''
+    if ref.network_address_id ~= 0 then
+        networkAddress = ref.network_address_id .. ''
     else
-        networkAddress = '#' .. self.network_address
+        networkAddress = '#' .. ref.network_address
     end
-    encodedRef = encodedRef .. '-' .. Base64.encode(networkAddress)
+    encodedRef = encodedRef .. '-' .. encode_base64(networkAddress)
 
     local entryEndpoint
-    if self.entry_endpoint_id ~= 0 then
-        entryEndpoint = self.entry_endpoint_id .. ''
+    if ref.entry_endpoint_id ~= 0 then
+        entryEndpoint = ref.entry_endpoint_id .. ''
     else
-        entryEndpoint = '#' .. self.entry_endpoint_name
+        entryEndpoint = '#' .. ref.entry_endpoint_name
     end
-    encodedRef = encodedRef .. '-' .. Base64.encode(entryEndpoint)
+    encodedRef = encodedRef .. '-' .. encode_base64(entryEndpoint)
 
     local parentEndpoint
-    if self.parent_endpoint_id ~= 0 then
-        parentEndpoint = self.parent_endpoint_id .. ''
+    if ref.parent_endpoint_id ~= 0 then
+        parentEndpoint = ref.parent_endpoint_id .. ''
     else
-        parentEndpoint = '#' .. self.parent_endpoint_name
+        parentEndpoint = '#' .. ref.parent_endpoint_name
     end
-    encodedRef = encodedRef .. '-' .. Base64.encode(parentEndpoint)
+    encodedRef = encodedRef .. '-' .. encode_base64(parentEndpoint)
 
     return encodedRef
 end
 
+-- Due to nesting relationship inside Segment/Span/TracingContext at the runtime,
+-- RefProtocol is created to prepare JSON format serialization.
+-- Following SkyWalking official trace protocol v2
+-- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
+-- local RefProtocol = {
+--     -- Constant in LUA, no cross-thread
+--     refType = 'CrossProcess',
+--     parentTraceSegmentId,
+--     parentSpanId,
+--     parentServiceInstanceId,
+--     networkAddress,
+--     networkAddressId,
+--     entryServiceInstanceId,
+--     entryEndpoint,
+--     entryEndpointId,
+--     parentEndpoint,
+--     parentEndpointId,
+-- }
 -- Return RefProtocol
-function SegmentRef:transform()
-    local refBuilder = RefProtocol:new()
-    refBuilder.parentTraceSegmentId = {idParts = self.segment_id }
-    refBuilder.parentSpanId = self.span_id
-    refBuilder.parentServiceInstanceId = self.parent_service_instance_id
-    refBuilder.networkAddress = self.network_address
-    refBuilder.networkAddressId = self.network_address_id
-    refBuilder.entryServiceInstanceId = self.entry_service_instance_id
-    refBuilder.entryEndpoint = self.entry_endpoint_name
-    refBuilder.entryEndpointId = self.entry_endpoint_id
-    refBuilder.parentEndpoint = self.parent_endpoint_name
-    refBuilder.parentEndpointId = self.parent_endpoint_id
+function _M.transform(ref)
+    local refBuilder = {}
+    refBuilder.refType = 'CrossProcess'
+    refBuilder.parentTraceSegmentId = {idParts = ref.segment_id }
+    refBuilder.parentSpanId = ref.span_id
+    refBuilder.parentServiceInstanceId = ref.parent_service_instance_id
+    refBuilder.networkAddress = ref.network_address
+    refBuilder.networkAddressId = ref.network_address_id
+    refBuilder.entryServiceInstanceId = ref.entry_service_instance_id
+    refBuilder.entryEndpoint = ref.entry_endpoint_name
+    refBuilder.entryEndpointId = ref.entry_endpoint_id
+    refBuilder.parentEndpoint = ref.parent_endpoint_name
+    refBuilder.parentEndpointId = ref.parent_endpoint_id
     return refBuilder
 end
 
-return SegmentRef
+return _M

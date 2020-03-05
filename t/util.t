@@ -19,6 +19,7 @@ our $HttpConfig = qq{
 run_tests;
 
 __DATA__
+
 === TEST 1: timestamp
 --- http_config eval: $::HttpConfig
 --- config

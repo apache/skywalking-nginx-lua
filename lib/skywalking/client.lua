@@ -1,19 +1,19 @@
--- 
+--
 -- Licensed to the Apache Software Foundation (ASF) under one or more
 -- contributor license agreements.  See the NOTICE file distributed with
 -- this work for additional information regarding copyright ownership.
 -- The ASF licenses this file to You under the Apache License, Version 2.0
 -- (the "License"); you may not use this file except in compliance with
 -- the License.  You may obtain a copy of the License at
--- 
+--
 --    http://www.apache.org/licenses/LICENSE-2.0
--- 
+--
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
--- 
+--
 
 local Client = {}
 
@@ -78,9 +78,9 @@ function Client:registerService(metadata_buffer, backend_http_uri)
     local ERR = ngx.ERR
 
     local serviceName = metadata_buffer:get('serviceName')
-    
+
     local cjson = require('cjson')
-    local serviceRegister = require("register"):newServiceRegister(serviceName)
+    local serviceRegister = require("register").newServiceRegister(serviceName)
     local serviceRegisterParam = cjson.encode(serviceRegister)
 
     local http = require('resty.http')
@@ -102,7 +102,7 @@ function Client:registerService(metadata_buffer, backend_http_uri)
         for i, result in ipairs(registerResults)
         do
             if result.key == serviceName then
-                local serviceId = result.value 
+                local serviceId = result.value
                 log(DEBUG, "Service registered, service id = " .. serviceId)
                 metadata_buffer:set('serviceId', serviceId)
             end
@@ -122,9 +122,9 @@ function Client:registerServiceInstance(metadata_buffer, backend_http_uri)
     metadata_buffer:set('serviceInstanceUUID', serviceInstName)
 
     local cjson = require('cjson')
-    local serviceInstanceRegister = require("register"):newServiceInstanceRegister(
-        metadata_buffer:get('serviceId'), 
-        serviceInstName, 
+    local serviceInstanceRegister = require("register").newServiceInstanceRegister(
+        metadata_buffer:get('serviceId'),
+        serviceInstName,
         ngx.now() * 1000)
     local serviceInstanceRegisterParam = cjson.encode(serviceInstanceRegister)
 
@@ -146,7 +146,7 @@ function Client:registerServiceInstance(metadata_buffer, backend_http_uri)
             for i, result in ipairs(registerResults)
             do
                 if result.key == serviceInstName then
-                    local serviceId = result.value 
+                    local serviceId = result.value
                     log(DEBUG, "Service Instance registered, service instance id = " .. serviceId)
                     metadata_buffer:set('serviceInstId', serviceId)
                 end
@@ -166,9 +166,9 @@ function Client:ping(metadata_buffer, backend_http_uri)
     local ERR = ngx.ERR
 
     local cjson = require('cjson')
-    local pingPkg = require("register"):newServiceInstancePingPkg(
-        metadata_buffer:get('serviceInstId'), 
-        metadata_buffer:get('serviceInstanceUUID'), 
+    local pingPkg = require("register").newServiceInstancePingPkg(
+        metadata_buffer:get('serviceInstId'),
+        metadata_buffer:get('serviceInstanceUUID'),
         ngx.now() * 1000)
     local pingPkgParam = cjson.encode(pingPkg)
 
@@ -214,7 +214,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
                 ["Content-Type"] = "application/json",
             },
         })
-        
+
         if err == nil then
             if res.status ~= 200 then
                 log(ERR, "Segment report fails, response code " .. res.status)
