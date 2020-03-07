@@ -28,7 +28,7 @@ http {
 
         -- Set service name
         metadata_buffer:set('serviceName', 'User Service Name')
-        -- Instance means the number of Nginx deloyment, does not mean the worker instances
+        -- Instance means the number of Nginx deployment, does not mean the worker instances
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
 
         require("client"):startBackendTimer("http://127.0.0.1:8080")
