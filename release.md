@@ -19,7 +19,6 @@ Use SVN to upload the files(tgz, asc and sha512) in the `release` folder to `htt
 
 The test build of x.y.z is available.
 
-This is our Apache release.
 We welcome any comments you may have, and will take all feedback into
 account if a quality vote is called for this build.
 
