@@ -81,8 +81,11 @@ Keys to verify the Release Candidate :
  * https://dist.apache.org/repos/dist/release/skywalking/KEYS
 
 
-A vote regarding the quality of this test build will be initiated
-within the next couple of days.
+Voting will start now (xxxx date) and will remain open for at least 72 hours, Request all PMC members to give their vote.
+[ ] +1 Release this package.
+[ ] +0 No opinion.
+[ ] -1 Do not release this package because....
+
 ```
 
 5. Publish release, if vote passed.
