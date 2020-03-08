@@ -16,12 +16,12 @@
 -- 
 
 local Layer = {
-    NONE = {name = "NONE", value=0},
-    DB = {name = "DB", value=1},
-    RPC_FRAMEWORK = {name = "RPC_FRAMEWORK", value=2},
-    HTTP = {name = "HTTP", value=3},
+    NONE = {name = "Unknown", value=0},
+    DB = {name = "Database", value=1},
+    RPC_FRAMEWORK = {name = "RPCFramework", value=2},
+    HTTP = {name = "Http", value=3},
     MQ = {name = "MQ", value=4},
-    CACHE = {name = "CACHE", value=5},
+    CACHE = {name = "Cache", value=5},
 }
 
 return Layer
