@@ -20,7 +20,7 @@ segmentItems:
             parentSpanId: 0
             componentId: 6000
             peer: 'User_Service_Name-nginx:upstream_ip2:port2'
-            spanLayer: HTTP
+            spanLayer: Http
           - operationName: /tier2/lb
             startTime: gt 0
             tags:
@@ -36,7 +36,7 @@ segmentItems:
               - {parentEndpointId: 0, entryEndpointId: 0, parentServiceInstanceId: 1, parentEndpoint: /ingress, parentTraceSegmentId: parentTraceSegmentId,
                  networkAddress: '#User_Service_Name-nginx:upstream_ip:port', parentSpanId: 1,
                  entryServiceInstanceId: 1, networkAddressId: 0, entryEndpoint: /ingress}
-            spanLayer: HTTP
+            spanLayer: Http
       - segmentId: not null
         spans:
           - operationName: /ingress
@@ -48,7 +48,7 @@ segmentItems:
             parentSpanId: 0
             componentId: 6000
             peer: 'User_Service_Name-nginx:upstream_ip:port'
-            spanLayer: HTTP
+            spanLayer: Http
           - operationName: /ingress
             startTime: gt 0
             tags:
@@ -59,5 +59,5 @@ segmentItems:
             spanId: 0
             parentSpanId: -1
             isError: false
-            spanLayer: HTTP
+            spanLayer: Http
             componentId: 6000
