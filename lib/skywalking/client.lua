@@ -231,7 +231,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
     end
 
     if count > 0 then
-        log(ERR, count,  " segments reported.")
+        log(DEBUG, count,  " segments reported.")
     end
 end
 
