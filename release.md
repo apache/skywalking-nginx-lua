@@ -97,6 +97,7 @@ Move the release from RC folder to the dist folder. This will begin the file syn
 ....
 enter your apache password
 ....
+```
 
 Send ANNOUNCE mail to dev@skywalking.apache.org
 ```
@@ -127,4 +128,4 @@ SkyWalking Resources:
 
 
 - Apache SkyWalking Team
-- ```
+```
