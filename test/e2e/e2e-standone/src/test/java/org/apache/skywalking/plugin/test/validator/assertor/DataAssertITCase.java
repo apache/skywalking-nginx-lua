@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.skywalking.plugin.test.validator.validator.assertor;
+package org.apache.skywalking.plugin.test.validator.assertor;
 
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -53,7 +53,7 @@ public class DataAssertITCase {
 
         for (int times = 0; times < 30; times++) { // retry 30 times, that will spend 60s in the worst case.
             final DataCollector collector = new DataCollector();
-            URL url = DataAssertIT.class.getResource("/logs/trace.log");
+            URL url = DataAssertITCase.class.getResource("/logs/trace.log");
             List<String> lines = Files.readAllLines(new File(url.getFile()).toPath());
             log.info("lines : {}", lines.size());
 
