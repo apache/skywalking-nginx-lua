@@ -1,0 +1,79 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+registryItems:
+  applications:
+    - {'nginx-e2e-standone': 2}
+  instances:
+    - {'nginx-e2e-standone': 1}
+  operationNames:
+    - nginx-e2e-standone: [/tier2/lb, /ingress]
+segmentItems:
+  - serviceName: nginx-e2e-standone
+    segmentSize: eq 2
+    segments:
+      - segmentId: not null
+        spans:
+          - operationName: /tier2/lb
+            startTime: gt 0
+            endTime: gt 0
+            spanType: Exit
+            spanId: 1
+            isError: false
+            parentSpanId: 0
+            componentId: 6000
+            peer: 'nginx-e2e-standone:upstream_ip2:port2'
+            spanLayer: Http
+          - operationName: /tier2/lb
+            startTime: gt 0
+            tags:
+              - {key: http.method, value: GET}
+              - {key: http.params, value: 'http://127.0.0.1/tier2/lb'}
+            endTime: gt 0
+            spanType: Entry
+            spanId: 0
+            isError: false
+            parentSpanId: -1
+            componentId: 6000
+            refs:
+              - {parentEndpointId: 0, entryEndpointId: 0, parentServiceInstanceId: 1, parentEndpoint: /ingress, parentTraceSegmentId: not null,
+                 networkAddress: 'nginx-e2e-standone:upstream_ip:port', parentSpanId: 1,
+                 entryServiceInstanceId: 1, networkAddressId: 0, entryEndpoint: /ingress}
+            spanLayer: Http
+      - segmentId: not null
+        spans:
+          - operationName: /ingress
+            startTime: gt 0
+            endTime: gt 0
+            spanType: Exit
+            spanId: 1
+            isError: false
+            parentSpanId: 0
+            componentId: 6000
+            peer: 'nginx-e2e-standone:upstream_ip:port'
+            spanLayer: Http
+          - operationName: /ingress
+            startTime: gt 0
+            tags:
+              - {key: http.method, value: GET}
+              - {key: http.params, value: 'not null'}
+            endTime: gt 0
+            spanType: Entry
+            spanId: 0
+            parentSpanId: -1
+            isError: false
+            spanLayer: Http
+            componentId: 6000
