@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.skywalking.plugin.test.validator.validator.assertor;
+package org.apache.skywalking.plugin.test.validator.assertor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.skywalking.plugin.test.validator.validator.assertor.entity.ExpectedDataEntity;
-import org.apache.skywalking.plugin.test.validator.validator.assertor.entity.RegistryItemsEntity;
+import org.apache.skywalking.plugin.test.validator.assertor.entity.ExpectedDataEntity;
+import org.apache.skywalking.plugin.test.validator.assertor.entity.RegistryItemsEntity;
 
 @Slf4j
 public class DataCollector {

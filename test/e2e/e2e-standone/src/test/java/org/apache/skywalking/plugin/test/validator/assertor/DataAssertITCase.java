@@ -33,9 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.skywalking.plugin.test.agent.tool.validator.assertor.DataAssert;
 import org.apache.skywalking.plugin.test.agent.tool.validator.assertor.exception.TypeUndefinedException;
 import org.apache.skywalking.plugin.test.agent.tool.validator.entity.Data;
-import org.apache.skywalking.plugin.test.agent.tool.validator.entity.DataForRead;
 import org.junit.Test;
-import org.yaml.snakeyaml.Yaml;
 
 @Slf4j
 public class DataAssertITCase {

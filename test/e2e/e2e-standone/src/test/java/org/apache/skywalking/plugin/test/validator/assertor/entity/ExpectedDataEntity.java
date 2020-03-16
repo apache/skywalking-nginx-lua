@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.skywalking.plugin.test.validator.validator.assertor.entity;
+package org.apache.skywalking.plugin.test.validator.assertor.entity;
 
 import com.google.gson.JsonObject;
 import java.util.List;

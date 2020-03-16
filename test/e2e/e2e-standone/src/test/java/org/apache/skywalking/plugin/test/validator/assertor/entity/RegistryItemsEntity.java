@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.skywalking.plugin.test.validator.validator.assertor.entity;
+package org.apache.skywalking.plugin.test.validator.assertor.entity;
 
 import java.util.List;
 import java.util.Map;
