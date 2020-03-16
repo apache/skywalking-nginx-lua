@@ -13,16 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 registryItems:
   applications:
-    - {'nginx-e2e-standone': 2}
+    - {'User_Service_Name': 2}
   instances:
-    - {'nginx-e2e-standone': 1}
+    - {'User_Service_Name': 1}
   operationNames:
-    - nginx-e2e-standone: [/tier2/lb, /ingress]
+    - User_Service_Name: [/tier2/lb, /ingress]
 segmentItems:
-  - serviceName: nginx-e2e-standone
+  - serviceName: User_Service_Name
     segmentSize: eq 2
     segments:
       - segmentId: not null
@@ -35,7 +34,7 @@ segmentItems:
             isError: false
             parentSpanId: 0
             componentId: 6000
-            peer: 'nginx-e2e-standone:upstream_ip2:port2'
+            peer: 'User_Service_Name-nginx:upstream_ip2:port2'
             spanLayer: Http
           - operationName: /tier2/lb
             startTime: gt 0
@@ -50,7 +49,7 @@ segmentItems:
             componentId: 6000
             refs:
               - {parentEndpointId: 0, entryEndpointId: 0, parentServiceInstanceId: 1, parentEndpoint: /ingress, parentTraceSegmentId: not null,
-                 networkAddress: 'nginx-e2e-standone:upstream_ip:port', parentSpanId: 1,
+                 networkAddress: '#User_Service_Name-nginx:upstream_ip:port', parentSpanId: 1,
                  entryServiceInstanceId: 1, networkAddressId: 0, entryEndpoint: /ingress}
             spanLayer: Http
       - segmentId: not null
@@ -63,7 +62,7 @@ segmentItems:
             isError: false
             parentSpanId: 0
             componentId: 6000
-            peer: 'nginx-e2e-standone:upstream_ip:port'
+            peer: 'User_Service_Name-nginx:upstream_ip:port'
             spanLayer: Http
           - operationName: /ingress
             startTime: gt 0

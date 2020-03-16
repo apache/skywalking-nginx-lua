@@ -42,6 +42,6 @@ jobs:
           maven-version: 3.6.1
       - name: Set environment
         run: export MAVEN_OPTS='-Dmaven.repo.local=~/.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-      - name: Compile & Install Test Codes
+      - name: E2E Test
         run: |
-          mvn -f ./test/e2e/validator/pom.xml clean verify
+          mvn -f ./test/e2e/pom.xml package verify

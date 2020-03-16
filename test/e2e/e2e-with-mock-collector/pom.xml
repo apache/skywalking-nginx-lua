@@ -25,8 +25,7 @@
         <artifactId>e2e-tests</artifactId>
         <version>1.0.0</version>
     </parent>
-
-    <artifactId>e2e-standone</artifactId>
+    <artifactId>e2e-with-mock-collector</artifactId>
     <packaging>jar</packaging>
 
     <build>
@@ -41,18 +40,24 @@
                             <name>openresty/openresty</name>
                             <alias>openresty-with-skywalking</alias>
                             <run>
+                                <dependsOn>
+                                    <container>skywalking-collector</container>
+                                </dependsOn>
                                 <ports>
                                     <port>+nginx.host:nginx.port:8080</port>
                                 </ports>
                                 <volumes>
                                     <bind>
-                                        <volume>${project.build.testOutputDirectory}/logs:/var/log/nginx</volume>
                                         <volume>${project.basedir}/conf.d:/var/nginx/conf.d</volume>
+                                        <volume>${project.basedir}/bin:/opt/bin</volume>
                                         <volume>
                                             ${project.basedir}/../../../lib:/usr/local/skywalking-nginx-lua/lib
                                         </volume>
                                     </bind>
                                 </volumes>
+                                <links>
+                                    <link>skywalking-collector</link>
+                                </links>
                                 <wait>
                                     <http>
                                         <url>
@@ -61,7 +66,22 @@
                                     </http>
                                     <time>30000</time>
                                 </wait>
-                                <cmd>/usr/bin/openresty -c /var/nginx/conf.d/nginx.conf</cmd>
+                                <cmd>bash /opt/bin/startup.sh</cmd>
+                            </run>
+                        </image>
+                        <image>
+                            <name>skywalking-collector:${project.version}</name>
+                            <alias>skywalking-collector</alias>
+                            <run>
+                                <ports>
+                                    <port>+collector.host:collector.port:12800</port>
+                                </ports>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${collector.port}/receiveData</url>
+                                    </http>
+                                    <time>30000</time>
+                                </wait>
                             </run>
                         </image>
                     </images>
@@ -71,11 +91,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <ping.url>
-                            http://${nginx.host}:${nginx.port}/ingress
-                        </ping.url>
+                        <service.entry>http://${nginx.host}:${nginx.port}/ingress</service.entry>
+                        <validation.entry>http://${collector.host}:${collector.port}/dataValidate</validation.entry>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>

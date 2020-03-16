@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 @Slf4j
-public class DataAssertIT {
+public class DataAssertITCase {
     private static final Gson gson = new Gson();
 
     @Test
