@@ -16,13 +16,13 @@
 
 registryItems:
   applications:
-    - {'nginx-e2e-standone': 2}
+    - {'e2e-test-with-mock-collector': 2}
   instances:
-    - {'nginx-e2e-standone': 1}
+    - {'e2e-test-with-mock-collector': 1}
   operationNames:
-    - nginx-e2e-standone: [/tier2/lb, /ingress]
+    - e2e-test-with-mock-collector: [/tier2/lb, /ingress]
 segmentItems:
-  - serviceName: nginx-e2e-standone
+  - serviceName: e2e-test-with-mock-collector
     segmentSize: eq 2
     segments:
       - segmentId: not null
@@ -35,7 +35,7 @@ segmentItems:
             isError: false
             parentSpanId: 0
             componentId: 6000
-            peer: 'nginx-e2e-standone:upstream_ip2:port2'
+            peer: 'e2e-test-with-mock-collector:upstream_ip2:port2'
             spanLayer: Http
           - operationName: /tier2/lb
             startTime: gt 0
@@ -50,7 +50,7 @@ segmentItems:
             componentId: 6000
             refs:
               - {parentEndpointId: 0, entryEndpointId: 0, parentServiceInstanceId: 1, parentEndpoint: /ingress, parentTraceSegmentId: not null,
-                 networkAddress: 'nginx-e2e-standone:upstream_ip:port', parentSpanId: 1,
+                 networkAddress: 'e2e-test-with-mock-collector:upstream_ip:port', parentSpanId: 1,
                  entryServiceInstanceId: 1, networkAddressId: 0, entryEndpoint: /ingress}
             spanLayer: Http
       - segmentId: not null
@@ -63,7 +63,7 @@ segmentItems:
             isError: false
             parentSpanId: 0
             componentId: 6000
-            peer: 'nginx-e2e-standone:upstream_ip:port'
+            peer: 'e2e-test-with-mock-collector:upstream_ip:port'
             spanLayer: Http
           - operationName: /ingress
             startTime: gt 0
