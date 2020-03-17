@@ -32,7 +32,6 @@
 
     <modules>
         <module>agent-test-tools</module>
-        <module>e2e-standone</module>
         <module>e2e-with-mock-collector</module>
     </modules>
 
