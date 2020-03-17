@@ -37,22 +37,34 @@ public class DataAssertITCase {
     private static final int MAX_RETRY_TIMES = 5;
     private String validationEntry;
     private String serviceEntry;
+    private String healthCheckEntry;
 
     @Before
     public void setup() throws IOException {
         serviceEntry = System.getProperty("service.entry");
         validationEntry = System.getProperty("validation.entry");
+        healthCheckEntry = System.getProperty("healthcheck.entry");
     }
 
-    @Test
+    @Test(timeout = 180_000)
     public void verify() throws IOException, InterruptedException {
-        TimeUnit.SECONDS.sleep(5L); // Wait Nginx Lua Agent available.
+        int times = 0;
+
+        do {
+            TimeUnit.SECONDS.sleep(2L); // Wait Nginx Lua Agent available.
+
+            try (CloseableHttpResponse response = client.execute(new HttpGet(healthCheckEntry))) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    break;
+                }
+            }
+        } while (++times <= MAX_RETRY_TIMES);
 
         try (CloseableHttpResponse response = client.execute(new HttpGet(serviceEntry))) {
             Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         }
 
-        int times = 0;
+        times = 0;
         do {
             TimeUnit.SECONDS.sleep(5L); // Wait Agent reported TraceSegment.
 
