@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,34 +16,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: E2E
+WORK_DIRECTORY=$1
+RESPOSITORY=$2
+COMMIT_ID=$3
+DIST_DIRECTORY=$4
 
-on:
-  pull_request:
-  push:
-    branches: 
-      - master
-    tags:
-      - 'v*'
+HOME_DIR="$(cd "$(dirname $0)"; pwd)"
 
-jobs:
-  agent:
-    runs-on: ubuntu-18.04
-    timeout-minutes: 180
-    strategy:
-      fail-fast: true
-    steps:
-      - uses: actions/checkout@v1
-        with:
-          submodules: true
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 8
-      - uses: aahmed-se/setup-maven@v3
-        with:
-          maven-version: 3.6.1
-      - name: Set environment
-        run: export MAVEN_OPTS='-Dmaven.repo.local=~/.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-      - name: Compile & E2E Test
-        run: |
-          mvn -f ./test/e2e/pom.xml package verify
+git clone $RESPOSITORY $WORK_DIRECTORY
+
+cd $WORK_DIRECTORY
+
+git checkout $COMMIT_ID
+
+mvn -B package -DskipTests
+
+[[ -d $DIST_DIRECTORY ]] || mkdir -p $DIST_DIRECTORY
+
+cp $WORK_DIRECTORY/dist/* $DIST_DIRECTORY/

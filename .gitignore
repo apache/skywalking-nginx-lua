@@ -17,6 +17,5 @@ packages/
 .vscode
 .checkstyle
 .externalToolBuilders
-/test/plugin/dist
-/test/plugin/workspace
+/test/e2e/agent-test-tools/dist
 /t/servroot/
