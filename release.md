@@ -99,7 +99,7 @@ enter your apache password
 ....
 ```
 
-Send ANNOUNCE mail to dev@skywalking.apache.org
+Send ANNOUNCE email to `dev@skywalking.apache.org`, `announce@apache.org`, the sender should use Apache email account.
 ```
 Mail title: [ANNOUNCE] Release Apache SkyWalking Nginx LUA version x.y.z
 
@@ -113,18 +113,30 @@ especially designed for microservices, cloud native and container-based (Docker,
 
 SkyWalking Nginx Agent provides the native tracing capability for Nginx powered by Nginx LUA module.
 
-Vote Thread: 
+This release contains a number of new features, bug fixes and improvements compared to
+version a.b.c(last release). The notable changes since x.y.z include:
 
-Download Links : http://skywalking.apache.org/downloads/
+(Highlight key changes)
+1. ...
+2. ...
+3. ...
 
-Release Notes : https://github.com/apache/skywalking-nginx-lua/blob/vx.y.z/CHANGES.md
+Please refer to the change log for the complete list of changes:
+https://github.com/apache/skywalking/blob/v7.0.0/CHANGES.md
 
-Website: http://skywalking.apache.org/
+Apache SkyWalking website:
+http://skywalking.apache.org/
+
+Downloads:
+http://skywalking.apache.org/downloads/
+
+Twitter:
+https://twitter.com/ASFSkyWalking
 
 SkyWalking Resources:
+- GitHub: https://github.com/apache/skywalking
 - Issue: https://github.com/apache/skywalking/issues
 - Mailing list: dev@skywalkiing.apache.org
-- Documents: https://github.com/apache/skywalking-nginx-lua/tree/vx.y.z
 
 
 - Apache SkyWalking Team
