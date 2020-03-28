@@ -29,6 +29,7 @@ function Client:startBackendTimer(backend_http_uri)
 
     local log = ngx.log
     local DEBUG = ngx.DEBUG
+    local ERR = ngx.ERR    
 
     check = function(premature)
         if not premature then
