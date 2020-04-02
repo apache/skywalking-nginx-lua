@@ -135,7 +135,7 @@ Create 2 kinds of span
 * Join `skywalking` channel at [Apache Slack](https://join.slack.com/t/the-asf/shared_invite/enQtNzc2ODE3MjI1MDk1LTAyZGJmNTg1NWZhNmVmOWZjMjA2MGUyOGY4MjE5ZGUwOTQxY2Q3MDBmNTM5YTllNGU4M2QyMzQ4M2U4ZjQ5YmY). If the link is not working, find the latest one at [Apache INFRA WIKI](https://cwiki.apache.org/confluence/display/INFRA/Slack+Guest+Invites).
 * QQ Group: 392443393(2000/2000, not available), 901167865(available)
 
-# Relase Guide
+# Release Guide
 All committers should follow [Release Guide](release.md) to publish the official release.
 
 # License
