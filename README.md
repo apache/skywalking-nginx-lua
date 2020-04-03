@@ -1,4 +1,4 @@
-Apache SkyWalking Nginx Agent
+Apache SkyWalking Nginx Agent With Customer Namespace
 ==========
 
 <img src="http://skywalking.apache.org/assets/logo.svg" alt="Sky Walking logo" height="90px" align="right" />
@@ -31,7 +31,7 @@ http {
         -- Instance means the number of Nginx deployment, does not mean the worker instances
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
 
-        require("client"):startBackendTimer("http://127.0.0.1:8080")
+        require("client"):startBackendTimer("http://127.0.0.1:12800")
     }
 
     server {
@@ -47,8 +47,9 @@ http {
                 -- Please set them as service logic name or DNS name
                 --
                 -- Currently, we can not have the upstream real network address
+                -- The parameter "customer_namespace" for java agent config "agent.namespace"
                 ------------------------------------------------------
-                require("tracer"):start("upstream service")
+                require("tracer"):start("upstream service", "customer_namespace")
             }
 
             -- Target upstream service
