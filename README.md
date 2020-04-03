@@ -113,8 +113,8 @@ If you just use this in the Ngnix, [Setup Doc](#setup-doc) should be good enough
 The following APIs are for developers or using this lib out of the Nginx case.
 
 ## Nginx APIs
-- **startTimer**, `require("client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
-- **start**, `require("tracer"):start("upstream service")`. Begin the tracing before the upstream begin.
+- **startTimer**, `require("client"):startBackendTimer("http://127.0.0.1:12800")`. Start the skywalking backend timer. This timer register the metadata and report traces to the backend.
+- **start**, `require("tracer"):start("upstream service", "agent_name_space")`. Begin the tracing before the upstream begin, use the name_space with java agent config "agent.namespace" .
 - **finish**, `require("tracer"):finish()`. Finish the tracing for this HTTP request.
 - **prepareForReport**, `require("tracer"):prepareForReport()`. Prepare the finished segment for further report.
 
