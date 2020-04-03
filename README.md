@@ -1,4 +1,4 @@
-Apache SkyWalking Nginx Agent With Customer Namespace
+Apache SkyWalking Nginx Agent
 ==========
 
 <img src="http://skywalking.apache.org/assets/logo.svg" alt="Sky Walking logo" height="90px" align="right" />
