@@ -18,10 +18,15 @@ local Span = require('span')
 
 local Tracer = {}
 
-function Tracer:start(upstream_name)
+function Tracer:start(upstream_name, agent_name_space)
     local metadata_buffer = ngx.shared.tracing_buffer
     local TC = require('tracing_context')
     local Layer = require('span_layer')
+
+    local nameSpace = ""
+    if agent_name_space ~= nil then
+        nameSpace = agent_name_space .. "-"
+    end
 
     local tracingContext
     local serviceName = metadata_buffer:get("serviceName")
@@ -38,8 +43,8 @@ function Tracer:start(upstream_name)
     local nginxComponentId = 6000
 
     local contextCarrier = {}
-    contextCarrier["sw6"] = ngx.req.get_headers()["sw6"]
-    local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
+    contextCarrier[nameSpace .. "sw6"] = ngx.req.get_headers()[nameSpace .. "sw6"]
+    local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier, agent_name_space)
     Span.start(entrySpan, ngx.now() * 1000)
     Span.setComponentId(entrySpan, nginxComponentId)
     Span.setLayer(entrySpan, Layer.HTTP)
@@ -54,7 +59,7 @@ function Tracer:start(upstream_name)
 
     local upstreamServerName = upstream_name
     ------------------------------------------------------
-    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan, upstreamServerName, contextCarrier)
+    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan, upstreamServerName, contextCarrier, agent_name_space)
     Span.start(exitSpan, ngx.now() * 1000)
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
