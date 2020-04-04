@@ -97,8 +97,8 @@ local _M = {}
 -- local TracingContext = {
 --     trace_id,
 --     segment_id,
---     service_id,
---     service_inst_id,
+--     service,
+--     service_instance,
 --     is_noop = false,
 --     internal,
 -- }

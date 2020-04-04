@@ -83,7 +83,7 @@ Then you could
 1. See the `register logs` happens on the console log.
 ```
 2020/04/04 15:15:37 [debug] 12089#1446111: *4 [lua] content_by_lua(nginx.conf:175):4: Instance report request = {"service":"User Service Name","serviceInstance":"User Service Instance Name","properties":[{"language":"Lua"}]}
-2020/04/04 15:15:37 [debug] 12089#1446111: *2 [lua] client.lua:89: registerService(): Instance report response = {}
+2020/04/04 15:15:37 [debug] 12089#1446111: *2 [lua] client.lua:89: reportServiceInstance(): Instance report response = {}
 ```
 
 1. See the `heartbeat logs` happens after the `register logs`

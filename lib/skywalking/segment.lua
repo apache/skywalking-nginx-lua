@@ -30,8 +30,8 @@ local _M = {}
 
 -- Due to nesting relationship inside Segment/Span/TracingContext at the runtime,
 -- SegmentProtocol is created to prepare JSON format serialization.
--- Following SkyWalking official trace protocol v2
--- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
+-- Following SkyWalking official trace protocol v3
+-- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent/Tracing.proto
 -- local SegmentProtocol = {
 --     traceId,
 --     traceSegmentId,

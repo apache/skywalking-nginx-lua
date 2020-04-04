@@ -35,7 +35,7 @@ function Client:startBackendTimer(backend_http_uri)
         if not premature then
             local instancePropertiesSubmitted = metadata_buffer:get('instancePropertiesSubmitted')
             if (instancePropertiesSubmitted == nil or instancePropertiesSubmitted == false) then
-                self:registerService(metadata_buffer, backend_http_uri)
+                self:reportServiceInstance(metadata_buffer, backend_http_uri)
             else
                 self:ping(metadata_buffer, backend_http_uri)
             end
@@ -60,8 +60,7 @@ function Client:startBackendTimer(backend_http_uri)
     end
 end
 
--- Register service
-function Client:registerService(metadata_buffer, backend_http_uri)
+function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
     local log = ngx.log
     local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
