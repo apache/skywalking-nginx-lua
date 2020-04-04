@@ -108,7 +108,7 @@ function _M.newNoOP()
 end
 
 function _M.new(serviceName, serviceInstanceName)
-    if serviceInstanceName == nil then
+    if serviceInstanceName == nil or serviceName == nil then
         return _M.newNoOP()
     end
 
