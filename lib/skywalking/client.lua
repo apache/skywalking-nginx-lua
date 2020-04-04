@@ -17,8 +17,8 @@
 
 local Client = {}
 
--- Tracing timer does the service and instance register
--- After register successfully, it sends traces and heart beat
+-- Tracing timer does the instance report and sends traces
+-- After report successfully, it will heart beat
 function Client:startBackendTimer(backend_http_uri)
     local metadata_buffer = ngx.shared.tracing_buffer
 
@@ -70,7 +70,7 @@ function Client:registerService(metadata_buffer, backend_http_uri)
     local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
 
     local cjson = require('cjson')
-    local reportInstance = require("register").newReportInstanceProperties(serviceName, serviceInstanceName)
+    local reportInstance = require("management").newReportInstanceProperties(serviceName, serviceInstanceName)
     local reportInstanceParam = cjson.encode(reportInstance)
 
     local http = require('resty.http')
@@ -103,7 +103,7 @@ function Client:ping(metadata_buffer, backend_http_uri)
     local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
 
     local cjson = require('cjson')
-    local pingPkg = require("register").newServiceInstancePingPkg(serviceName, serviceInstanceName)
+    local pingPkg = require("management").newServiceInstancePingPkg(serviceName, serviceInstanceName)
     local pingPkgParam = cjson.encode(pingPkg)
 
     local http = require('resty.http')

@@ -63,7 +63,7 @@ local _M = {}
 -- }
 
 -- Create an entry span. Represent the HTTP incoming request.
--- @param contextCarrier, HTTP request header, which could carry the `sw6` context
+-- @param contextCarrier, HTTP request header, which could carry the `sw8` context
 function _M.createEntrySpan(operationName, context, parent, contextCarrier)
     local span = _M.new(operationName, context, parent)
     span.is_entry = true

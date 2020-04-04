@@ -82,20 +82,20 @@ By using the `/examples/nginx.conf`, you could start the Nginx with LUA module o
 Then you could
 1. See the `register logs` happens on the console log.
 ```
-2020/02/27 09:22:06 [debug] 20676#11799235: *4 [lua] content_by_lua(nginx.conf:118):4: Service register request = {"services":[{"type":"normal","serviceName":"User Service Name"}]}
-2020/02/27 09:22:06 [debug] 20676#11799235: *2 [lua] client.lua:99: registerService(): Service register response = [{"key":"User Service Name","value":1}]
-
-2020/02/27 09:22:06 [debug] 20676#11799235: *2 [lua] client.lua:106: registerService(): Service registered, service id = 1
-2020/02/27 09:22:06 [debug] 20676#11799235: *4 [lua] content_by_lua(nginx.conf:134):3: Service instance register request = {"instances":[{"time":1582766526928,"instanceUUID":"name:User Service Instance Name","properties":[{"key":"language","value":"Lua"}],"serviceId":1}]}
-2020/02/27 09:22:06 [debug] 20676#11799235: *2 [lua] client.lua:143: registerServiceInstance(): Service Instance register response = [{"key":"name:User Service Instance Name","value":1}]
-2020/02/27 09:22:06 [debug] 20676#11799235: *2 [lua] client.lua:150: registerServiceInstance(): Service Instance registered, service instance id = 1
+2020/04/04 15:15:37 [debug] 12089#1446111: *4 [lua] content_by_lua(nginx.conf:175):4: Instance report request = {"service":"User Service Name","serviceInstance":"User Service Instance Name","properties":[{"language":"Lua"}]}
+2020/04/04 15:15:37 [debug] 12089#1446111: *2 [lua] client.lua:89: registerService(): Instance report response = {}
 ```
 
-2. Access the `http://127.0.0.1:8080/ingress` then you could see the tracing happens and reported spans in the logs.
+1. See the `heartbeat logs` happens after the `register logs`
 ```
-2020/02/27 09:22:10 [debug] 20676#11799235: *9 [lua] tracer.lua:91: prepareForReport(): segment = {"spans":[{"operationName":"\/tier2\/lb","startTime":1582766530125,"endTime":1582766530139,"spanType":"Exit","spanId":1,"isError":false,"parentSpanId":0,"componentId":6000,"peer":"User Service Name-nginx:upstream_ip:port","spanLayer":"HTTP"},{"operationName":"\/tier2\/lb","startTime":1582766530125,"tags":[{"key":"http.method","value":"GET"},{"key":"http.params","value":"http:\/\/127.0.0.1\/tier2\/lb"}],"endTime":1582766530139,"spanType":"Entry","spanId":0,"isError":false,"parentSpanId":-1,"componentId":6000,"refs":[{"parentTraceSegmentId":{"idParts":[1582766530044,794206293,69887]},"parentEndpointId":0,"entryEndpointId":0,"parentServiceInstanceId":1,"parentEndpoint":"\/ingress","networkAddress":"#User Service Name-nginx:upstream_ip:port","parentSpanId":1,"entryServiceInstanceId":1,"networkAddressId":0,"entryEndpoint":"\/ingress"}],"spanLayer":"HTTP"}],"serviceInstanceId":1,"serviceId":1,"traceSegmentId":{"idParts":[1582766530052,794206293,69887]},"globalTraceIds":[{"idParts":[1582766530044,794206293,69887]}]}
-2020/02/27 09:22:10 [debug] 20676#11799235: *9 [lua] tracer.lua:95: prepareForReport(): segment buffer size = 1
-2020/02/27 09:22:10 [debug] 20676#11799235: *6 [lua] tracer.lua:91: prepareForReport(): segment = {"spans":[{"operationName":"\/ingress","startTime":1582766530114,"endTime":1582766530140,"spanType":"Exit","spanId":1,"isError":false,"parentSpanId":0,"componentId":6000,"peer":"User Service Name-nginx:upstream_ip:port","spanLayer":"HTTP"},{"operationName":"\/ingress","startTime":1582766530114,"tags":[{"key":"http.method","value":"GET"},{"key":"http.params","value":"http:\/\/127.0.0.1\/ingress"}],"endTime":1582766530140,"spanType":"Entry","spanId":0,"parentSpanId":-1,"isError":false,"spanLayer":"HTTP","componentId":6000}],"serviceInstanceId":1,"serviceId":1,"traceSegmentId":{"idParts":[1582766530044,794206293,69887]},"globalTraceIds":[{"idParts":[1582766530044,794206293,69887]}]}
+2020/04/04 15:15:40 [debug] 12089#1446111: *4 [lua] content_by_lua(nginx.conf:188):3: KeepAlive request = {"service":"User Service Name","serviceInstance":"User Service Instance Name"}
+```
+
+1. Access the `http://127.0.0.1:8080/ingress` then you could see the tracing happens and reported spans in the logs.
+```
+2020/04/04 15:15:46 [debug] 12089#1446111: *11 [lua] tracer.lua:83: prepareForReport(): segment = {"traceId":"1585984546953.410917649.45972","serviceInstance":"User Service Instance Name","spans":[{"operationName":"\/tier2\/lb","startTime":1585984546967,"endTime":1585984546968,"spanType":"Exit","spanId":1,"isError":false,"parentSpanId":0,"componentId":6000,"peer":"backend service","spanLayer":"Http"},{"operationName":"\/tier2\/lb","startTime":1585984546967,"tags":[{"key":"http.method","value":"GET"},{"key":"http.params","value":"http:\/\/127.0.0.1\/tier2\/lb"}],"endTime":1585984546968,"spanType":"Entry","spanId":0,"isError":false,"parentSpanId":-1,"componentId":6000,"refs":[{"traceId":"1585984546953.410917649.45972","networkAddressUsedAtPeer":"upstream service","parentEndpoint":"\/ingress","parentServiceInstance":"User Service Instance Name","parentSpanId":1,"parentService":"User Service Name","parentTraceSegmentId":"1585984546953.410917649.45972","refType":"CrossProcess"}],"spanLayer":"Http"}],"service":"User Service Name","traceSegmentId":"1585984546967.449397702.9959"}
+2020/04/04 15:15:46 [debug] 12089#1446111: *11 [lua] tracer.lua:87: prepareForReport(): segment buffer size = 1
+2020/04/04 15:15:46 [debug] 12089#1446111: *8 [lua] tracer.lua:83: prepareForReport(): segment = {"traceId":"1585984546953.410917649.45972","serviceInstance":"User Service Instance Name","spans":[{"operationName":"\/ingress","startTime":1585984546953,"endTime":1585984546968,"spanType":"Exit","spanId":1,"isError":false,"parentSpanId":0,"componentId":6000,"peer":"upstream service","spanLayer":"Http"},{"operationName":"\/ingress","startTime":1585984546953,"tags":[{"key":"http.method","value":"GET"},{"key":"http.params","value":"http:\/\/localhost\/ingress"}],"endTime":1585984546968,"spanType":"Entry","spanId":0,"parentSpanId":-1,"isError":false,"spanLayer":"Http","componentId":6000}],"service":"User Service Name","traceSegmentId":"1585984546953.410917649.45972"}
 ```
 
 ### Local Development and Unit Tests

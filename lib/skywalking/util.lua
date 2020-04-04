@@ -83,27 +83,7 @@ end
 math.randomseed(random_seed())
 
 function _M.newID()
-    return timestamp() .. math.random(0, MAX_ID_PART2) .. math.random(0, MAX_ID_PART3)
-end
-
--- Format a trace/segment id into an array.
--- An official ID should have three parts separated by '.' and each part of it is a number
-function _M.formatID(str)
-    local regex = '.'
-    if _M.is_ngx_lua then
-        regex = [[\.]]
-    end
-    local parts = split(str, regex)
-    if #parts ~= 3 then
-        return nil
-    end
-
-    return parts
-end
-
--- @param id is an array with length = 3
-function _M.id2String(id)
-    return id[1] .. '.' .. id[2] .. '.' .. id[3]
+    return timestamp() .. '.' .. math.random(0, MAX_ID_PART2) .. '.' .. math.random(0, MAX_ID_PART3)
 end
 
 return _M

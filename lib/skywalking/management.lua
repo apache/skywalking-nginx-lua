@@ -22,14 +22,14 @@ function _M.newReportInstanceProperties(serviceName, serviceInstance)
     local instanceProperties = {
         service = serviceName,
         serviceInstance = serviceInstance,
-        allProperties = {}
+        properties = {}
     }
 
     local allProperties = {
         language = "Lua"
     }
 
-    instanceProperties.allProperties[#instanceProperties.allProperties + 1] = allProperties
+    instanceProperties.properties[#instanceProperties.properties + 1] = allProperties
 
     return instanceProperties
 end
