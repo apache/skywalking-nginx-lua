@@ -23,8 +23,8 @@ local _M = {}
 -- local Segment = {
 --     trace_id,
 --     segment_id,
---     service_id,
---     service_inst_id,
+--     service,
+--     service_instance,
 --     spans,
 -- }
 
@@ -33,22 +33,20 @@ local _M = {}
 -- Following SkyWalking official trace protocol v2
 -- https://github.com/apache/skywalking-data-collect-protocol/blob/master/language-agent-v2/trace.proto
 -- local SegmentProtocol = {
---     globalTraceIds,
+--     traceId,
 --     traceSegmentId,
---     serviceId,
---     serviceInstanceId,
+--     service,
+--     serviceInstance,
 --     spans,
 -- }
 
 -- Return SegmentProtocol
 function _M.transform(segment)
     local segmentBuilder = {}
-    segmentBuilder.serviceId = segment.service_id
-    segmentBuilder.globalTraceIds = {}
-    segmentBuilder.globalTraceIds[1] = {idParts = segment.trace_id}
-    segmentBuilder.traceSegmentId = {idParts = segment.segment_id}
-    segmentBuilder.serviceId = segment.service_id
-    segmentBuilder.serviceInstanceId = segment.service_inst_id
+    segmentBuilder.traceId = segment.trace_id
+    segmentBuilder.traceSegmentId = segment.segment_id
+    segmentBuilder.service = segment.service
+    segmentBuilder.serviceInstance = segment.service_instance
 
     segmentBuilder.spans = {}
 

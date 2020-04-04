@@ -22,23 +22,21 @@ local Span = require('span')
 
 TestTracingContext = {}
     function TestTracingContext:testNew()
-        local context = TC.new(1, 1)
+        local context = TC.new("service", "instance")
         lu.assertNotNil(context)
-        lu.assertNotNil(context.segment_id[1])
-        lu.assertNotNil(context.segment_id[2])
-        lu.assertNotNil(context.segment_id[3])
+        lu.assertNotNil(context.segment_id)
 
         lu.assertEquals(context.trace_id, context.segment_id)
     end
 
     function TestTracingContext:testInternal_NextSpanSeqID()
-        local context = TC.new(1, 1)
+        local context = TC.new("service", "instance")
 
         lu.assertEquals(context.internal.nextSpanID(context.internal), 0)
     end
 
     function TestTracingContext:testInternal_addActive()
-        local context = TC.new(1, 1)
+        local context = TC.new("service", "instance")
 
         local mockSpan = {span_id = 0}
         context.internal.addActive(context.internal, mockSpan)
@@ -47,7 +45,7 @@ TestTracingContext = {}
     end
 
     function TestTracingContext:testSpanStack()
-        local context = TC.new(1, 1)
+        local context = TC.new("service", "instance")
         local span1 = TC.createEntrySpan(context, 'entry_op')
         local span2 = TC.createExitSpan(context, "exit_op", span1, "127.0.0.1")
 

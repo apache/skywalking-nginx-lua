@@ -22,49 +22,43 @@ local cjson = require("cjson")
 
 TestSegmentRef = {}
     -- This test is originally from ContextCarrierV2HeaderTest in the Java agent.
-    function TestSegmentRef:testFromSW6Value()
-        local ref = SegmentRef.fromSW6Value('1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
+    function TestSegmentRef:testFromSW8Value()
+        local ref = SegmentRef.fromSW8Value('1-My40LjU=-MS4yLjM=-4-c2VydmljZQ==-aW5zdGFuY2U=-L2FwcA==-MTI3LjAuMC4xOjgwODA=')
         lu.assertNotNil(ref)
-        lu.assertEquals(ref.trace_id, {"3", "4", "5"})
-        lu.assertEquals(ref.segment_id, {"1", "2", "3"})
+        lu.assertEquals(ref.trace_id, "3.4.5")
+        lu.assertEquals(ref.segment_id, "1.2.3")
         lu.assertEquals(ref.span_id, 4)
-        lu.assertEquals(ref.parent_service_instance_id, 1)
-        lu.assertEquals(ref.entry_service_instance_id, 1)
-        lu.assertEquals(ref.network_address, '127.0.0.1:8080')
-        lu.assertEquals(ref.network_address_id, 0)
-        lu.assertEquals(ref.entry_endpoint_name, '/portal')
-        lu.assertEquals(ref.entry_endpoint_id, 0)
-        lu.assertEquals(ref.parent_endpoint_name, nil)
-        lu.assertEquals(ref.parent_endpoint_id, 123)
+        lu.assertEquals(ref.parent_service, "service")
+        lu.assertEquals(ref.parent_service_instance, "instance")
+        lu.assertEquals(ref.parent_endpoint, '/app')
+        lu.assertEquals(ref.address_used_at_client, '127.0.0.1:8080')
 
-        ref = SegmentRef.fromSW6Value('1-My40LjU=-MS')
+        ref = SegmentRef.fromSW8Value('1-My40LjU=-MS')
         lu.assertNil(ref)
     end
 
     function TestSegmentRef:testSerialize()
         local ref = SegmentRef.new()
-        ref.trace_id = {3, 4, 5}
-        ref.segment_id = {1, 2, 3}
+        ref.trace_id = "3.4.5"
+        ref.segment_id = "1.2.3"
         ref.span_id = 4
-        ref.entry_service_instance_id = 1
-        ref.parent_service_instance_id = 1
-        ref.network_address = "127.0.0.1:8080"
-        ref.entry_endpoint_name = "/portal"
-        ref.parent_endpoint_id = 123
+        ref.parent_service = "service"
+        ref.parent_service_instance = "instance"
+        ref.parent_endpoint = "/app"
+        ref.address_used_at_client = "127.0.0.1:8080"
 
-        lu.assertEquals(SegmentRef.serialize(ref), '1-My40LjU=-MS4yLjM=-4-1-1-IzEyNy4wLjAuMTo4MDgw-Iy9wb3J0YWw=-MTIz')
+        lu.assertEquals(SegmentRef.serialize(ref), '1-My40LjU=-MS4yLjM=-4-c2VydmljZQ==-aW5zdGFuY2U=-L2FwcA==-MTI3LjAuMC4xOjgwODA=')
     end
 
     function TestSegmentRef:testTransform()
         local ref = SegmentRef.new()
-        ref.trace_id = {3, 4, 5}
-        ref.segment_id = {1, 2, 3}
+        ref.trace_id = "3.4.5"
+        ref.segment_id = "1.2.3"
         ref.span_id = 4
-        ref.entry_service_instance_id = 1
-        ref.parent_service_instance_id = 1
-        ref.network_address = "127.0.0.1:8080"
-        ref.entry_endpoint_name = "/portal"
-        ref.parent_endpoint_id = 123
+        ref.parent_service = "service"
+        ref.parent_service_instance = "instance"
+        ref.parent_endpoint = "/app"
+        ref.address_used_at_client = "127.0.0.1:8080"
 
         local refProtocol = SegmentRef.transform(ref)
         local inJSON = cjson.encode(refProtocol)

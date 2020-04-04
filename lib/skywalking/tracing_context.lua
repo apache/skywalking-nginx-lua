@@ -107,16 +107,16 @@ function _M.newNoOP()
     return {is_noop = true}
 end
 
-function _M.new(serviceId, serviceInstID)
-    if serviceInstID == nil then
+function _M.new(serviceName, serviceInstanceName)
+    if serviceInstanceName == nil then
         return _M.newNoOP()
     end
 
     local tracing_context = {}
     tracing_context.trace_id = Util.newID()
     tracing_context.segment_id = tracing_context.trace_id
-    tracing_context.service_id = serviceId
-    tracing_context.service_inst_id = serviceInstID
+    tracing_context.service = serviceName
+    tracing_context.service_instance = serviceInstanceName
     tracing_context.internal = Internal.new()
     tracing_context.internal.owner = tracing_context
     return tracing_context
@@ -160,8 +160,8 @@ function _M.drainAfterFinished(tracingContext)
         local segment = {}
         segment.trace_id = tracingContext.trace_id
         segment.segment_id = tracingContext.segment_id
-        segment.service_id = tracingContext.service_id
-        segment.service_inst_id = tracingContext.service_inst_id
+        segment.service = tracingContext.service
+        segment.service_instance = tracingContext.service_instance
         segment.spans = tracingContext.internal.finished_spans
         return true, segment
     end

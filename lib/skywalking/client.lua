@@ -33,26 +33,14 @@ function Client:startBackendTimer(backend_http_uri)
 
     check = function(premature)
         if not premature then
-            local serviceId = metadata_buffer:get('serviceId')
-            if (serviceId == nil or serviceId == 0) then
+            local instancePropertiesSubmitted = metadata_buffer:get('instancePropertiesSubmitted')
+            if (instancePropertiesSubmitted == nil or instancePropertiesSubmitted == false) then
                 self:registerService(metadata_buffer, backend_http_uri)
-            end
-
-            -- Register is in the async way, if register successfully, go for instance register
-            serviceId = metadata_buffer:get('serviceId')
-            if (serviceId ~= nil and serviceId ~= 0) then
-                local serviceInstId = metadata_buffer:get('serviceInstId')
-                if (serviceInstId == nil or serviceInstId == 0)  then
-                    self:registerServiceInstance(metadata_buffer, backend_http_uri)
-                end
-            end
-
-            -- After all register successfully, begin to send trace segments
-            local serviceInstId = metadata_buffer:get('serviceInstId')
-            if (serviceInstId ~= nil and serviceInstId ~= 0) then
-                self:reportTraces(metadata_buffer, backend_http_uri)
+            else
                 self:ping(metadata_buffer, backend_http_uri)
             end
+
+            self:reportTraces(metadata_buffer, backend_http_uri)
 
             -- do the health check
             local ok, err = new_timer(delay, check)
@@ -79,84 +67,29 @@ function Client:registerService(metadata_buffer, backend_http_uri)
     local ERR = ngx.ERR
 
     local serviceName = metadata_buffer:get('serviceName')
+    local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
 
     local cjson = require('cjson')
-    local serviceRegister = require("register").newServiceRegister(serviceName)
-    local serviceRegisterParam = cjson.encode(serviceRegister)
+    local reportInstance = require("register").newReportInstanceProperties(serviceName, serviceInstanceName)
+    local reportInstanceParam = cjson.encode(reportInstance)
 
     local http = require('resty.http')
     local httpc = http.new()
-    local res, err = httpc:request_uri(backend_http_uri .. '/v2/service/register', {
+    local res, err = httpc:request_uri(backend_http_uri .. '/v3/management/reportProperties', {
         method = "POST",
-        body = serviceRegisterParam,
+        body = reportInstanceParam,
         headers = {
             ["Content-Type"] = "application/json",
         },
     })
 
     if not res then
-        log(ERR, "Service register fails, " .. err)
+        log(ERR, "Instance report fails, " .. err)
     elseif res.status == 200 then
-        log(DEBUG, "Service register response = " .. res.body)
-        local registerResults = cjson.decode(res.body)
-
-        for i, result in ipairs(registerResults)
-        do
-            if result.key == serviceName then
-                local serviceId = result.value
-                log(DEBUG, "Service registered, service id = " .. serviceId)
-                metadata_buffer:set('serviceId', serviceId)
-            end
-        end
+        log(DEBUG, "Instance report response = " .. res.body)
+        metadata_buffer:set('instancePropertiesSubmitted', true)
     else
         log(ERR, "Service register fails, response code " .. res.status)
-    end
-end
-
--- Register service instance
-function Client:registerServiceInstance(metadata_buffer, backend_http_uri)
-    local log = ngx.log
-    local DEBUG = ngx.DEBUG
-    local ERR = ngx.ERR
-
-    local serviceInstName = 'name:' .. metadata_buffer:get('serviceInstanceName')
-    metadata_buffer:set('serviceInstanceUUID', serviceInstName)
-
-    local cjson = require('cjson')
-    local serviceInstanceRegister = require("register").newServiceInstanceRegister(
-        metadata_buffer:get('serviceId'),
-        serviceInstName,
-        ngx.now() * 1000)
-    local serviceInstanceRegisterParam = cjson.encode(serviceInstanceRegister)
-
-    local http = require('resty.http')
-    local httpc = http.new()
-    local res, err = httpc:request_uri(backend_http_uri .. '/v2/instance/register', {
-        method = "POST",
-        body = serviceInstanceRegisterParam,
-        headers = {
-            ["Content-Type"] = "application/json",
-        },
-    })
-
-    if err == nil then
-        if res.status == 200 then
-            log(DEBUG, "Service Instance register response = " .. res.body)
-            local registerResults = cjson.decode(res.body)
-
-            for i, result in ipairs(registerResults)
-            do
-                if result.key == serviceInstName then
-                    local serviceId = result.value
-                    log(DEBUG, "Service Instance registered, service instance id = " .. serviceId)
-                    metadata_buffer:set('serviceInstId', serviceId)
-                end
-            end
-        else
-            log(ERR, "Service Instance register fails, response code " .. res.status)
-        end
-    else
-        log(ERR, "Service Instance register fails, " .. err)
     end
 end
 
@@ -166,16 +99,16 @@ function Client:ping(metadata_buffer, backend_http_uri)
     local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
 
+    local serviceName = metadata_buffer:get('serviceName')
+    local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
+
     local cjson = require('cjson')
-    local pingPkg = require("register").newServiceInstancePingPkg(
-        metadata_buffer:get('serviceInstId'),
-        metadata_buffer:get('serviceInstanceUUID'),
-        ngx.now() * 1000)
+    local pingPkg = require("register").newServiceInstancePingPkg(serviceName, serviceInstanceName)
     local pingPkgParam = cjson.encode(pingPkg)
 
     local http = require('resty.http')
     local httpc = http.new()
-    local res, err = httpc:request_uri(backend_http_uri .. '/v2/instance/heartbeat', {
+    local res, err = httpc:request_uri(backend_http_uri .. '/v3/management/keepAlive', {
         method = "POST",
         body = pingPkgParam,
         headers = {
@@ -208,7 +141,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
 
     while segment ~= nil
     do
-        local res, err = httpc:request_uri(backend_http_uri .. '/v2/segments', {
+        local res, err = httpc:request_uri(backend_http_uri .. '/v3/segments', {
             method = "POST",
             body = segment,
             headers = {

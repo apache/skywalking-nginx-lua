@@ -25,20 +25,15 @@ function Tracer:start(upstream_name)
 
     local tracingContext
     local serviceName = metadata_buffer:get("serviceName")
-    local serviceInstId = metadata_buffer:get("serviceInstId")
-    local serviceId = metadata_buffer:get('serviceId')
-    if (serviceInstId ~= nil and serviceInstId ~= 0) then
-        tracingContext = TC.new(serviceId, serviceInstId)
-    else
-        tracingContext = TC.newNoOP()
-    end
+    local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
+    tracingContext = TC.new(serviceName, serviceInstanceName)
 
     -- Constant pre-defined in SkyWalking main repo
     -- 84 represents Nginx
     local nginxComponentId = 6000
 
     local contextCarrier = {}
-    contextCarrier["sw6"] = ngx.req.get_headers()["sw6"]
+    contextCarrier["sw8"] = ngx.req.get_headers()["sw8"]
     local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
     Span.start(entrySpan, ngx.now() * 1000)
     Span.setComponentId(entrySpan, nginxComponentId)

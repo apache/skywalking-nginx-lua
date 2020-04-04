@@ -83,7 +83,7 @@ end
 math.randomseed(random_seed())
 
 function _M.newID()
-    return {timestamp(), math.random(0, MAX_ID_PART2), math.random(0, MAX_ID_PART3)}
+    return timestamp() .. math.random(0, MAX_ID_PART2) .. math.random(0, MAX_ID_PART3)
 end
 
 -- Format a trace/segment id into an array.
