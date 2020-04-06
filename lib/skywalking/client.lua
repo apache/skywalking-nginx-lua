@@ -119,7 +119,7 @@ function Client:registerServiceInstance(metadata_buffer, backend_http_uri)
     local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
 
-    local serviceInstName = 'name:' .. metadata_buffer:get('serviceInstanceName')
+    local serviceInstName = 'NAME:' .. metadata_buffer:get('serviceInstanceName')
     metadata_buffer:set('serviceInstanceUUID', serviceInstName)
 
     local cjson = require('cjson')
