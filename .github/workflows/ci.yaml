@@ -47,7 +47,6 @@ jobs:
       - name: 'Install Dependencies'
         run: |
           sudo luarocks install luaunit
-          sudo luarocks install luabitop
           sudo luarocks install lua-cjson 2.1.0-1
       - name: "Install OpenResty"
         run: |
