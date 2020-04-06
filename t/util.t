@@ -52,7 +52,7 @@ true
         content_by_lua_block {
             local util = require('util')
             local id = util.newID()
-            local regex = [[^\d+\.\d+\.\d+$]]
+            local regex = [[^\d+\-\d+\-\d+\-\d+$]]
             local m = ngx.re.match(id, regex)
             if m then
                 ngx.say(true)

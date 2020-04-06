@@ -51,9 +51,6 @@ _M.split = split
 _M.timestamp = timestamp
 _M.is_ngx_lua = ok
 
-local MAX_ID_PART2 = 1000000000
-local MAX_ID_PART3 = 100000
-
 local random_seed = function ()
     local seed
     local frandom = io.open("/dev/urandom", "rb")
@@ -80,10 +77,12 @@ local random_seed = function ()
     return seed
 end
 
+local uuid = require('dependencies/lua-resty-jit-uuid')
+uuid.seed()
 math.randomseed(random_seed())
 
 function _M.newID()
-    return timestamp() .. '.' .. math.random(0, MAX_ID_PART2) .. '.' .. math.random(0, MAX_ID_PART3)
+    return uuid.generate_v4()
 end
 
 return _M
