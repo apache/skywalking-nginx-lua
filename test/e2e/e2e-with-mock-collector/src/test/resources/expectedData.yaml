@@ -49,9 +49,10 @@ segmentItems:
             parentSpanId: -1
             componentId: 6000
             refs:
-              - {parentEndpointId: 0, entryEndpointId: 0, parentServiceInstanceId: 1, parentEndpoint: /ingress, parentTraceSegmentId: not null,
+              - {parentEndpoint: /ingress, parentTraceSegmentId: not null, refType: 'CrossProcess',
                  networkAddress: 'e2e-test-with-mock-collector:upstream_ip:port', parentSpanId: 1,
-                 entryServiceInstanceId: 1, networkAddressId: 0, entryEndpoint: /ingress}
+                 parentServiceInstance: 'e2e-test-with-mock-collector-instanceA', traceId: not null,
+                 parentService: 'e2e-test-with-mock-collector'}
             spanLayer: Http
       - segmentId: not null
         spans:
