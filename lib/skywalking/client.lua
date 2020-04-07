@@ -89,10 +89,10 @@ function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
     if not res then
         log(ERR, "Instance report fails, ", err)
     elseif res.status == 200 then
-        log(DEBUG, "Instance report response = " .. res.body)
+        log(DEBUG, "Instance report response = ", res.body)
         metadata_buffer:set('instancePropertiesSubmitted', true)
     else
-        log(ERR, "Instance report fails, response code " .. res.status)
+        log(ERR, "Instance report fails, response code ", res.status)
     end
 end
 
@@ -124,7 +124,7 @@ function Client:ping(metadata_buffer, backend_http_uri)
 
     if err == nil then
         if res.status ~= 200 then
-            log(ERR, "Agent ping fails, response code " .. res.status)
+            log(ERR, "Agent ping fails, response code ", res.status)
         end
     else
         log(ERR, "Agent ping fails, ", err)
@@ -157,7 +157,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
 
         if err == nil then
             if res.status ~= 200 then
-                log(ERR, "Segment report fails, response code " .. res.status)
+                log(ERR, "Segment report fails, response code ", res.status)
                 break
             else
                 count = count + 1

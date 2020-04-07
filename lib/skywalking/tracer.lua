@@ -80,11 +80,11 @@ function Tracer:prepareForReport()
         local status, segment = TC.drainAfterFinished(ngx.ctx.tracingContext)
         if status then
             local segmentJson = require('cjson').encode(Segment.transform(segment))
-            ngx.log(ngx.DEBUG, 'segment = ' .. segmentJson)
+            ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
 
             local queue = ngx.shared.tracing_buffer
             local length = queue:lpush('segment', segmentJson)
-            ngx.log(ngx.DEBUG, 'segment buffer size = ' .. queue:llen('segment'))
+            ngx.log(ngx.DEBUG, 'segment buffer size = ', queue:llen('segment'))
         end
     end
 end
