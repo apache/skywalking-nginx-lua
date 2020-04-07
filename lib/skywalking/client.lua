@@ -70,7 +70,11 @@ function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
 
     local cjson = require('cjson')
     local reportInstance = require("management").newReportInstanceProperties(serviceName, serviceInstanceName)
-    local reportInstanceParam = cjson.encode(reportInstance)
+    local reportInstanceParam, err = cjson.encode(reportInstance)
+    if err ~= nil then
+        log(ERR, "Request to report instance fails, ", err)
+        return
+    end
 
     local http = require('resty.http')
     local httpc = http.new()
@@ -83,12 +87,12 @@ function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
     })
 
     if not res then
-        log(ERR, "Instance report fails, " .. err)
+        log(ERR, "Instance report fails, ", err)
     elseif res.status == 200 then
         log(DEBUG, "Instance report response = " .. res.body)
         metadata_buffer:set('instancePropertiesSubmitted', true)
     else
-        log(ERR, "Service register fails, response code " .. res.status)
+        log(ERR, "Instance report fails, response code " .. res.status)
     end
 end
 
@@ -103,7 +107,10 @@ function Client:ping(metadata_buffer, backend_http_uri)
 
     local cjson = require('cjson')
     local pingPkg = require("management").newServiceInstancePingPkg(serviceName, serviceInstanceName)
-    local pingPkgParam = cjson.encode(pingPkg)
+    local pingPkgParam, err = cjson.encode(pingPkg)
+    if err ~= nil then
+        log(ERR, "Agent ping fails, ", err)
+    end
 
     local http = require('resty.http')
     local httpc = http.new()
@@ -120,7 +127,7 @@ function Client:ping(metadata_buffer, backend_http_uri)
             log(ERR, "Agent ping fails, response code " .. res.status)
         end
     else
-        log(ERR, "Agent ping fails, " .. err)
+        log(ERR, "Agent ping fails, ", err)
     end
 end
 
@@ -156,7 +163,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
                 count = count + 1
             end
         else
-            log(ERR, "Segment report fails, " .. err)
+            log(ERR, "Segment report fails, ", err)
             break
         end
 
