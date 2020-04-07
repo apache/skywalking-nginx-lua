@@ -17,8 +17,8 @@
 
 local Client = {}
 
--- Tracing timer does the instance report and sends traces
--- After report successfully, it will heart beat
+-- Tracing timer reports instance properties report, keeps alive and sends traces
+-- After report instance properties successfully, it sends keep alive packages.
 function Client:startBackendTimer(backend_http_uri)
     local metadata_buffer = ngx.shared.tracing_buffer
 

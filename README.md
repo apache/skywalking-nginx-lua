@@ -80,18 +80,18 @@ You could choose master branch before the official 7.0.0 release.
 ### Debug Startup
 By using the `/examples/nginx.conf`, you could start the Nginx with LUA module or OpenResty. Such as `nginx -c /path/to/skywalking-nginx-lua/examples/nginx.conf`
 Then you could
-1. See the `register logs` happens on the console log.
+1. See the `instance properties update logs` happens on the console log.
 ```
 2020/04/04 15:15:37 [debug] 12089#1446111: *4 [lua] content_by_lua(nginx.conf:175):4: Instance report request = {"service":"User Service Name","serviceInstance":"User Service Instance Name","properties":[{"language":"Lua"}]}
 2020/04/04 15:15:37 [debug] 12089#1446111: *2 [lua] client.lua:89: reportServiceInstance(): Instance report response = {}
 ```
 
-1. See the `heartbeat logs` happens after the `register logs`
+2. See the `heartbeat logs` happens after the `register logs`
 ```
 2020/04/04 15:15:40 [debug] 12089#1446111: *4 [lua] content_by_lua(nginx.conf:188):3: KeepAlive request = {"service":"User Service Name","serviceInstance":"User Service Instance Name"}
 ```
 
-1. Access the `http://127.0.0.1:8080/ingress` then you could see the tracing happens and reported spans in the logs.
+3. Access the `http://127.0.0.1:8080/ingress` then you could see the tracing happens and reported spans in the logs.
 ```
 2020/04/04 15:15:46 [debug] 12089#1446111: *11 [lua] tracer.lua:83: prepareForReport(): segment = {"traceId":"1585984546953.410917649.45972","serviceInstance":"User Service Instance Name","spans":[{"operationName":"\/tier2\/lb","startTime":1585984546967,"endTime":1585984546968,"spanType":"Exit","spanId":1,"isError":false,"parentSpanId":0,"componentId":6000,"peer":"backend service","spanLayer":"Http"},{"operationName":"\/tier2\/lb","startTime":1585984546967,"tags":[{"key":"http.method","value":"GET"},{"key":"http.params","value":"http:\/\/127.0.0.1\/tier2\/lb"}],"endTime":1585984546968,"spanType":"Entry","spanId":0,"isError":false,"parentSpanId":-1,"componentId":6000,"refs":[{"traceId":"1585984546953.410917649.45972","networkAddressUsedAtPeer":"upstream service","parentEndpoint":"\/ingress","parentServiceInstance":"User Service Instance Name","parentSpanId":1,"parentService":"User Service Name","parentTraceSegmentId":"1585984546953.410917649.45972","refType":"CrossProcess"}],"spanLayer":"Http"}],"service":"User Service Name","traceSegmentId":"1585984546967.449397702.9959"}
 2020/04/04 15:15:46 [debug] 12089#1446111: *11 [lua] tracer.lua:87: prepareForReport(): segment buffer size = 1
