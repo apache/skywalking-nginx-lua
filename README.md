@@ -106,6 +106,7 @@ All codes in the `lib/skywalking` require the `*_test.lua` to do the UnitTest. T
 The following libs are required in runtime or test cases, please use `LuaRocks` to install them.
 - lua-cjson. NOTICE, some platforms such as MacOS 10.15 may have issue with the latest release of this lib, consider to install an old release.(`luarocks install lua-cjson 2.1.0-1`)
 - luaunit
+- lua-resty-jit-uuid
 
 # APIs
 This LUA tracing lib is originally designed for Nginx+LUA/OpenResty ecosystems. But we write it to support more complex cases.
