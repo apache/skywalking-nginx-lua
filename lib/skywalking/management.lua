@@ -19,28 +19,22 @@ local _M = {}
 
 -- Return Services as service register parameter
 function _M.newReportInstanceProperties(serviceName, serviceInstance)
-    local instanceProperties = {
-        service = serviceName,
-        serviceInstance = serviceInstance,
-        properties = {}
-    }
-
     local allProperties = {
         language = "Lua"
     }
 
-    instanceProperties.properties[#instanceProperties.properties + 1] = allProperties
-
-    return instanceProperties
+    return {
+        service = serviceName,
+        serviceInstance = serviceInstance,
+        properties = {allProperties}
+    }
 end
 
 function _M.newServiceInstancePingPkg(serviceName, serviceInstance)
-    local serviceInstancePingPkg = {
+    return {
         service = serviceName,
         serviceInstance = serviceInstance,
     }
-
-    return serviceInstancePingPkg
 end
 
 return _M

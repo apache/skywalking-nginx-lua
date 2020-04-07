@@ -80,18 +80,20 @@ local random_seed = function ()
     return seed
 end
 
-local newID = function()
-    return timestamp() .. '.' .. math.random(0, MAX_ID_PART2) .. '.' .. math.random(0, MAX_ID_PART3)
-end
 
 math.randomseed(random_seed())
 
+local newID
 -- for Nginx Lua
-local ok, uuid = pcall(require, "dependencies/lua-resty-jit-uuid")
+local ok, uuid = pcall(require, "lua-resty-jit-uuid")
 if ok then
     uuid.seed()
     newID = function()
         return uuid.generate_v4()
+    end
+else
+    newID = function()
+        return timestamp() .. '.' .. math.random(0, MAX_ID_PART2) .. '.' .. math.random(0, MAX_ID_PART3)
     end
 end
 

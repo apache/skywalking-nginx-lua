@@ -66,13 +66,13 @@ end
 -- Return string to represent this ref.
 function _M.serialize(ref)
     local encodedRef = '1'
-    encodedRef = encodedRef .. '-' .. encode_base64(ref.trace_id)
-    encodedRef = encodedRef .. '-' .. encode_base64(ref.segment_id)
-    encodedRef = encodedRef .. '-' .. ref.span_id
-    encodedRef = encodedRef .. '-' .. encode_base64(ref.parent_service)
-    encodedRef = encodedRef .. '-' .. encode_base64(ref.parent_service_instance)
-    encodedRef = encodedRef .. '-' .. encode_base64(ref.parent_endpoint)
-    encodedRef = encodedRef .. '-' .. encode_base64(ref.address_used_at_client)
+            .. '-' .. encode_base64(ref.trace_id)
+            .. '-' .. encode_base64(ref.segment_id)
+            .. '-' .. ref.span_id
+            .. '-' .. encode_base64(ref.parent_service)
+            .. '-' .. encode_base64(ref.parent_service_instance)
+            .. '-' .. encode_base64(ref.parent_endpoint)
+            .. '-' .. encode_base64(ref.address_used_at_client)
 
     return encodedRef
 end
