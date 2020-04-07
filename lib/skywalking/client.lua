@@ -71,7 +71,7 @@ function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
     local cjson = require('cjson')
     local reportInstance = require("management").newReportInstanceProperties(serviceName, serviceInstanceName)
     local reportInstanceParam, err = cjson.encode(reportInstance)
-    if err ~= nil then
+    if err then
         log(ERR, "Request to report instance fails, ", err)
         return
     end
@@ -108,7 +108,7 @@ function Client:ping(metadata_buffer, backend_http_uri)
     local cjson = require('cjson')
     local pingPkg = require("management").newServiceInstancePingPkg(serviceName, serviceInstanceName)
     local pingPkgParam, err = cjson.encode(pingPkg)
-    if err ~= nil then
+    if err then
         log(ERR, "Agent ping fails, ", err)
     end
 
