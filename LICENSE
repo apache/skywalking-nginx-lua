@@ -216,8 +216,7 @@ The following components are provided under a MIT license. See project link for 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     base64 dependencies/base64.lua https://github.com/iskolbin/lbase64 MIT
-    lua-resty-jit-uuid dependencies/lua-resty-jit-uuid.lua https://github.com/thibaultcha/lua-resty-jit-uuid MIT
-
+    lua-resty-jit-uuid lib/resty/jit-uuid.lua https://github.com/thibaultcha/lua-resty-jit-uuid MIT
 
 ========================================================================
 BSD 2-Clause License
