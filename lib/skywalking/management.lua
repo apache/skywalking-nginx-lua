@@ -20,7 +20,8 @@ local _M = {}
 -- Return Services as service register parameter
 function _M.newReportInstanceProperties(serviceName, serviceInstance)
     local allProperties = {
-        language = "Lua"
+        key = "language",
+        value = "lua"
     }
 
     return {
