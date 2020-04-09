@@ -29,7 +29,7 @@ function Tracer:start(upstream_name)
     tracingContext = TC.new(serviceName, serviceInstanceName)
 
     -- Constant pre-defined in SkyWalking main repo
-    -- 84 represents Nginx
+    -- 6000 represents Nginx
     local nginxComponentId = 6000
 
     local contextCarrier = {}
