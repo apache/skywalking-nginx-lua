@@ -15,21 +15,27 @@
 -- limitations under the License.
 --
 
-local lu = require('luaunit')
-local Util = require('util')
+local _M = {}
 
-TestUtil = {}
-    function TestUtil.testNewID()
-        local id = Util.newID()
+-- Return Services as service register parameter
+function _M.newReportInstanceProperties(serviceName, serviceInstance)
+    local allProperties = {
+        key = "language",
+        value = "lua"
+    }
 
-        lu.assertNotNil(id)
-    end
+    return {
+        service = serviceName,
+        serviceInstance = serviceInstance,
+        properties = {allProperties}
+    }
+end
 
-    function TestUtil.testTimestamp()
-        local id = Util.timestamp()
-        lu.assertNotNil(id)
-    end
--- end TestUtil
+function _M.newServiceInstancePingPkg(serviceName, serviceInstance)
+    return {
+        service = serviceName,
+        serviceInstance = serviceInstance,
+    }
+end
 
-
-os.exit( lu.LuaUnit.run() )
+return _M
