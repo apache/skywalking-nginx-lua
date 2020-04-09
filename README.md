@@ -71,6 +71,9 @@ http {
 # Download
 Please head to the [releases page](http://skywalking.apache.org/downloads/) to download a release of Apache SkyWalking.
 
+* 0.1.0 release requires SkyWalking 7
+* 0.2.0+ releases require SkyWalking 8
+
 # Compatible backend
 SkyWalking OAP begins to support LUA agent in 7.0.0 release. 
 
