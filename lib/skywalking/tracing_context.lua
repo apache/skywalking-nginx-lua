@@ -29,8 +29,6 @@ local Internal = {}
 --     owner,
 --     -- The first created span.
 --     first_span,
---     -- The first ref injected in this context
---     first_ref,
 --     -- Created span and still active
 --     active_spans,
 --     active_count,
@@ -44,7 +42,6 @@ local function addRefIfFirst(internal, ref)
     if internal.self_generated_trace_id == true then
         internal.self_generated_trace_id = false
         internal.owner.trace_id = ref.trace_id
-        internal.first_ref = ref
     end
 end
 
