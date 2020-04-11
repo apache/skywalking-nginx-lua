@@ -102,11 +102,7 @@ function _M.createExitSpan(operationName, context, parent, peer, contextCarrier)
 
         local firstSpan = context.internal.first_span
         local parentEndpointName
-        if context.internal.first_ref then
-            parentEndpointName = context.internal.first_ref.entry_endpoint_name
-        else
-            parentEndpointName = firstSpan.operation_name
-        end
+        parentEndpointName = firstSpan.operation_name
         injectableRef.parent_endpoint = parentEndpointName
 
         contextCarrier[CONTEXT_CARRIER_KEY] = SegmentRef.serialize(injectableRef)
