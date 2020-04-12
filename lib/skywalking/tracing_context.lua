@@ -129,7 +129,11 @@ function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrie
         return Span.newNoOP()
     end
 
-    tracingContext.correlation = CorrelationContext.fromSW8Value(contextCarrier[CONTEXT_CORRELATION_KEY])
+    local correlationData = ''
+    if contextCarrier then
+        correlationData = contextCarrier[CONTEXT_CORRELATION_KEY]
+    end
+    tracingContext.correlation = CorrelationContext.fromSW8Value(correlationData)
 
     return Span.createEntrySpan(operationName, tracingContext, parent, contextCarrier)
 end

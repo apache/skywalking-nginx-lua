@@ -49,6 +49,8 @@ http {
                 -- Currently, we can not have the upstream real network address
                 ------------------------------------------------------
                 require("tracer"):start("upstream service")
+                -- if you want to custom data to downstream service
+                require("tracer"):start("upstream service", {custom = "custom_value"})
             }
 
             -- Target upstream service
@@ -118,7 +120,7 @@ The following APIs are for developers or using this lib out of the Nginx case.
 
 ## Nginx APIs
 - **startTimer**, `require("client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
-- **start**, `require("tracer"):start("upstream service")`. Begin the tracing before the upstream begin.
+- **start**, `require("tracer"):start("upstream service", correlation)`. Begin the tracing before the upstream begin. The custom data (table type) can be passed in the second parameter, and then you can correlate the data to the downstream service.
 - **finish**, `require("tracer"):finish()`. Finish the tracing for this HTTP request.
 - **prepareForReport**, `require("tracer"):prepareForReport()`. Prepare the finished segment for further report.
 
