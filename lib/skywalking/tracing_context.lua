@@ -17,6 +17,9 @@
 
 local Util = require('util')
 local Span = require('span')
+local CorrelationContext = require('correlation_context')
+
+local CONTEXT_CORRELATION_KEY = 'sw8-correlation'
 
 -------------- Internal Object-------------
 local Internal = {}
@@ -126,14 +129,26 @@ function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrie
         return Span.newNoOP()
     end
 
+    tracingContext.correlation = CorrelationContext.fromSW8Value(contextCarrier[CONTEXT_CORRELATION_KEY])
+
     return Span.createEntrySpan(operationName, tracingContext, parent, contextCarrier)
 end
 
 -- Delegate to Span.createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
-function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier)
+function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier, correlation)
     if tracingContext.is_noop then
         return Span.newNoOP()
+    end
+
+    if contextCarrier then
+        if correlation then
+            for name, value in pairs(correlation) do
+                CorrelationContext.put(tracingContext.correlation, name, value)
+            end
+        end
+
+        contextCarrier[CONTEXT_CORRELATION_KEY] = CorrelationContext.serialize(tracingContext.correlation)
     end
 
     return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)

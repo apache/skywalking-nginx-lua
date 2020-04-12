@@ -73,6 +73,7 @@ jobs:
           lua span_test.lua
           lua tracing_context_test.lua
           lua segment_ref_test.lua
+          lua correlation_context_test.lua
           cd ..
       - name: 'Run Nginx Lua Tests'
         run: |
