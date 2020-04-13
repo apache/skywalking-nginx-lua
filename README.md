@@ -49,8 +49,8 @@ http {
                 -- Currently, we can not have the upstream real network address
                 ------------------------------------------------------
                 require("tracer"):start("upstream service")
-                -- if you want to custom data to downstream service
-                require("tracer"):start("upstream service", {custom = "custom_value"})
+                -- If you want correlation custom data to the downstream service
+                -- require("tracer"):start("upstream service", {custom = "custom_value"})
             }
 
             -- Target upstream service

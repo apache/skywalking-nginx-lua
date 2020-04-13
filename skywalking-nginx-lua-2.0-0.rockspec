@@ -26,5 +26,6 @@ build = {
     ["skywalking.span"] = "lib/skywalking/span.lua",
     ["skywalking.tracing_context"] = "lib/skywalking/tracing_context.lua",
     ["skywalking.util"] = "lib/skywalking/util.lua",
+    ["skywalking.correlation_context"] = "lib/skywalking/correlation_context.lua",
    }
 }
