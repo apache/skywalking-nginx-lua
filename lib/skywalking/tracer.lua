@@ -18,7 +18,7 @@ local Span = require('span')
 
 local Tracer = {}
 
-function Tracer:start(upstream_name)
+function Tracer:start(upstream_name, correlation)
     local metadata_buffer = ngx.shared.tracing_buffer
     local TC = require('tracing_context')
     local Layer = require('span_layer')
@@ -34,6 +34,7 @@ function Tracer:start(upstream_name)
 
     local contextCarrier = {}
     contextCarrier["sw8"] = ngx.req.get_headers()["sw8"]
+    contextCarrier["sw8-correlation"] = ngx.req.get_headers()["sw8-correlation"]
     local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
     Span.start(entrySpan, ngx.now() * 1000)
     Span.setComponentId(entrySpan, nginxComponentId)
@@ -49,7 +50,7 @@ function Tracer:start(upstream_name)
 
     local upstreamServerName = upstream_name
     ------------------------------------------------------
-    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan, upstreamServerName, contextCarrier)
+    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan, upstreamServerName, contextCarrier, correlation)
     Span.start(exitSpan, ngx.now() * 1000)
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
