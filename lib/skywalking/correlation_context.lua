@@ -16,8 +16,8 @@
 --
 
 -- limit define
-local ELEMENT_MAX_NUMBER = 3;
-local VALUE_MAX_LENGTH = 128;
+local ELEMENT_MAX_NUMBER = 3
+local VALUE_MAX_LENGTH = 128
 
 local Util = require('util')
 local Base64 = require('dependencies/base64')
