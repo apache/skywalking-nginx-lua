@@ -30,7 +30,7 @@ TestCorelationContext = {}
         -- analyze with empty value
         context = correlationContext.fromSW8Value('dGVzdDE=:')
         lu.assertNotNil(context)
-        lu.assertEquals(context["test1"], "")
+        lu.assertNil(context["test1"])
 
         -- analyze with empty header
         context = correlationContext.fromSW8Value('')
@@ -61,7 +61,7 @@ TestCorelationContext = {}
         correlationContext.put(context, "test1", "")
         encode_context = correlationContext.serialize(context)
         lu.assertNotNil(encode_context)
-        lu.assertEquals(encode_context, "dGVzdDE=:")
+        lu.assertEquals(encode_context, "")
     end
 
     function TestCorelationContext:testPut()

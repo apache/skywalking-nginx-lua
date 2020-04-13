@@ -39,7 +39,7 @@ end
 function _M.fromSW8Value(value)
     local context = _M.new()
 
-    if value == nil then
+    if value == nil or #value == 0 then
         return context
     end
 
@@ -55,10 +55,12 @@ function _M.fromSW8Value(value)
         end
 
         local parts = Util.split(per_data, ':')
-        local key = decode_base64(parts[1])
-        local value = #parts > 1 and decode_base64(parts[2]) or ""
+        if #parts == 2 then
+            local key = decode_base64(parts[1])
+            local value = decode_base64(parts[2])
 
-        context[key] = value
+            context[key] = value
+        end
     end
 
     return context
@@ -86,7 +88,7 @@ function _M.put(context, key, value)
     end
 
     -- remove and return previous value when value is empty
-    if not value then
+    if not value or #value == 0 then
         context[key] = nil
         return
     end
