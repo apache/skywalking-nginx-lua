@@ -1,7 +1,7 @@
 # Release Guide
 All committer should follow these steps to do release for this repo.
 
-1. Update the [CHANGES.md](CHANGES.md) to prepare the official release. 
+1. Update the [CHANGES.md](CHANGES.md) to prepare the official release.
 
 2. Package the source release.
 
@@ -54,7 +54,7 @@ within the next couple of days.
 5. Call for a vote. Call a vote in dev@skywalking.apache.org
 
 ```
-[VOTE] Release SkyWalking Nginx LUA x.y.z 
+[VOTE] Release SkyWalking Nginx LUA x.y.z
 
 This is a call for vote to release Apache SkyWalking Nginx LUA version x.y.z.
 
@@ -108,8 +108,8 @@ Hi all,
 
 Apache SkyWalking  Team is glad to announce the first release of Apache SkyWalking Nginx LUA x.y.z
 
-SkyWalking: APM (application performance monitor) tool for distributed systems, 
-especially designed for microservices, cloud native and container-based (Docker, Kubernetes, Mesos) architectures. 
+SkyWalking: APM (application performance monitor) tool for distributed systems,
+especially designed for microservices, cloud native and container-based (Docker, Kubernetes, Mesos) architectures.
 
 SkyWalking Nginx Agent provides the native tracing capability for Nginx powered by Nginx LUA module.
 
@@ -141,3 +141,8 @@ SkyWalking Resources:
 
 - Apache SkyWalking Team
 ```
+
+6. upload rockspec file to luarocks.org
+login to [luarocks.org](https://luarocks.org/), the user name is `apache-skywalking` and the password has been sent to `private@skwalking.apache.org`.
+
+Then upload the rockspec file and you can use the `luarocks` command line to install the new version.
