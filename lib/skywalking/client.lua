@@ -15,6 +15,8 @@
 -- limitations under the License.
 --
 
+local SEGMENT_BATCH_COUNT = 100
+
 local Client = {}
 
 -- Tracing timer reports instance properties report, keeps alive and sends traces
@@ -131,6 +133,36 @@ function Client:ping(metadata_buffer, backend_http_uri)
     end
 end
 
+-- Send segemnts data to backend
+local function sendSegments(segmentTransform, count, backend_http_uri)
+    local log = ngx.log
+    local DEBUG = ngx.DEBUG
+    local ERR = ngx.ERR
+
+    local http = require('resty.http')
+    local httpc = http.new()
+
+    local res, err = httpc:request_uri(backend_http_uri .. '/v3/segments', {
+        method = "POST",
+        body = segmentTransform,
+        headers = {
+            ["Content-Type"] = "application/json",
+        },
+    })
+
+    if err == nil then
+        if res.status ~= 200 then
+            log(ERR, "Segment report fails, response code ", res.status)
+            return 0
+        end
+    else
+        log(ERR, "Segment report fails, ", err)
+        return 0
+    end
+
+    return count
+end
+
 -- Report trace segments to the backend
 function Client:reportTraces(metadata_buffer, backend_http_uri)
     local log = ngx.log
@@ -139,39 +171,35 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
 
     local queue = ngx.shared.tracing_buffer
     local segment = queue:rpop('segment')
+    local segmentTransform = ''
 
-    local count = 0;
-
-    local http = require('resty.http')
-    local httpc = http.new()
+    local count = 0
+    local totalCount = 0
 
     while segment ~= nil
     do
-        local res, err = httpc:request_uri(backend_http_uri .. '/v3/segments', {
-            method = "POST",
-            body = segment,
-            headers = {
-                ["Content-Type"] = "application/json",
-            },
-        })
-
-        if err == nil then
-            if res.status ~= 200 then
-                log(ERR, "Segment report fails, response code ", res.status)
-                break
-            else
-                count = count + 1
-            end
-        else
-            log(ERR, "Segment report fails, ", err)
-            break
+        if #segmentTransform > 0 then
+            segmentTransform = segmentTransform .. ','
         end
 
+        segmentTransform = segmentTransform .. segment
         segment = queue:rpop('segment')
+        count = count + 1
+
+        if count >= SEGMENT_BATCH_COUNT then
+            totalCount = totalCount + sendSegments('[' .. segmentTransform .. ']', count, backend_http_uri)
+            segmentTransform = ''
+
+            count = 0
+        end
     end
 
-    if count > 0 then
-        log(DEBUG, count,  " segments reported.")
+    if #segmentTransform > 0 then
+        totalCount = totalCount + sendSegments('[' .. segmentTransform .. ']', count, backend_http_uri)
+    end
+
+    if totalCount > 0 then
+        log(DEBUG, totalCount,  " segments reported.")
     end
 end
 
