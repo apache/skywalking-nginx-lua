@@ -134,7 +134,7 @@ function Client:ping(metadata_buffer, backend_http_uri)
 end
 
 -- Send segemnts data to backend
-local function sendSegments(segmentTransform, count, backend_http_uri)
+local function sendSegments(segmentTransform, backend_http_uri)
     local log = ngx.log
     local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
@@ -153,14 +153,14 @@ local function sendSegments(segmentTransform, count, backend_http_uri)
     if err == nil then
         if res.status ~= 200 then
             log(ERR, "Segment report fails, response code ", res.status)
-            return 0
+            return false
         end
     else
         log(ERR, "Segment report fails, ", err)
-        return 0
+        return false
     end
 
-    return count
+    return true
 end
 
 -- Report trace segments to the backend
@@ -187,15 +187,19 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
         count = count + 1
 
         if count >= SEGMENT_BATCH_COUNT then
-            totalCount = totalCount + sendSegments('[' .. segmentTransform .. ']', count, backend_http_uri)
-            segmentTransform = ''
+            if sendSegments('[' .. segmentTransform .. ']', backend_http_uri) then
+                totalCount = totalCount + count
+            end
 
+            segmentTransform = ''
             count = 0
         end
     end
 
     if #segmentTransform > 0 then
-        totalCount = totalCount + sendSegments('[' .. segmentTransform .. ']', count, backend_http_uri)
+        if sendSegments('[' .. segmentTransform .. ']', backend_http_uri) then
+            totalCount = totalCount + count
+        end
     end
 
     if totalCount > 0 then
