@@ -38,7 +38,7 @@
         <docker.image.name>skywalking-collector</docker.image.name>
         <docker-maven-plugin.version>0.4.13</docker-maven-plugin.version>
         <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
-        <agent-test-tools.version>1f009d692b99896c08cf9f26440f92287f0364e7</agent-test-tools.version>
+        <agent-test-tools.version>ed896e044f146cf607441d375da4830e8d0547f8</agent-test-tools.version>
         <agent-test-tools.workingDirectory>${project.basedir}/target/agent-test-tools</agent-test-tools.workingDirectory>
         <agent-test-tools.repos>https://github.com/apache/skywalking-agent-test-tool.git</agent-test-tools.repos>
     </properties>
