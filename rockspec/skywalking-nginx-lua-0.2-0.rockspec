@@ -27,5 +27,6 @@ build = {
     ["skywalking.tracing_context"] = "lib/skywalking/tracing_context.lua",
     ["skywalking.util"] = "lib/skywalking/util.lua",
     ["skywalking.correlation_context"] = "lib/skywalking/correlation_context.lua",
+    ["skywalking.dependencies.base64"] = "lib/skywalking/dependencies/base64.lua",
    }
 }
