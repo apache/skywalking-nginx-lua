@@ -1,6 +1,6 @@
 # Changes
 
-## 0.20
+## 0.2.0
 
 1. Adapt the new v3 protocol.
 2. Implement correlation protocol.
