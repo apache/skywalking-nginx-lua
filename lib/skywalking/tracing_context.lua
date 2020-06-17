@@ -124,7 +124,7 @@ end
 
 -- Delegate to Span.createEntrySpan
 -- @param contextCarrier could be nil if there is no downstream propagated context
-function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrier)
+function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrier, agent_namespace)
     if tracingContext.is_noop then
         return Span.newNoOP()
     end
@@ -135,12 +135,12 @@ function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrie
     end
     tracingContext.correlation = CorrelationContext.fromSW8Value(correlationData)
 
-    return Span.createEntrySpan(operationName, tracingContext, parent, contextCarrier)
+    return Span.createEntrySpan(operationName, tracingContext, parent, contextCarrier, agent_namespace)
 end
 
 -- Delegate to Span.createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
-function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier, correlation)
+function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier, correlation, agent_namespace)
     if tracingContext.is_noop then
         return Span.newNoOP()
     end
@@ -155,7 +155,7 @@ function _M.createExitSpan(tracingContext, operationName, parent, peer, contextC
         contextCarrier[CONTEXT_CORRELATION_KEY] = CorrelationContext.serialize(tracingContext.correlation)
     end
 
-    return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
+    return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier, agent_namespace)
 end
 
 -- After all active spans finished, this segment will be treated as finished status.

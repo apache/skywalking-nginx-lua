@@ -64,12 +64,17 @@ local _M = {}
 
 -- Create an entry span. Represent the HTTP incoming request.
 -- @param contextCarrier, HTTP request header, which could carry the `sw8` context
-function _M.createEntrySpan(operationName, context, parent, contextCarrier)
+function _M.createEntrySpan(operationName, context, parent, contextCarrier, agent_namespace)
+    local nameSpace = ""
+    if agent_namespace ~= nil then
+        nameSpace = agent_namespace .. "-"
+    end
+
     local span = _M.new(operationName, context, parent)
     span.is_entry = true
 
     if contextCarrier ~= nil then
-        local propagatedContext = contextCarrier[CONTEXT_CARRIER_KEY]
+        local propagatedContext = contextCarrier[nameSpace .. CONTEXT_CARRIER_KEY]
         if propagatedContext ~= nil then
             local ref = SegmentRef.fromSW8Value(propagatedContext)
             if ref ~= nil then
@@ -85,7 +90,12 @@ function _M.createEntrySpan(operationName, context, parent, contextCarrier)
 end
 
 -- Create an exit span. Represent the HTTP outgoing request.
-function _M.createExitSpan(operationName, context, parent, peer, contextCarrier)
+function _M.createExitSpan(operationName, context, parent, peer, contextCarrier, agent_namespace)
+    local nameSpace = ""
+    if agent_namespace ~= nil then
+        nameSpace = agent_namespace .. "-"
+    end
+
     local span = _M.new(operationName, context, parent)
     span.is_exit = true
     span.peer = peer
@@ -105,7 +115,7 @@ function _M.createExitSpan(operationName, context, parent, peer, contextCarrier)
         parentEndpointName = firstSpan.operation_name
         injectableRef.parent_endpoint = parentEndpointName
 
-        contextCarrier[CONTEXT_CARRIER_KEY] = SegmentRef.serialize(injectableRef)
+        contextCarrier[nameSpace .. CONTEXT_CARRIER_KEY] = SegmentRef.serialize(injectableRef)
     end
 
     return span
