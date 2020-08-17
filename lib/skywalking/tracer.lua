@@ -77,6 +77,7 @@ function Tracer:prepareForReport()
     local TC = require('tracing_context')
     local Segment = require('segment')
     if ngx.ctx.entrySpan ~= nil then
+        Span.tag(ngx.ctx.entrySpan, 'http.status', ngx.var.status)
         Span.finish(ngx.ctx.entrySpan, ngx.now() * 1000)
         local status, segment = TC.drainAfterFinished(ngx.ctx.tracingContext)
         if status then
