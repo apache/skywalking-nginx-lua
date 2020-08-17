@@ -42,6 +42,7 @@ segmentItems:
             tags:
               - {key: http.method, value: GET}
               - {key: http.params, value: 'http://127.0.0.1/tier2/lb'}
+              - {key: http.status, value: '200'}
             endTime: gt 0
             spanType: Entry
             spanId: 0
@@ -71,6 +72,7 @@ segmentItems:
             tags:
               - {key: http.method, value: GET}
               - {key: http.params, value: 'not null'}
+              - {key: http.status, value: '200'}
             endTime: gt 0
             spanType: Entry
             spanId: 0
