@@ -37,6 +37,8 @@ segmentItems:
             componentId: 6000
             peer: 'e2e-test-with-mock-collector:upstream_ip2:port2'
             spanLayer: Http
+            tags:
+              - {key: http.status, value: '200'}
           - operationName: /tier2/lb
             startTime: gt 0
             tags:
@@ -67,6 +69,8 @@ segmentItems:
             componentId: 6000
             peer: 'e2e-test-with-mock-collector:upstream_ip:port'
             spanLayer: Http
+            tags:
+              - {key: http.status, value: '200'}
           - operationName: /ingress
             startTime: gt 0
             tags:
