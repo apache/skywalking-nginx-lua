@@ -10,7 +10,7 @@ no_root_location();
 log_level('info');
 
 our $HttpConfig = qq{
-    lua_package_path "$pwd/lib/skywalking/?.lua;;";
+    lua_package_path "$pwd/lib/?.lua;;";
     error_log logs/error.log debug;
     resolver 114.114.114.114 8.8.8.8 ipv6=off;
     lua_shared_dict tracing_buffer 100m;
@@ -25,7 +25,7 @@ __DATA__
 --- config
     location /t {
         content_by_lua_block {
-            local util = require('util')
+            local util = require('skywalking.util')
             local timestamp = util.timestamp()
             local regex = [[^\d+$]]
             local m = ngx.re.match(timestamp, regex)
@@ -50,7 +50,7 @@ true
 --- config
     location /t {
         content_by_lua_block {
-            local util = require('util')
+            local util = require('skywalking.util')
             local id = util.newID()
             local regex = [[^[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+$]]
             local m = ngx.re.match(id, regex)
