@@ -17,7 +17,7 @@ All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
 ```nginx
 http {
-    lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/skywalking/?.lua;;";
+    lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/?.lua;;";
 
     # Buffer represents the register inform and the queue of the finished segment
     lua_shared_dict tracing_buffer 100m;
@@ -49,9 +49,9 @@ http {
                 --
                 -- Currently, we can not have the upstream real network address
                 ------------------------------------------------------
-                require("tracer"):start("upstream service")
+                require("skywalking.tracer"):start("upstream service")
                 -- If you want correlation custom data to the downstream service
-                -- require("tracer"):start("upstream service", {custom = "custom_value"})
+                -- require("skywalking.tracer"):start("upstream service", {custom = "custom_value"})
             }
 
             -- Target upstream service
@@ -59,12 +59,12 @@ http {
 
             body_filter_by_lua_block {
                 if ngx.arg[2] then
-                    require("tracer"):finish()
+                    require("skywalking.tracer"):finish()
                 end
             }
 
             log_by_lua_block {
-                require("tracer"):prepareForReport()
+                require("skywalking.tracer"):prepareForReport()
             }
         }
     }

@@ -16,9 +16,9 @@
 --
 
 local lu = require('luaunit')
-local TC = require('tracing_context')
-local Span = require('span')
-local SpanLayer = require("span_layer")
+local TC = require('skywalking.tracing_context')
+local Span = require('skywalking.span')
+local SpanLayer = require("skywalking.span_layer")
 
 TestSpan = {}
     function TestSpan:testNewEntry()
