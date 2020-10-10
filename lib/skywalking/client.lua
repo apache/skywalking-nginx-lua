@@ -31,7 +31,7 @@ function Client:startBackendTimer(backend_http_uri)
 
     local log = ngx.log
     local DEBUG = ngx.DEBUG
-    local ERR = ngx.ERR    
+    local ERR = ngx.ERR
 
     check = function(premature)
         if not premature then
@@ -71,7 +71,7 @@ function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
     local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
 
     local cjson = require('cjson')
-    local reportInstance = require("management").newReportInstanceProperties(serviceName, serviceInstanceName)
+    local reportInstance = require("skywalking.management").newReportInstanceProperties(serviceName, serviceInstanceName)
     local reportInstanceParam, err = cjson.encode(reportInstance)
     if err then
         log(ERR, "Request to report instance fails, ", err)
@@ -108,7 +108,7 @@ function Client:ping(metadata_buffer, backend_http_uri)
     local serviceInstanceName = metadata_buffer:get('serviceInstanceName')
 
     local cjson = require('cjson')
-    local pingPkg = require("management").newServiceInstancePingPkg(serviceName, serviceInstanceName)
+    local pingPkg = require("skywalking.management").newServiceInstancePingPkg(serviceName, serviceInstanceName)
     local pingPkgParam, err = cjson.encode(pingPkg)
     if err then
         log(ERR, "Agent ping fails, ", err)

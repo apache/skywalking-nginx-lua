@@ -15,9 +15,9 @@
 -- limitations under the License.
 --
 
-local spanLayer = require("span_layer")
-local Util = require('util')
-local SegmentRef = require("segment_ref")
+local spanLayer = require("skywalking.span_layer")
+local Util = require('skywalking.util')
+local SegmentRef = require("skywalking.segment_ref")
 
 local CONTEXT_CARRIER_KEY = 'sw8'
 

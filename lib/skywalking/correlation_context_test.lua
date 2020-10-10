@@ -16,8 +16,8 @@
 --
 
 local lu = require('luaunit')
-local correlationContext = require('correlation_context')
-local TC = require('tracing_context')
+local correlationContext = require('skywalking.correlation_context')
+local TC = require('skywalking.tracing_context')
 
 TestCorelationContext = {}
     function TestCorelationContext:testFromSW8Value()

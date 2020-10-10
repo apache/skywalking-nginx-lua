@@ -17,7 +17,7 @@
 
 
 local lu = require('luaunit')
-local SegmentRef = require('segment_ref')
+local SegmentRef = require('skywalking.segment_ref')
 local cjson = require("cjson")
 
 TestSegmentRef = {}
