@@ -93,7 +93,8 @@ if ok then
     end
 else
     newID = function()
-        return timestamp() .. '.' .. math.random(0, MAX_ID_PART2) .. '.' .. math.random(0, MAX_ID_PART3)
+        return timestamp() .. '.' .. math.random(0, MAX_ID_PART2) .. '.'
+               .. math.random(0, MAX_ID_PART3)
     end
 end
 

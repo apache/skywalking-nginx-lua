@@ -56,6 +56,13 @@ done
             local m = ngx.re.match(id, regex)
             if m then
                 ngx.say("done")
+                return
+            end
+
+            regex = [[^\d+.\d+.\d+$]]
+            m = ngx.re.match(id, regex)
+            if m then
+                ngx.say("done")
             else
                 ngx.say("failed to generate id: ", id)
             end
