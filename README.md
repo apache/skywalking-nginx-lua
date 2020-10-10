@@ -14,7 +14,8 @@ This agent follows the SkyWalking tracing and header protocol. It reports tracin
 All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
 # Setup Doc
-```
+
+```nginx
 http {
     lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/skywalking/?.lua;;";
 
@@ -77,7 +78,7 @@ Please head to the [releases page](http://skywalking.apache.org/downloads/) to d
 * 0.2.0+ releases require SkyWalking 8
 
 # Compatible backend
-SkyWalking OAP begins to support LUA agent in 7.0.0 release. 
+SkyWalking OAP begins to support LUA agent in 7.0.0 release.
 
 You could choose master branch before the official 7.0.0 release.
 
