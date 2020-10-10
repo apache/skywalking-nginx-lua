@@ -19,8 +19,8 @@
 local ELEMENT_MAX_NUMBER = 3
 local VALUE_MAX_LENGTH = 128
 
-local Util = require('util')
-local Base64 = require('dependencies/base64')
+local Util = require('skywalking.util')
+local Base64 = require('skywalking.dependencies.base64')
 local encode_base64 = Base64.encode
 local decode_base64 = Base64.decode
 

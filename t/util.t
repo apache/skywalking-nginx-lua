@@ -10,7 +10,7 @@ no_root_location();
 log_level('info');
 
 our $HttpConfig = qq{
-    lua_package_path "$pwd/lib/skywalking/?.lua;;";
+    lua_package_path "$pwd/lib/?.lua;;";
     error_log logs/error.log debug;
     resolver 114.114.114.114 8.8.8.8 ipv6=off;
     lua_shared_dict tracing_buffer 100m;
@@ -25,21 +25,21 @@ __DATA__
 --- config
     location /t {
         content_by_lua_block {
-            local util = require('util')
+            local util = require('skywalking.util')
             local timestamp = util.timestamp()
             local regex = [[^\d+$]]
             local m = ngx.re.match(timestamp, regex)
             if m and tonumber(m[0]) == timestamp then
-                ngx.say(true)
+                ngx.say("done")
             else
-                ngx.say(false)
+                ngx.say("failed to generate timestamp: ", timestamp)
             end
         }
     }
 --- request
 GET /t
 --- response_body
-true
+done
 --- no_error_log
 [error]
 
@@ -50,18 +50,27 @@ true
 --- config
     location /t {
         content_by_lua_block {
-            local util = require('util')
+            local util = require('skywalking.util')
             local id = util.newID()
             local regex = [[^[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+$]]
             local m = ngx.re.match(id, regex)
             if m then
-                ngx.say(true)
+                ngx.say("done")
+                return
+            end
+
+            regex = [[^\d+.\d+.\d+$]]
+            m = ngx.re.match(id, regex)
+            if m then
+                ngx.say("done")
+            else
+                ngx.say("failed to generate id: ", id)
             end
         }
     }
 --- request
 GET /t
 --- response_body
-true
+done
 --- no_error_log
 [error]
