@@ -14,6 +14,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
+
 local _M = {}
 
 -- for pure Lua
@@ -47,12 +48,15 @@ if ok then
     end
 end
 
+
 _M.split = split
 _M.timestamp = timestamp
 _M.is_ngx_lua = ok
 
+
 local MAX_ID_PART2 = 1000000000
 local MAX_ID_PART3 = 100000
+
 
 local random_seed = function ()
     local seed
@@ -100,6 +104,19 @@ else
     end
 end
 
+
 _M.newID = newID
+
+
+if _M.is_ngx_lua then
+    _M.encode_base64 = ngx.encode_base64
+    _M.decode_base64 = ngx.decode_base64
+
+else
+    local Base64 = require('skywalking.dependencies.base64')
+    _M.encode_base64 = Base64.encode
+    _M.decode_base64 = Base64.decode
+end
+
 
 return _M
