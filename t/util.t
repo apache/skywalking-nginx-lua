@@ -30,16 +30,16 @@ __DATA__
             local regex = [[^\d+$]]
             local m = ngx.re.match(timestamp, regex)
             if m and tonumber(m[0]) == timestamp then
-                ngx.say(true)
+                ngx.say("done")
             else
-                ngx.say(false)
+                ngx.say("failed to generate timestamp: ", timestamp)
             end
         }
     }
 --- request
 GET /t
 --- response_body
-true
+done
 --- no_error_log
 [error]
 
@@ -55,13 +55,15 @@ true
             local regex = [[^[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+\-[0-9a-f]+$]]
             local m = ngx.re.match(id, regex)
             if m then
-                ngx.say(true)
+                ngx.say("done")
+            else
+                ngx.say("failed to generate id: ", id)
             end
         }
     }
 --- request
 GET /t
 --- response_body
-true
+done
 --- no_error_log
 [error]
