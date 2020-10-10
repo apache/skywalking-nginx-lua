@@ -17,7 +17,7 @@ All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
 ```nginx
 http {
-    lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/skywalking/?.lua;;";
+    lua_package_path "/Path/to/.../skywalking-nginx-lua/lib/?.lua;;";
 
     # Buffer represents the register inform and the queue of the finished segment
     lua_shared_dict tracing_buffer 100m;
