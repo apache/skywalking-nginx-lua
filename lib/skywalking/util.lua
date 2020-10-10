@@ -81,13 +81,15 @@ local random_seed = function ()
 end
 
 
-math.randomseed(random_seed())
+_M.set_randomseed = function ()
+    math.randomseed(random_seed())
+end
+
 
 local newID
 -- for Nginx Lua
 local ok, uuid = pcall(require, "resty.jit-uuid")
 if ok then
-    uuid.seed()
     newID = function()
         return uuid.generate_v4()
     end
