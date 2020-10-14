@@ -1,8 +1,8 @@
 package = "skywalking-nginx-lua"
-version = "master-0"
+version = "0.3-0"
 source = {
    url = "git://github.com/apache/skywalking-nginx-lua",
-   branch = "master",
+   tag = "v0.3",
 }
 
 description = {
