@@ -77,13 +77,13 @@ end
 
 -- Create an internal instance
 function Internal.new()
-    local internal = {}
+    local internal = Util.tablepool_fetch()
 
     internal.self_generated_trace_id = true
     internal.span_id_seq = 0
-    internal.active_spans = {}
+    internal.active_spans = Util.tablepool_fetch()
     internal.active_count = 0
-    internal.finished_spans = {}
+    internal.finished_spans = Util.tablepool_fetch()
     internal.addRefIfFirst = addRefIfFirst
     internal.addActive = addActive
     internal.finishSpan = finishSpan
@@ -112,7 +112,7 @@ function _M.new(serviceName, serviceInstanceName)
         return _M.newNoOP()
     end
 
-    local tracing_context = {}
+    local tracing_context = Util.tablepool_fetch()
     tracing_context.trace_id = Util.newID()
     tracing_context.segment_id = tracing_context.trace_id
     tracing_context.service = serviceName
@@ -173,7 +173,7 @@ function _M.drainAfterFinished(tracingContext)
     if tracingContext.internal.active_count ~= 0 then
         return false, nil
     else
-        local segment = {}
+        local segment = Util.tablepool_fetch()
         segment.trace_id = tracingContext.trace_id
         segment.segment_id = tracingContext.segment_id
         segment.service = tracingContext.service
