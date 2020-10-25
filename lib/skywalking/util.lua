@@ -124,6 +124,10 @@ if _M.is_ngx_lua then
     local clear_tab = require("table.clear")
     local insert_tab = table.insert
     _M.tablepool_fetch = function(name, narr, nrec)
+        narr = narr or 8
+        nrec = nrec or 8
+        name = name or "sw_default_tab"
+
         local sw_tab_pool = ngx.ctx.sw_tab_pool
         if not sw_tab_pool then
             sw_tab_pool = tablepool.fetch("sw_tab_pool", 128, 0)
