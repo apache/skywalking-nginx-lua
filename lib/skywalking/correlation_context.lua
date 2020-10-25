@@ -26,7 +26,7 @@ local decode_base64 = Util.decode_base64
 local _M = {}
 
 function _M.new()
-    return {}
+    return Util.tablepool_fetch("sw_correlation_context")
 end
 
 -- Deserialze value from the correlation context and initalize the context
@@ -37,14 +37,14 @@ function _M.fromSW8Value(value)
         return context
     end
 
-    local data = Util.split(value, ',')
-    if #data == 0 then
+    local items = Util.split(value, ',')
+    if #items == 0 then
         return context
     end
 
-    for i, per_data in ipairs(data)
+    for i, per_data in ipairs(items)
     do
-        if #data > ELEMENT_MAX_NUMBER then
+        if #items > ELEMENT_MAX_NUMBER then
             return context
         end
 

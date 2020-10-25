@@ -18,6 +18,23 @@ SHELL := /bin/bash -o pipefail
 VERSION ?= latest
 RELEASE_SRC = skywalking-nginx-lua-${VERSION}-src
 
+.PHONY: default
+default: release-src
+
+### test:         Run test suite. Use test=... for specific tests
+.PHONY: test
+test:
+	prove -I. -r -s t
+
+### help:         Show Makefile rules
+.PHONY: help
+help:
+	@echo Makefile rules:
+	@echo
+	@grep -E '^### [-A-Za-z0-9_]+:' Makefile | sed 's/###/   /'
+
+### release-src:  Release source code
+.PHONY: release-src
 release-src:
 	tar -zcvf $(RELEASE_SRC).tgz \
 	--exclude bin \

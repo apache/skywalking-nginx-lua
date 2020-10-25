@@ -14,11 +14,11 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
+local Util = require("skywalking.util")
 local Span = require('skywalking.span')
 local TC = require('skywalking.tracing_context')
 local Layer = require('skywalking.span_layer')
 local Segment = require('skywalking.segment')
-local Util = require('skywalking.util')
 local json = require('cjson.safe')
 
 local metadata_shdict = ngx.shared.tracing_buffer
@@ -37,11 +37,11 @@ function Tracer:start(upstream_name, correlation)
     -- Constant pre-defined in SkyWalking main repo
     -- 6000 represents Nginx
 
-    local contextCarrier = {}
+    local contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     contextCarrier["sw8"] = ngx.var.http_sw8
     contextCarrier["sw8-correlation"] = ngx.var.http_sw8_correlation
-
     local time_now = ngx.now() * 1000
+
     local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
     Span.start(entrySpan, time_now)
     Span.setComponentId(entrySpan, nginxComponentId)
@@ -51,7 +51,7 @@ function Tracer:start(upstream_name, correlation)
     Span.tag(entrySpan, 'http.params',
              ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri )
 
-    contextCarrier = {}
+    contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     -- Use the same URI to represent incoming and forwarding requests
     -- Change it if you need.
     local upstreamUri = ngx.var.uri
@@ -87,37 +87,26 @@ function Tracer:finish()
 end
 
 function Tracer:prepareForReport()
-    local entrySpan = ngx.ctx.entrySpan
-    if not entrySpan then
-        return
+    if ngx.ctx.entrySpan ~= nil then
+        local ngxstatus = ngx.var.status
+        Span.tag(ngx.ctx.entrySpan, 'http.status', ngxstatus)
+        if tonumber(ngxstatus) >= 500 then
+           Span.errorOccurred(ngx.ctx.entrySpan)
+        end
+
+        Span.finish(ngx.ctx.entrySpan, ngx.now() * 1000)
+        local status, segment = TC.drainAfterFinished(ngx.ctx.tracingContext)
+        if status then
+            local segmentJson = json.encode(Segment.transform(segment))
+            ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
+
+            local queue = ngx.shared.tracing_buffer
+            local length = queue:lpush('segment', segmentJson)
+            ngx.log(ngx.DEBUG, 'segment buffer size = ', length)
+        end
     end
 
-    local ngxstatus = ngx.var.status
-    Span.tag(entrySpan, 'http.status', ngxstatus)
-    if tonumber(ngxstatus) >= 500 then
-        Span.errorOccurred(entrySpan)
-    end
-
-    Span.finish(entrySpan, ngx.now() * 1000)
-
-    local ok, segment = TC.drainAfterFinished(ngx.ctx.tracingContext)
-    if not ok then
-        return
-    end
-
-    local segmentJson, err = json.encode(Segment.transform(segment))
-    if not segmentJson then
-        ngx.log(ngx.ERR, "failed to encode segment: ", err)
-        return
-    end
-    ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
-
-    local length, err = metadata_shdict:lpush('segment', segmentJson)
-    if not length then
-        ngx.log(ngx.ERR, "failed to push segment: ", err)
-        return
-    end
-    ngx.log(ngx.DEBUG, 'segment buffer size = ', length)
+    Util.tablepool_release()
 end
 
 return Tracer

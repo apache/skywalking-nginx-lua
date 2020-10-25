@@ -74,3 +74,84 @@ GET /t
 done
 --- no_error_log
 [error]
+
+
+
+=== TEST 3: tablepool, use different name
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua_block {
+            local util = require('skywalking.util')
+
+            local tab1_name = util.tablepool_fetch("name1", 1, 1)
+            local tab1_name2 = util.tablepool_fetch("name2", 1, 1)
+            util.tablepool_release()
+
+            local tab2_name = util.tablepool_fetch("name1", 1, 1)
+            local tab2_name2 = util.tablepool_fetch("name2", 1, 1)
+            util.tablepool_release()
+
+            if tab1_name == tab2_name then
+                ngx.say("fetch same table by name1")
+            else
+                ngx.say("fetch different table by name1")
+            end
+
+            if tab1_name2 == tab2_name2 then
+                ngx.say("fetch same table by name2")
+            else
+                ngx.say("fetch different table by name2")
+            end
+        }
+    }
+--- request
+GET /t
+--- response_body
+fetch same table by name1
+fetch same table by name2
+--- no_error_log
+[error]
+
+
+
+=== TEST 4: tablepool, use default name
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua_block {
+            local util = require('skywalking.util')
+
+            local tab1_name = util.tablepool_fetch()
+            local tab1_name2 = util.tablepool_fetch()
+            util.tablepool_release()
+
+            local tab2_name = util.tablepool_fetch()
+            local tab2_name2 = util.tablepool_fetch()
+            util.tablepool_release()
+
+            if tab1_name == tab2_name then
+                ngx.say("fetch same table by default name[1]")
+            else
+                ngx.say("fetch different table by default name[1]")
+            end
+
+            if tab1_name2 == tab2_name2 then
+                ngx.say("fetch same table by default name[2]")
+            else
+                ngx.say("fetch different table by default name[2]")
+            end
+
+            util.tablepool_release()
+            util.tablepool_release()
+            ngx.say("done")
+        }
+    }
+--- request
+GET /t
+--- response_body
+fetch same table by default name[1]
+fetch same table by default name[2]
+done
+--- no_error_log
+[error]
