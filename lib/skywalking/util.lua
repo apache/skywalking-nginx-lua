@@ -119,4 +119,45 @@ else
 end
 
 
+if _M.is_ngx_lua then
+    local tablepool = require("tablepool")
+    local clear_tab = require("table.clear")
+    local insert_tab = table.insert
+    _M.tablepool_fetch = function(name, narr, nrec)
+        local sw_tab_pool = ngx.ctx.sw_tab_pool
+        if not sw_tab_pool then
+            sw_tab_pool = tablepool.fetch("sw_tab_pool", 128, 0)
+            insert_tab(sw_tab_pool, "sw_tab_pool")
+            insert_tab(sw_tab_pool, sw_tab_pool)
+
+            ngx.ctx.sw_tab_pool = sw_tab_pool
+        end
+
+        local tab = tablepool.fetch(name, narr, nrec)
+        insert_tab(sw_tab_pool, name)
+        insert_tab(sw_tab_pool, tab)
+        return tab
+    end
+    _M.tablepool_release = function()
+        local sw_tab_pool = ngx.ctx.sw_tab_pool
+        if not sw_tab_pool then
+            return
+        end
+
+        for i = #sw_tab_pool, 1, -2 do
+            local name = sw_tab_pool[i - 1]
+            local tab = sw_tab_pool[i]
+            tablepool.release(name, tab)
+            ngx.log(ngx.WARN, "release name: ", name, " ", tostring(tab))
+        end
+        clear_tab(sw_tab_pool)
+
+        ngx.ctx.sw_tab_pool = nil
+    end
+else
+    _M.tablepool_fetch = function () return {} end
+    _M.tablepool_release = function () return true end
+end
+
+
 return _M
