@@ -106,7 +106,6 @@ function Tracer:prepareForReport()
     end
 
     local segmentJson, err = json.encode(Segment.transform(segment))
-    Util.tablepool_release()
     if not segmentJson then
         ngx.log(ngx.ERR, "failed to encode segment: ", err)
         return
