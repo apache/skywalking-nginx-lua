@@ -19,3 +19,4 @@ packages/
 .externalToolBuilders
 /test/e2e/agent-test-tools/dist
 /t/servroot/
+go
