@@ -21,12 +21,12 @@ local Client = {}
 
 -- Tracing timer reports instance properties report, keeps alive and sends traces
 -- After report instance properties successfully, it sends keep alive packages.
-function Client:startBackendTimer(backend_http_uri)
+function Client:startBackendTimer(backend_http_uri, in_current_process)
     local metadata_buffer = ngx.shared.tracing_buffer
 
     -- The codes of timer setup is following the OpenResty timer doc
     local delay = 3  -- in seconds
-    local new_timer = ngx.timer.at
+    local new_timer = ngx.timer.every
     local check
 
     local log = ngx.log
@@ -43,17 +43,10 @@ function Client:startBackendTimer(backend_http_uri)
             end
 
             self:reportTraces(metadata_buffer, backend_http_uri)
-
-            -- do the health check
-            local ok, err = new_timer(delay, check)
-            if not ok then
-                log(ERR, "failed to create timer: ", err)
-                return
-            end
         end
     end
 
-    if 0 == ngx.worker.id() then
+    if in_current_process or 0 == ngx.worker.id() then
         local ok, err = new_timer(delay, check)
         if not ok then
             log(ERR, "failed to create timer: ", err)
