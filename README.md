@@ -32,6 +32,8 @@ http {
         -- Instance means the number of Nginx deployment, does not mean the worker instances
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
 
+        -- set random seed
+        require("skywalking.util").set_randomseed()
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
     }
 
