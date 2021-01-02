@@ -43,7 +43,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y lua5.3 lua5.3-dev
-          ls -alh /usr/bin | grep lua
+          sudo ln /usr/bin/lua5.3 /usr/bin/lua
       - name: 'Install LuaRocks'
         run: |
           wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
@@ -72,11 +72,11 @@ jobs:
       - name: 'Run Lua Tests'
         run: |
           cd lib
-          /usr/bin/lua skywalking/util_test.lua
-          /usr/bin/lua skywalking/span_test.lua
-          /usr/bin/lua skywalking/tracing_context_test.lua
-          /usr/bin/lua skywalking/segment_ref_test.lua
-          /usr/bin/lua skywalking/correlation_context_test.lua
+          lua skywalking/util_test.lua
+          lua skywalking/span_test.lua
+          lua skywalking/tracing_context_test.lua
+          lua skywalking/segment_ref_test.lua
+          lua skywalking/correlation_context_test.lua
           cd ..
       - name: 'Run Nginx Lua Tests'
         run: |
