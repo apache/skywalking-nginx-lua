@@ -41,7 +41,7 @@ jobs:
       - name: 'Install Lua'
         shell: bash
         run: |
-          sudo apt install lua5.3
+          sudo apt-get install lua5.3
       - name: 'Install LuaRocks'
         run: |
           wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
