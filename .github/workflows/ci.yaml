@@ -49,7 +49,7 @@ jobs:
           wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
           tar zxpf luarocks-3.3.0.tar.gz
           cd luarocks-3.3.0
-          ./configure --with-lua=/usr/ && make && sudo make install
+          ./configure && make && sudo make install
           cd ..
       - name: 'Install Dependencies'
         run: |
