@@ -43,7 +43,6 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y lua5.3 lua5.3-dev
-          export PATH=/usr/bin/lua:$PATH
       - name: 'Install LuaRocks'
         run: |
           wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
@@ -71,6 +70,7 @@ jobs:
           git clone https://github.com/iresty/test-nginx.git test-nginx
       - name: 'Run Lua Tests'
         run: |
+          export PATH=/usr/bin/:$PATH
           cd lib
           lua skywalking/util_test.lua
           lua skywalking/span_test.lua
