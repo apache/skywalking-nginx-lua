@@ -41,11 +41,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 8
-      - uses: aahmed-se/setup-maven@v3
-        with:
-          maven-version: 3.6.1
       - name: Set environment
         run: export MAVEN_OPTS='-Dmaven.repo.local=~/.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
       - name: Compile & E2E Test
         run: |
-          mvn -f ./test/e2e/pom.xml package verify
+          ./mvnw -f ./test/e2e/pom.xml package verify
