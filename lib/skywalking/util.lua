@@ -152,7 +152,7 @@ if _M.is_ngx_lua then
             local name = sw_tab_pool[i - 1]
             local tab = sw_tab_pool[i]
             tablepool.release(name, tab)
-            ngx.log(ngx.WARN, "release name: ", name, " ", tostring(tab))
+            ngx.log(ngx.INFO, "release name: ", name, " ", tostring(tab))
         end
         clear_tab(sw_tab_pool)
 

@@ -38,8 +38,8 @@ function Tracer:start(upstream_name, correlation)
     -- 6000 represents Nginx
 
     local contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
-    contextCarrier["sw8"] = ngx.req.get_headers()["sw8"]
-    contextCarrier["sw8-correlation"] = ngx.req.get_headers()["sw8-correlation"]
+    contextCarrier["sw8"] = ngx.var.http_sw8
+    contextCarrier["sw8-correlation"] = ngx.var.http_sw8_correlation
     local time_now = ngx.now() * 1000
 
     local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
