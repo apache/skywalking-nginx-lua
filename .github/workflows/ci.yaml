@@ -38,9 +38,12 @@ jobs:
         run: |
           git submodule sync --recursive
           git -c protocol.version=2 submodule update --init --force --recursive --depth=1
-      - uses: leafo/gh-actions-lua@v5
-        with:
-          luaVersion: "5.3.5"
+      - name: 'Install Lua'
+        shell: bash
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y lua5.3 lua5.3-dev
+          sudo ln /usr/bin/lua5.3 /usr/bin/lua
       - name: 'Install LuaRocks'
         run: |
           wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
