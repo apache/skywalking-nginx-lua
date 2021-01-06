@@ -19,6 +19,7 @@ local TC = require('skywalking.tracing_context')
 local Layer = require('skywalking.span_layer')
 local Segment = require('skywalking.segment')
 local Util = require('skywalking.util')
+local Const = require('skywalking.constants')
 local json = require('cjson.safe')
 
 local metadata_shdict = ngx.shared.tracing_buffer
@@ -112,7 +113,7 @@ function Tracer:prepareForReport()
     end
     ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
 
-    local length, err = metadata_shdict:lpush('segment', segmentJson)
+    local length, err = metadata_shdict:lpush(Const.segment_queue, segmentJson)
     if not length then
         ngx.log(ngx.ERR, "failed to push segment: ", err)
         return
