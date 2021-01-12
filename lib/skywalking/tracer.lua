@@ -33,6 +33,7 @@ local Tracer = {}
 function Tracer:start(upstream_name, correlation)
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
+    local includeHostInEntrySpan = metadata_shdict:get('includeHostInEntrySpan')
     local tracingContext = TC.new(serviceName, serviceInstanceName)
 
     -- Constant pre-defined in SkyWalking main repo
@@ -43,7 +44,12 @@ function Tracer:start(upstream_name, correlation)
     contextCarrier["sw8-correlation"] = ngx.var.http_sw8_correlation
 
     local time_now = ngx.now() * 1000
-    local entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
+    local entrySpan
+    if (includeHostInEntrySpan)  then
+        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.host .. ngx.var.uri, nil, contextCarrier)
+    else
+        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
+    end
     Span.start(entrySpan, time_now)
     Span.setComponentId(entrySpan, nginxComponentId)
     Span.setLayer(entrySpan, Layer.HTTP)
