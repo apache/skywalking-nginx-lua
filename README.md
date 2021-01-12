@@ -31,7 +31,9 @@ http {
         metadata_buffer:set('serviceName', 'User Service Name')
         -- Instance means the number of Nginx deployment, does not mean the worker instances
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
-
+        -- type 'boolean', mark the entrySpan include host/domain
+        metadata_buffer:set('includeHostInEntrySpan', 'Whether the endpoint name include host/domain')
+        
         -- set random seed
         require("skywalking.util").set_randomseed()
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
