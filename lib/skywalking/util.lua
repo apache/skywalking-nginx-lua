@@ -30,10 +30,10 @@ end
 
 local timestamp = function()
     local _, b = math.modf(os.clock())
-    if b==0 then
-        b='000'
+    if b == 0 then
+        b = '000'
     else
-        b=tostring(b):sub(3,5)
+        b = tostring(b):sub(3,5)
     end
 
     return os.time() * 1000 + b
