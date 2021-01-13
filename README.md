@@ -39,8 +39,7 @@ http {
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
     }
 
-    server {
-        listen 8080;
+
 
         location /ingress {
             default_type text/html;
