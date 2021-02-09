@@ -67,7 +67,7 @@ function Client:startBackendTimer(backend_http_uri)
 end
 
 -- Stop the tracing report timer and clean unreported data
-function Client:destoryBackendTimer()
+function Client:destroyBackendTimer()
     self.stopped = true
 
     local metadata_buffer = ngx.shared.tracing_buffer

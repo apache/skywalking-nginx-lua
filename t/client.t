@@ -77,14 +77,14 @@ Go keepAlive
 
 
 
-=== TEST 2: destory backend timer
+=== TEST 2: destroy backend timer
 --- config
     location /t {
         content_by_lua_block {
             local client = require("skywalking.client")
             client.backendTimerDelay = 0.01
             client:startBackendTimer("http://127.0.0.1:" .. ngx.var.server_port)
-            local ok, err = client:destoryBackendTimer()
+            local ok, err = client:destroyBackendTimer()
             ngx.sleep(0.02)
             if not err then
                 ngx.say(ok)
