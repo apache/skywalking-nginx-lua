@@ -39,15 +39,17 @@ function Tracer:start(upstream_name, correlation)
     -- Constant pre-defined in SkyWalking main repo
     -- 6000 represents Nginx
 
+    local req_uri = ngx.var.uri
+
     local contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     contextCarrier["sw8"] = ngx.var.http_sw8
     contextCarrier["sw8-correlation"] = ngx.var.http_sw8_correlation
     local time_now = ngx.now() * 1000
     local entrySpan
     if (includeHostInEntrySpan)  then
-        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.host .. ngx.var.uri, nil, contextCarrier)
+        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.host .. req_uri, nil, contextCarrier)
     else
-        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
+        entrySpan = TC.createEntrySpan(tracingContext, req_uri, nil, contextCarrier)
     end
     Span.start(entrySpan, time_now)
     Span.setComponentId(entrySpan, nginxComponentId)
@@ -60,10 +62,9 @@ function Tracer:start(upstream_name, correlation)
     contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     -- Use the same URI to represent incoming and forwarding requests
     -- Change it if you need.
-    local upstreamUri = ngx.var.uri
     local upstreamServerName = upstream_name
     ------------------------------------------------------
-    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan,
+    local exitSpan = TC.createExitSpan(tracingContext, req_uri, entrySpan,
                         upstreamServerName, contextCarrier, correlation)
     Span.start(exitSpan, time_now)
     Span.setComponentId(exitSpan, nginxComponentId)
