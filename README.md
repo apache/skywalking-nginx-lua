@@ -31,14 +31,15 @@ http {
         metadata_buffer:set('serviceName', 'User Service Name')
         -- Instance means the number of Nginx deployment, does not mean the worker instances
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
-
+        -- type 'boolean', mark the entrySpan include host/domain
+        metadata_buffer:set('includeHostInEntrySpan', false)
+        
         -- set random seed
         require("skywalking.util").set_randomseed()
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
     }
 
-    server {
-        listen 8080;
+
 
         location /ingress {
             default_type text/html;
@@ -123,6 +124,7 @@ The following APIs are for developers or using this lib out of the Nginx case.
 
 ## Nginx APIs
 - **startTimer**, `require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
+- **destroyBackendTimer**, `require("skywalking.client"):destroyBackendTimer()`. Stop the timer created by `startBackendTimer`, and clean unreported data.
 - **start**, `require("skywalking.tracer"):start("upstream service", correlation)`. Begin the tracing before the upstream begin. The custom data (table type) can be injected as the second parameter, and then they will be propagated to the downstream service.
 - **finish**, `require("skywalking.tracer"):finish()`. Finish the tracing for this HTTP request.
 - **prepareForReport**, `require("skywalking.tracer"):prepareForReport()`. Prepare the finished segment for further report.

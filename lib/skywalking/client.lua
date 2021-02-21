@@ -14,11 +14,16 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
+local Const = require('skywalking.constants')
+
 
 local ngx = ngx
 local SEGMENT_BATCH_COUNT = 100
 
-local Client = {}
+local Client = {
+    -- expose the delay for test
+    backendTimerDelay = 3 -- in seconds 
+}
 
 -- Tracing timer reports instance properties report, keeps alive and sends traces
 -- After report instance properties successfully, it sends keep alive packages.
@@ -26,7 +31,6 @@ function Client:startBackendTimer(backend_http_uri)
     local metadata_buffer = ngx.shared.tracing_buffer
 
     -- The codes of timer setup is following the OpenResty timer doc
-    local delay = 3  -- in seconds
     local new_timer = ngx.timer.at
     local check
 
@@ -34,7 +38,7 @@ function Client:startBackendTimer(backend_http_uri)
     local ERR = ngx.ERR
 
     check = function(premature)
-        if not premature then
+        if not premature and not self.stopped then
             local instancePropertiesSubmitted = metadata_buffer:get('instancePropertiesSubmitted')
             if (instancePropertiesSubmitted == nil or instancePropertiesSubmitted == false) then
                 self:reportServiceInstance(metadata_buffer, backend_http_uri)
@@ -45,7 +49,7 @@ function Client:startBackendTimer(backend_http_uri)
             self:reportTraces(metadata_buffer, backend_http_uri)
 
             -- do the health check
-            local ok, err = new_timer(delay, check)
+            local ok, err = new_timer(self.backendTimerDelay, check)
             if not ok then
                 log(ERR, "failed to create timer: ", err)
                 return
@@ -54,12 +58,25 @@ function Client:startBackendTimer(backend_http_uri)
     end
 
     if 0 == ngx.worker.id() then
-        local ok, err = new_timer(delay, check)
+        local ok, err = new_timer(self.backendTimerDelay, check)
         if not ok then
             log(ERR, "failed to create timer: ", err)
             return
         end
     end
+end
+
+-- Stop the tracing report timer and clean unreported data
+function Client:destroyBackendTimer()
+    self.stopped = true
+
+    local metadata_buffer = ngx.shared.tracing_buffer
+    local ok, err = metadata_buffer:delete(Const.segment_queue)
+    if not ok then
+        return nil, err
+    end
+    
+    return true
 end
 
 function Client:reportServiceInstance(metadata_buffer, backend_http_uri)
@@ -167,7 +184,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
     local DEBUG = ngx.DEBUG
 
     local queue = ngx.shared.tracing_buffer
-    local segment = queue:rpop('segment')
+    local segment = queue:rpop(Const.segment_queue)
     local segmentTransform = ''
 
     local count = 0
@@ -180,7 +197,7 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
         end
 
         segmentTransform = segmentTransform .. segment
-        segment = queue:rpop('segment')
+        segment = queue:rpop(Const.segment_queue)
         count = count + 1
 
         if count >= SEGMENT_BATCH_COUNT then
