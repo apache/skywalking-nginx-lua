@@ -123,6 +123,7 @@ if _M.is_ngx_lua then
     local tablepool = require("tablepool")
     local clear_tab = require("table.clear")
     local insert_tab = table.insert
+    local ngx = ngx
     _M.tablepool_fetch = function(name, narr, nrec)
         narr = narr or 8
         nrec = nrec or 8
@@ -152,7 +153,7 @@ if _M.is_ngx_lua then
             local name = sw_tab_pool[i - 1]
             local tab = sw_tab_pool[i]
             tablepool.release(name, tab)
-            ngx.log(ngx.INFO, "release name: ", name, " ", tostring(tab))
+            -- ngx.log(ngx.INFO, "release name: ", name, " ", tostring(tab))
         end
         clear_tab(sw_tab_pool)
 

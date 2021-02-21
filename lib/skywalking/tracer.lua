@@ -116,14 +116,14 @@ function Tracer:prepareForReport()
         ngx.log(ngx.ERR, "failed to encode segment: ", err)
         return
     end
-    ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
+    -- ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
 
     local length, err = metadata_shdict:lpush(Const.segment_queue, segmentJson)
     if not length then
         ngx.log(ngx.ERR, "failed to push segment: ", err)
         return
     end
-    ngx.log(ngx.DEBUG, 'segment buffer size = ', length)
+    -- ngx.log(ngx.DEBUG, 'segment buffer size = ', length)
 
     Util.tablepool_release()
 end
