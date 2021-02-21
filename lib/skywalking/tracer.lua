@@ -14,11 +14,11 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
-local Util = require("skywalking.util")
 local Span = require('skywalking.span')
 local TC = require('skywalking.tracing_context')
 local Layer = require('skywalking.span_layer')
 local Segment = require('skywalking.segment')
+local Util = require("skywalking.util")
 local Const = require('skywalking.constants')
 local json = require('cjson.safe')
 
