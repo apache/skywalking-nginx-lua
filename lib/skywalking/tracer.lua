@@ -18,7 +18,7 @@ local Span = require('skywalking.span')
 local TC = require('skywalking.tracing_context')
 local Layer = require('skywalking.span_layer')
 local Segment = require('skywalking.segment')
-local Util = require('skywalking.util')
+local Util = require("skywalking.util")
 local Const = require('skywalking.constants')
 local json = require('cjson.safe')
 
@@ -39,16 +39,17 @@ function Tracer:start(upstream_name, correlation)
     -- Constant pre-defined in SkyWalking main repo
     -- 6000 represents Nginx
 
-    local contextCarrier = {}
+    local req_uri = ngx.var.uri
+
+    local contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     contextCarrier["sw8"] = ngx.var.http_sw8
     contextCarrier["sw8-correlation"] = ngx.var.http_sw8_correlation
-
     local time_now = ngx.now() * 1000
     local entrySpan
     if (includeHostInEntrySpan)  then
-        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.host .. ngx.var.uri, nil, contextCarrier)
+        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.host .. req_uri, nil, contextCarrier)
     else
-        entrySpan = TC.createEntrySpan(tracingContext, ngx.var.uri, nil, contextCarrier)
+        entrySpan = TC.createEntrySpan(tracingContext, req_uri, nil, contextCarrier)
     end
     Span.start(entrySpan, time_now)
     Span.setComponentId(entrySpan, nginxComponentId)
@@ -58,13 +59,12 @@ function Tracer:start(upstream_name, correlation)
     Span.tag(entrySpan, 'http.params',
              ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri )
 
-    contextCarrier = {}
+    contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     -- Use the same URI to represent incoming and forwarding requests
     -- Change it if you need.
-    local upstreamUri = ngx.var.uri
     local upstreamServerName = upstream_name
     ------------------------------------------------------
-    local exitSpan = TC.createExitSpan(tracingContext, upstreamUri, entrySpan,
+    local exitSpan = TC.createExitSpan(tracingContext, req_uri, entrySpan,
                         upstreamServerName, contextCarrier, correlation)
     Span.start(exitSpan, time_now)
     Span.setComponentId(exitSpan, nginxComponentId)
@@ -117,14 +117,16 @@ function Tracer:prepareForReport()
         ngx.log(ngx.ERR, "failed to encode segment: ", err)
         return
     end
-    ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
+    -- ngx.log(ngx.DEBUG, 'segment = ', segmentJson)
 
     local length, err = metadata_shdict:lpush(Const.segment_queue, segmentJson)
     if not length then
         ngx.log(ngx.ERR, "failed to push segment: ", err)
         return
     end
-    ngx.log(ngx.DEBUG, 'segment buffer size = ', length)
+    -- ngx.log(ngx.DEBUG, 'segment buffer size = ', length)
+
+    Util.tablepool_release()
 end
 
 return Tracer

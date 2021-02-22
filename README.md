@@ -33,10 +33,16 @@ http {
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
         -- type 'boolean', mark the entrySpan include host/domain
         metadata_buffer:set('includeHostInEntrySpan', false)
-        
+
         -- set random seed
         require("skywalking.util").set_randomseed()
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
+
+        -- If there is a bug of this `tablepool` implementation, we can
+        -- disable it in this way
+        -- require("skywalking.util").disable_tablepool()
+
+        skywalking_tracer = require("skywalking.tracer")
     }
 
 
@@ -52,9 +58,9 @@ http {
                 --
                 -- Currently, we can not have the upstream real network address
                 ------------------------------------------------------
-                require("skywalking.tracer"):start("upstream service")
+                skywalking_tracer:start("upstream service")
                 -- If you want correlation custom data to the downstream service
-                -- require("skywalking.tracer"):start("upstream service", {custom = "custom_value"})
+                -- skywalking_tracer:start("upstream service", {custom = "custom_value"})
             }
 
             -- Target upstream service
@@ -62,12 +68,12 @@ http {
 
             body_filter_by_lua_block {
                 if ngx.arg[2] then
-                    require("skywalking.tracer"):finish()
+                    skywalking_tracer:finish()
                 end
             }
 
             log_by_lua_block {
-                require("skywalking.tracer"):prepareForReport()
+                skywalking_tracer:prepareForReport()
             }
         }
     }

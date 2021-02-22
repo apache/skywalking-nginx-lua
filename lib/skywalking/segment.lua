@@ -18,6 +18,7 @@
 -- Segment represents a finished tracing context
 -- Including all information to send to the SkyWalking OAP server.
 local Span = require('skywalking.span')
+local Util = require('skywalking.util')
 
 local _M = {}
 -- local Segment = {
@@ -42,17 +43,16 @@ local _M = {}
 
 -- Return SegmentProtocol
 function _M.transform(segment)
-    local segmentBuilder = {}
+    local segmentBuilder = Util.tablepool_fetch()
     segmentBuilder.traceId = segment.trace_id
     segmentBuilder.traceSegmentId = segment.segment_id
     segmentBuilder.service = segment.service
     segmentBuilder.serviceInstance = segment.service_instance
 
-    segmentBuilder.spans = {}
+    segmentBuilder.spans = Util.tablepool_fetch()
 
     if segment.spans ~= nil and #segment.spans > 0 then
-        for i, span in ipairs(segment.spans)
-        do
+        for _, span in ipairs(segment.spans) do
             segmentBuilder.spans[#segmentBuilder.spans + 1] = Span.transform(span)
         end
     end

@@ -17,6 +17,7 @@
 local Const = require('skywalking.constants')
 
 
+local ngx = ngx
 local SEGMENT_BATCH_COUNT = 100
 
 local Client = {
@@ -34,7 +35,6 @@ function Client:startBackendTimer(backend_http_uri)
     local check
 
     local log = ngx.log
-    local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
 
     check = function(premature)
@@ -118,7 +118,6 @@ end
 -- Ping the backend to update instance heartheat
 function Client:ping(metadata_buffer, backend_http_uri)
     local log = ngx.log
-    local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
 
     local serviceName = metadata_buffer:get('serviceName')
@@ -153,7 +152,6 @@ end
 -- Send segemnts data to backend
 local function sendSegments(segmentTransform, backend_http_uri)
     local log = ngx.log
-    local DEBUG = ngx.DEBUG
     local ERR = ngx.ERR
 
     local http = require('resty.http')
@@ -184,7 +182,6 @@ end
 function Client:reportTraces(metadata_buffer, backend_http_uri)
     local log = ngx.log
     local DEBUG = ngx.DEBUG
-    local ERR = ngx.ERR
 
     local queue = ngx.shared.tracing_buffer
     local segment = queue:rpop(Const.segment_queue)
