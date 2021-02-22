@@ -38,6 +38,10 @@ http {
         require("skywalking.util").set_randomseed()
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
 
+        -- If there is a bug of this `tablepool` implementation, we can
+        -- disable it in this way
+        -- require("skywalking.util").disable_tablepool()
+
         skywalking_tracer = require("skywalking.tracer")
     }
 

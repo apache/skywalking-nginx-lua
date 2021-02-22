@@ -165,4 +165,10 @@ else
 end
 
 
+function _M.disable_tablepool()
+    _M.tablepool_fetch = function () return {} end
+    _M.tablepool_release = function () return true end
+end
+
+
 return _M

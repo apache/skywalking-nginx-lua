@@ -155,3 +155,46 @@ fetch same table by default name[2]
 done
 --- no_error_log
 [error]
+
+
+=== TEST 4: tablepool, use default name
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua_block {
+            local util = require('skywalking.util')
+
+            local tab1 = util.tablepool_fetch()
+            util.tablepool_release()
+
+            local tab2 = util.tablepool_fetch()
+            util.tablepool_release()
+
+            if tab1 == tab2 then
+                ngx.say("enabled tablepool: fetched same tables")
+            else
+                ngx.say("enabled tablepool: fetched different tables")
+            end
+
+            util.tablepool_fetch()
+
+            local tab1 = util.tablepool_fetch()
+            util.tablepool_release()
+
+            local tab2 = util.tablepool_fetch()
+            util.tablepool_release()
+
+            if tab1 == tab2 then
+                ngx.say("disable tablepool: fetched same tables")
+            else
+                ngx.say("disable tablepool: fetched different tables")
+            end
+        }
+    }
+--- request
+GET /t
+--- response_body
+enabled tablepool: fetched same tables
+disable tablepool: fetched different tables
+--- no_error_log
+[error]
