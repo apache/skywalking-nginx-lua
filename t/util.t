@@ -157,7 +157,8 @@ done
 [error]
 
 
-=== TEST 4: tablepool, use default name
+
+=== TEST 5: tablepool, call `disable_tablepool` to disable tablepool
 --- http_config eval: $::HttpConfig
 --- config
     location /t {
@@ -176,7 +177,7 @@ done
                 ngx.say("enabled tablepool: fetched different tables")
             end
 
-            util.tablepool_fetch()
+            util.disable_tablepool()
 
             local tab1 = util.tablepool_fetch()
             util.tablepool_release()
