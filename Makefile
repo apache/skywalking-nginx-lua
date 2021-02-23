@@ -44,6 +44,7 @@ release-src:
 		./t \
 		./Makefile \
 		./NOTICE \
+		./LICENSE \
 		./*.md 
 
 	gpg --batch --yes --armor --detach-sig $(RELEASE_SRC).tgz
