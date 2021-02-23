@@ -6,7 +6,7 @@
 2. Add destroyBackendTimer to stop reporting metrics.
 3. Doc: set random seed in `init_worker` phase.
 4. Local cache some variables and reuse them in Lua module. 
-4. Enable local cache and use `tablepool` to reuse the temporary table.
+5. Enable local cache and use `tablepool` to reuse the temporary table.
 
 ## 0.3.0
 
