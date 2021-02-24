@@ -1,7 +1,10 @@
 # Release Guide
 All committer should follow these steps to do release for this repo.
 
-1. Update the [CHANGES.md](CHANGES.md) to prepare the official release.
+1. Prepare the official release.
+
+- Update the [CHANGES.md](CHANGES.md).
+- Create a new `skywalking-nginx-lua-x.y-z.rockspec` file under [rockspec](/rockspec).
 
 2. Package the source release.
 
