@@ -20,6 +20,7 @@ build = {
    type = "builtin",
    modules = {
       ["skywalking.client"] = "lib/skywalking/client.lua",
+      ["skywalking.constants"] = "lib/skywalking/constants.lua",
       ["skywalking.correlation_context"] = "lib/skywalking/correlation_context.lua",
       ["skywalking.management"] = "lib/skywalking/management.lua",
       ["skywalking.segment_ref"] = "lib/skywalking/segment_ref.lua",
