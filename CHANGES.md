@@ -1,5 +1,9 @@
 # Changes
 
+## 0.4.1
+
+1. fix: missing `constants` in the rockspsec.
+
 ## 0.4.0
 
 1. Add a global field 'includeHostInEntrySpan', type 'boolean', mark the entrySpan include host/domain.
