@@ -22,10 +22,11 @@
 
     <parent>
         <groupId>org.apache.skywalking.plugin.nginx-lua</groupId>
-        <artifactId>e2e-tests</artifactId>
+        <artifactId>e2e-test</artifactId>
         <version>1.0.0</version>
     </parent>
-    <artifactId>e2e-with-mock-collector</artifactId>
+    
+    <artifactId>nginx</artifactId>
     <packaging>jar</packaging>
 
     <build>
@@ -37,8 +38,15 @@
                     <containerNamePattern>%a-%t-%i</containerNamePattern>
                     <images>
                         <image>
-                            <name>openresty/openresty</name>
-                            <alias>openresty-with-skywalking</alias>
+                            <name>openresty-with-skywalking</name>
+                            <build>
+                                <from>openresty/openresty</from>
+                                <workdir>/skywalking-nginx-lua</workdir>
+                                <cmd>
+                                    <shell>apt update</shell>
+                                    <shell>apt install -y luarocks</shell>
+                                </cmd>
+                            </build>
                             <run>
                                 <dependsOn>
                                     <container>skywalking-collector</container>
@@ -51,7 +59,7 @@
                                         <volume>${project.basedir}/docker/conf.d:/var/nginx/conf.d</volume>
                                         <volume>${project.basedir}/docker/bin:/opt/bin</volume>
                                         <volume>
-                                            ${project.basedir}/../../../lib:/usr/local/skywalking-nginx-lua/lib
+                                            ${project.basedir}/../../../..:/skywalking-nginx-lua/
                                         </volume>
                                     </bind>
                                 </volumes>

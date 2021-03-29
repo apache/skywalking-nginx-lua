@@ -16,6 +16,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
+apt update
+
+apt install -y luarocks
+
+luarocks make rockspec/skywalking-nginx-lua-master-0.rockspec
+
 COLLECTOR=$(grep "skywalking-collector" /etc/hosts |awk -F" " '{print $1}')
 sed -e "s%\${collector}%${COLLECTOR}%g" /var/nginx/conf.d/nginx.conf > /var/run/nginx.conf
 
