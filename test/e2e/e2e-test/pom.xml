@@ -23,16 +23,19 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.apache.skywalking.plugin.nginx-lua</groupId>
-    <artifactId>e2e</artifactId>
-    <version>1.0.0</version>
+    <parent>
+        <groupId>org.apache.skywalking.plugin.nginx-lua</groupId>
+        <artifactId>e2e</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    
+    <artifactId>e2e-test</artifactId>
 
     <name>SkyWalking Nginx Lua E2E Tests</name>
     <packaging>pom</packaging>
 
     <modules>
-        <module>agent-test-tools</module>
-        <module>e2e-test</module>
+        <module>nginx</module>
     </modules>
 
     <properties>
@@ -216,6 +219,13 @@
                         <imagePullPolicy>IfNotPresent</imagePullPolicy>
                     </configuration>
                     <executions>
+                        <execution>
+                            <id>build</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
                         <execution>
                             <id>start</id>
                             <phase>pre-integration-test</phase>
