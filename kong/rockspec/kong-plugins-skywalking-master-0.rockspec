@@ -12,8 +12,6 @@ description = {
 }
 
 dependencies = {
-   "lua-resty-http >= 0.15",
-   "lua-resty-jit-uuid >= 0.0.7",
    "skywalking-nginx-lua >= master"
 }
 

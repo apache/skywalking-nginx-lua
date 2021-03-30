@@ -19,6 +19,8 @@ local tracer = require("skywalking.tracer")
 local client = require("skywalking.client")
 local Span = require('skywalking.span')
 
+local subsystem = ngx.config.subsystem
+
 local SkyWalkingHandler = {
     PRIORITY = 100001,
     VERSION = "0.0.1",
@@ -29,19 +31,29 @@ function SkyWalkingHandler:init_worker()
 end
 
 function SkyWalkingHandler:access(config)
-    if not client:isInitialized() then
-        local metadata_buffer = ngx.shared.tracing_buffer
-        metadata_buffer:set('serviceName', config.service_name)
-        metadata_buffer:set('serviceInstanceName', config.service_instance_name)
-        metadata_buffer:set('includeHostInEntrySpan', config.include_host_in_entry_span)
-
-        client:startBackendTimer(config.backend_http_uri)
+    if subsystem == "stream" then
+        kong.log.warn("Not supportted to trace \"stream\" yet.")
+        return
     end
-    tracer:start(kong.request.get_forwarded_host())
+
+    if config.sample_ratio == 1 or math.random() * 10000 < config.sample_ratio then
+        kong.ctx.plugin.skywalking_sample = true
+
+        if not client:isInitialized() then
+            local metadata_buffer = ngx.shared.tracing_buffer
+            metadata_buffer:set('serviceName', config.service_name)
+            metadata_buffer:set('serviceInstanceName', config.service_instance_name)
+            metadata_buffer:set('includeHostInEntrySpan', config.include_host_in_entry_span)
+
+            client:startBackendTimer(config.backend_http_uri)
+        end
+
+        tracer:start(kong.request.get_forwarded_host())
+    end
 end
 
 function SkyWalkingHandler:body_filter(config)
-    if ngx.arg[2] then
+    if ngx.arg[2] and kong.ctx.plugin.skywalking_sample then
         local entrySpan = ngx.ctx.entrySpan
         Span.tag(entrySpan, 'kong.node', kong.node.get_hostname())
 
