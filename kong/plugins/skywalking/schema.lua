@@ -53,6 +53,13 @@ return {
                             type = "boolean",
                             default = false
                         }
+                    },
+                    {
+                        sample_ratio = {
+                            type = "number",
+                            between = { 1 , 10000 },
+                            default = 1
+                        }
                     }
                 },
             },

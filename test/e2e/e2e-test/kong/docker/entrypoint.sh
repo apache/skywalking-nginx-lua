@@ -16,9 +16,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-luarocks make rockspec/skywalking-nginx-lua-master-0.rockspec
-
-COLLECTOR=$(grep "skywalking-collector" /etc/hosts |awk -F" " '{print $1}')
-sed -e "s%\${collector}%${COLLECTOR}%g" /var/nginx/conf.d/nginx.conf > /var/run/nginx.conf
-
-/usr/bin/openresty -c /var/run/nginx.conf
+export KONG_NGINX_HTTP_LUA_SHARED_DICT="tracing_buffer 128m"
