@@ -107,7 +107,7 @@
                                             http://${docker.host.address}:${admin.port}
                                         </url>
                                     </http>
-                                    <time>30000</time>
+                                    <time>1800000</time>
                                 </wait>
                                 <cmd>/docker/entrypoint.sh</cmd>
                             </run>
@@ -122,7 +122,7 @@
                 <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <kong.admin.baseURL>http://${docker.host.address}:{admin.port}</kong.admin.baseURL>
+                        <kong.admin.baseURL>http://${docker.host.address}:${admin.port}</kong.admin.baseURL>
                         <service.entry>http://${docker.host.address}:${kong.port}/example-service</service.entry>
                         <collector.baseURL>http://${collector.host}:${collector.port}</collector.baseURL>
                         <collector.in.baseURL>http://${collector.host}:12800</collector.in.baseURL>

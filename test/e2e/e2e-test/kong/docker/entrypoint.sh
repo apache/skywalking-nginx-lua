@@ -15,7 +15,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-:required
+
 # export KONG_NGINX_HTTP_LUA_SHARED_DICT="tracing_buffer 128m"
 
 echo "hello world"
@@ -28,5 +28,5 @@ luarocks make ./kong/rockspec/kong-plugins-skywalking-master-0.rockspec --local
 
 kong migrations bootstrap
 
-kong start --run-migrations -c /docker/conf/kong.conf
+kong start --run-migrations #-c /docker/conf/kong.conf
 
