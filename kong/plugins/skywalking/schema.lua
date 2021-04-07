@@ -57,7 +57,7 @@ return {
                     {
                         sample_ratio = {
                             type = "number",
-                            between = { 1 , 10000 },
+                            between = { 1 , 100 },
                             default = 1
                         }
                     }

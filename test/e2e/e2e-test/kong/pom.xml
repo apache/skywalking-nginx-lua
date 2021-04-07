@@ -19,65 +19,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <parent>
         <groupId>org.apache.skywalking.plugin.nginx-lua</groupId>
         <artifactId>e2e-test</artifactId>
         <version>1.0.0</version>
     </parent>
     
-    <artifactId>nginx</artifactId>
+    <artifactId>kong</artifactId>
     <packaging>jar</packaging>
-
+    
     <build>
         <plugins>
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <configuration>
-                    <containerNamePattern>%a-%t-%i</containerNamePattern>
+                    <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                     <images>
                         <image>
-                            <name>kong-with-skywalking</name>
-                            <build>
-                                <from>kong:2.3.3-alpine</from>
-                                <workdir>/kong</workdir>
-                                <cmd>
-                                    <shell>apt update</shell>
-                                    <shell>apt install -y luarocks</shell>
-                                </cmd>
-                            </build>
+                            <name>postgres:9.6</name>
+                            <alias>kong-database</alias>
                             <run>
-                                <dependsOn>
-                                    <container>skywalking-collector</container>
-                                </dependsOn>
-                                <ports>
-                                    <port>+nginx.host:nginx.port:8080</port>
-                                </ports>
-                                <volumes>
-                                    <bind>
-                                        <volume>${project.basedir}/docker/conf.d:/var/nginx/conf.d</volume>
-                                        <volume>${project.basedir}/docker/bin:/opt/bin</volume>
-                                        <volume>
-                                            ${project.basedir}/../../../../kong:/kong
-                                        </volume>
-                                    </bind>
-                                </volumes>
                                 <env>
-                                    <KONG_NGINX_HTTP_LUA_SHARED_DICT>tracing_buffer 128m</KONG_NGINX_HTTP_LUA_SHARED_DICT>
+                                    <POSTGRES_DB>kong</POSTGRES_DB>
+                                    <POSTGRES_USER>kong</POSTGRES_USER>
+                                    <POSTGRES_PASSWORD>kong</POSTGRES_PASSWORD>
                                 </env>
-                                <links>
-                                    <link>skywalking-collector</link>
-                                </links>
+                                <hostname>kong-database</hostname>
+                                <ports>
+                                    <port>+pg.host:pg.port:5432</port>
+                                </ports>
                                 <wait>
-                                    <http>
-                                        <url>
-                                            http://${docker.host.address}:${nginx.port}
-                                        </url>
-                                    </http>
-                                    <time>30000</time>
+                                    <log>.*PostgreSQL init process complete; ready for start up.*</log>
                                 </wait>
-                                <cmd>bash -C</cmd>
+                                <net>custom</net>
                             </run>
                         </image>
                         <image>
@@ -95,19 +71,61 @@
                                 </wait>
                             </run>
                         </image>
+                        <image>
+                            <name>kong</name>
+                            <alias>kong-with-skywalking</alias>
+                            <run>
+                                <volumes>
+                                    <bind>
+                                        <volume>${project.basedir}/docker:/docker</volume>
+                                        <volume>${project.basedir}/../../../..:/skywalking-nginx-lua</volume>
+                                    </bind>
+                                </volumes>
+                                <ports>
+                                    <port>kong.port:8000</port>
+                                    <port>admin.port:8001</port>
+                                </ports>
+                                <env>
+                                    <KONG_DATABASE>postgres</KONG_DATABASE>
+                                    <KONG_PG_HOST>kong-database</KONG_PG_HOST>
+                                    <KONG_PG_PASSWORD>kong</KONG_PG_PASSWORD>
+                                    <KONG_CASSANDRA_CONTACT_POINTS>kong-database</KONG_CASSANDRA_CONTACT_POINTS>
+                                    <KONG_NGINX_HTTP_LUA_SHARED_DICT>tracing_buffer 128m
+                                    </KONG_NGINX_HTTP_LUA_SHARED_DICT>
+                                    <KONG_ADMIN_LISTEN>0.0.0.0:8001, 0.0.0.0:8444 ssl</KONG_ADMIN_LISTEN>
+                                </env>
+                                <net>custom</net>
+                                <dependsOn>
+                                    <container>kong-database</container>
+                                </dependsOn>
+                                <links>
+                                    <link>kong-database</link>
+                                </links>
+                                <wait>
+                                    <http>
+                                        <url>
+                                            http://${docker.host.address}:${admin.port}
+                                        </url>
+                                    </http>
+                                    <time>30000</time>
+                                </wait>
+                                <cmd>/docker/entrypoint.sh</cmd>
+                            </run>
+                        </image>
                     </images>
                 </configuration>
             </plugin>
-
+    
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <service.entry>http://${nginx.host}:${nginx.port}/ingress</service.entry>
-                        <validation.entry>http://${collector.host}:${collector.port}/dataValidate</validation.entry>
-                        <healthcheck.entry>http://${collector.host}:${collector.port}/status</healthcheck.entry>
+                        <kong.admin.baseURL>http://${docker.host.address}:{admin.port}</kong.admin.baseURL>
+                        <service.entry>http://${docker.host.address}:${kong.port}/example-service</service.entry>
+                        <collector.baseURL>http://${collector.host}:${collector.port}</collector.baseURL>
+                        <collector.in.baseURL>http://${collector.host}:12800</collector.in.baseURL>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>

@@ -32,11 +32,11 @@ end
 
 function SkyWalkingHandler:access(config)
     if subsystem == "stream" then
-        kong.log.warn("Not supportted to trace \"stream\" yet.")
+        kong.log.warn("Not supportted to trace \"stream\" request yet.")
         return
     end
 
-    if config.sample_ratio == 1 or math.random() * 10000 < config.sample_ratio then
+    if config.sample_ratio == 1 or math.random() * 100 < config.sample_ratio then
         kong.ctx.plugin.skywalking_sample = true
 
         if not client:isInitialized() then
