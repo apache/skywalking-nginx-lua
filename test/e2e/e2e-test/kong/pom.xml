@@ -69,10 +69,12 @@
                                     </http>
                                     <time>30000</time>
                                 </wait>
+                                <net>custom</net>
+                                <hostname>skywalking-collector</hostname>
                             </run>
                         </image>
                         <image>
-                            <name>kong</name>
+                            <name>kong:2.3.3-centos</name>
                             <alias>kong-with-skywalking</alias>
                             <run>
                                 <volumes>
@@ -97,6 +99,7 @@
                                 <net>custom</net>
                                 <dependsOn>
                                     <container>kong-database</container>
+                                    <container>skywalking-collector</container>
                                 </dependsOn>
                                 <links>
                                     <link>kong-database</link>
@@ -123,7 +126,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <kong.admin.baseURL>http://${docker.host.address}:${admin.port}</kong.admin.baseURL>
-                        <service.entry>http://${docker.host.address}:${kong.port}/example-service</service.entry>
+			<service.entry>http://${docker.host.address}:${kong.port}/mock</service.entry>
                         <collector.baseURL>http://${collector.host}:${collector.port}</collector.baseURL>
                         <collector.in.baseURL>http://${collector.host}:12800</collector.in.baseURL>
                     </systemPropertyVariables>
