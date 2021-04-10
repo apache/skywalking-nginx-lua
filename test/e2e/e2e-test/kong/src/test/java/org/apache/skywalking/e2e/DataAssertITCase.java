@@ -19,7 +19,10 @@
 package org.apache.skywalking.e2e;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteStreams;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -33,18 +36,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 public class DataAssertITCase {
     private CloseableHttpClient client = HttpClientBuilder.create().build();
     private static final int MAX_RETRY_TIMES = 5;
     private String collectorBaseURL;
     private String serviceEntry;
     private String collectorInBaseURL;
-    
+
     private String kongAdminBaseUrl;
 
     @Before
@@ -52,7 +50,7 @@ public class DataAssertITCase {
         serviceEntry = System.getProperty("service.entry");
         collectorBaseURL = System.getProperty("collector.baseURL");
         collectorInBaseURL = System.getProperty("collector.in.baseURL");
-    
+
         kongAdminBaseUrl = System.getProperty("kong.admin.baseURL");
         try (CloseableHttpResponse response = client.execute(new HttpGet(kongAdminBaseUrl))) {
             Assert.assertEquals(200, response.getStatusLine().getStatusCode());
@@ -69,15 +67,15 @@ public class DataAssertITCase {
         do {
             TimeUnit.SECONDS.sleep(2L); // Wait Nginx Lua Agent available.
 
-            try (CloseableHttpResponse response = client.execute(new HttpGet(collectorBaseURL + "/healthCheck"))) {
-		System.out.println(response.getStatusLine());
+            try (CloseableHttpResponse response = client.execute(new HttpGet(collectorBaseURL + "/status"))) {
                 if (response.getStatusLine().getStatusCode() == 200) {
                     break;
                 }
             }
-        } while (++times <= MAX_RETRY_TIMES);
+        }
+        while (++times <= MAX_RETRY_TIMES);
 
-	System.out.println(serviceEntry);
+        TimeUnit.SECONDS.sleep(3L);
         try (CloseableHttpResponse response = client.execute(new HttpGet(serviceEntry))) {
             final int statusCode = response.getStatusLine().getStatusCode();
             Assert.assertTrue(statusCode >= 200 && statusCode <= 400);
@@ -91,7 +89,6 @@ public class DataAssertITCase {
             InputStream input = DataAssertITCase.class.getResourceAsStream("/expectedData.yaml");
             post.setEntity(new InputStreamEntity(input));
             try (CloseableHttpResponse response = client.execute(post)) {
-                System.out.println(response.getStatusLine().getStatusCode());
                 if (response.getStatusLine().getStatusCode() == 200) {
                     break;
                 }
@@ -102,49 +99,46 @@ public class DataAssertITCase {
 
         Assert.assertTrue("Test failed.", times <= MAX_RETRY_TIMES);
     }
-    
+
     private void createService() throws IOException {
         HttpPost post = new HttpPost(kongAdminBaseUrl + "/services");
         List<BasicNameValuePair> basicNameValuePairs = Lists.newArrayList(
-                new BasicNameValuePair("name", "example-service"),
-                new BasicNameValuePair("url", "http://mockbin.org")
+            new BasicNameValuePair("name", "example-service"),
+            new BasicNameValuePair("url", "http://mockbin.org")
         );
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(basicNameValuePairs);
         post.setEntity(entity);
         try (CloseableHttpResponse response = client.execute(post)) {
-//            Assert.assertEquals(201, response.getStatusLine().getStatusCode());
-            System.out.println(response.getStatusLine());
+            Assert.assertEquals(201, response.getStatusLine().getStatusCode());
         }
     }
-    
+
     private void addRouteForService() throws IOException {
         HttpPost post = new HttpPost(kongAdminBaseUrl + "/services/example-service/routes");
         List<BasicNameValuePair> basicNameValuePairs = Lists.newArrayList(
-                new BasicNameValuePair("name", "mocking"),
-                new BasicNameValuePair("paths[]", "/mock")
+            new BasicNameValuePair("name", "mocking"),
+            new BasicNameValuePair("paths[]", "/mock")
         );
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(basicNameValuePairs);
         post.setEntity(entity);
         try (CloseableHttpResponse response = client.execute(post)) {
-            System.out.println(response.getStatusLine());
-//            Assert.assertEquals(201, response.getStatusLine().getStatusCode());
+            Assert.assertEquals(201, response.getStatusLine().getStatusCode());
         }
     }
-    
+
     private void enablePlugin() throws IOException {
         HttpPost post = new HttpPost(kongAdminBaseUrl + "/plugins");
         List<BasicNameValuePair> basicNameValuePairs = Lists.newArrayList(
-                new BasicNameValuePair("name", "skywalking"),
-                new BasicNameValuePair("config.backend_http_uri", "http://skywalking-collector:12800"),
-                new BasicNameValuePair("config.service_name", "kong"),
-                new BasicNameValuePair("config.service_instance_name", "kong-with-skywalking"),
-                new BasicNameValuePair("config.sample_ratio", "100")
+            new BasicNameValuePair("name", "skywalking"),
+            new BasicNameValuePair("config.backend_http_uri", collectorInBaseURL),
+            new BasicNameValuePair("config.service_name", "kong"),
+            new BasicNameValuePair("config.service_instance_name", "kong-with-skywalking"),
+            new BasicNameValuePair("config.sample_ratio", "100")
         );
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(basicNameValuePairs);
         post.setEntity(entity);
         try (CloseableHttpResponse response = client.execute(post)) {
-            System.out.println(response.getStatusLine());
-//            Assert.assertEquals(201, response.getStatusLine().getStatusCode());
+            Assert.assertEquals(201, response.getStatusLine().getStatusCode());
         }
     }
 

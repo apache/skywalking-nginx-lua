@@ -126,9 +126,9 @@
                 <configuration>
                     <systemPropertyVariables>
                         <kong.admin.baseURL>http://${docker.host.address}:${admin.port}</kong.admin.baseURL>
-			<service.entry>http://${docker.host.address}:${kong.port}/mock</service.entry>
+                        <service.entry>http://${docker.host.address}:${kong.port}/mock</service.entry>
                         <collector.baseURL>http://${collector.host}:${collector.port}</collector.baseURL>
-                        <collector.in.baseURL>http://${collector.host}:12800</collector.in.baseURL>
+                        <collector.in.baseURL>http://skywalking-collector:12800</collector.in.baseURL>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>
