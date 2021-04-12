@@ -148,4 +148,6 @@ SkyWalking Resources:
 6. upload rockspec file to luarocks.org
 login to [luarocks.org](https://luarocks.org/), the user name is `apache-skywalking` and the password has been sent to `private@skwalking.apache.org`.
 
-Then upload the rockspec file and you can use the `luarocks` command line to install the new version.
+Then upload the following two rockspec files and you can use the `luarocks` command line to install the new version.
+1. rockspec/skywalking-nginx-lua-x.y-z.rockspec
+2. kong/rockspec/kong-plugin-skywalking-x.y-z.rockspec
