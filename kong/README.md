@@ -1,7 +1,7 @@
 Apache SkyWalking Nginx Agent For Kong
 ==========
 
-This plugin base on  Apache SkyWalking Nginx Agent for the Kong API gateway to integrate with the Apache SkyWalking distributed tracing system.
+This plugin base on Apache SkyWalking Nginx Agent for the Kong API gateway to integrate with the Apache SkyWalking distributed tracing system.
 
 ## Usage
 
@@ -20,7 +20,7 @@ lua_package_path = ${user.home}/.luarocks/share/lua/5.1/?.lua;;
 ```
 
 Set environment:
-```
+```bash
 $ export KONG_NGINX_HTTP_LUA_SHARED_DICT="tracing_buffer 128m"
 ```
 
@@ -30,7 +30,7 @@ Restart Kong
 
 Add the plugin to an API:
 
-```
+```bash
 $ curl -i -X POST \
    --url http://localhost:8001/apis/{api_name}/plugins/ \
    --data 'name=skywalking' \
@@ -41,7 +41,7 @@ $ curl -i -X POST \
 ``` 
 
 Add the plugin to global:
-```
+```bash
 $ curl -X POST --url http://localhost:8001/plugins/ \
    --data 'name=skywalking' \
    --data 'config.backend_http_uri=http://localhost:12800' \
