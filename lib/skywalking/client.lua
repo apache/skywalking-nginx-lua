@@ -25,9 +25,12 @@ local Client = {
     backendTimerDelay = 3 -- in seconds 
 }
 
+local initialized = false
+
 -- Tracing timer reports instance properties report, keeps alive and sends traces
 -- After report instance properties successfully, it sends keep alive packages.
 function Client:startBackendTimer(backend_http_uri)
+    initialized = true
     local metadata_buffer = ngx.shared.tracing_buffer
 
     -- The codes of timer setup is following the OpenResty timer doc
@@ -64,6 +67,10 @@ function Client:startBackendTimer(backend_http_uri)
             return
         end
     end
+end
+
+function Client:isInitialized()
+    return initialized
 end
 
 -- Stop the tracing report timer and clean unreported data

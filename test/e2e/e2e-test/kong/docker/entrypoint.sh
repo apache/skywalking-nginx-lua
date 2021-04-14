@@ -16,12 +16,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-apt update
-apt install -y luarocks
+# export KONG_NGINX_HTTP_LUA_SHARED_DICT="tracing_buffer 128m"
 
-luarocks make rockspec/skywalking-nginx-lua-master-0.rockspec
+cd skywalking-nginx-lua
 
-COLLECTOR=$(grep "skywalking-collector" /etc/hosts |awk -F" " '{print $1}')
-sed -e "s%\${collector}%${COLLECTOR}%g" /var/nginx/conf.d/nginx.conf > /var/run/nginx.conf
+luarocks make ./rockspec/skywalking-nginx-lua-master-0.rockspec --local
 
-/usr/bin/openresty -c /var/run/nginx.conf
+luarocks make ./kong/rockspec/kong-plugin-skywalking-master-0.rockspec --local
+
+kong migrations bootstrap
+
+kong start -c /docker/conf/kong.conf --vv

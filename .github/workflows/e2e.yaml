@@ -25,14 +25,11 @@ on:
       - 'v*'
 
 jobs:
-  agent:
+  nginx:
     runs-on: ubuntu-18.04
     timeout-minutes: 180
-    strategy:
-      fail-fast: true
     steps:
       - uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
       - name: checkout submodules
         shell: bash
         run: |
@@ -43,6 +40,9 @@ jobs:
           java-version: 8
       - name: Set environment
         run: export MAVEN_OPTS='-Dmaven.repo.local=~/.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-      - name: Compile & E2E Test
-        run: |
-          ./mvnw -f ./test/e2e/pom.xml verify
+      - name: Build E2E Docker
+        run: ./mvnw -f ./test/e2e/pom.xml package
+      - name: Run Nginx Test
+        run: ./mvnw -f ./test/e2e/e2e-test/nginx/pom.xml verify
+      - name: Run Kong Test
+        run: ./mvnw -f ./test/e2e/e2e-test/kong/pom.xml verify
