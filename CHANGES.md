@@ -1,5 +1,10 @@
 # Changes
 
+## 0.5.0
+
+1. Provide Kong plugin.
+2. Correct the version format luarock.
+
 ## 0.4.1
 
 1. fix: missing `constants` in the rockspsec.

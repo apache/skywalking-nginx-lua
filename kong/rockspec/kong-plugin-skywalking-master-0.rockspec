@@ -2,7 +2,7 @@ package = "kong-plugin-skywalking"
 version = "master-0"
 source = {
    url = "git://github.com/apache/skywalking-nginx-lua",
-   branch = "kong",
+   branch = "master",
 }
 
 description = {
