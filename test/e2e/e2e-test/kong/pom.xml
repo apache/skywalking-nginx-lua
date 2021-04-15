@@ -74,7 +74,7 @@
                             </run>
                         </image>
                         <image>
-                            <name>kong:2.3.3-centos</name>
+                            <name>kong:2.3.3</name>
                             <alias>kong-with-skywalking</alias>
                             <run>
                                 <volumes>

@@ -26,10 +26,6 @@ local metadata_shdict = ngx.shared.tracing_buffer
 local ngx = ngx
 local nginxComponentId = 6000
 
-if kong then
-    nginxComponentId = 6001
-end
-
 
 local Tracer = {}
 
