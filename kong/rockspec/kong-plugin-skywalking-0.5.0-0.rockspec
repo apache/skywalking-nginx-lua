@@ -1,8 +1,8 @@
-package = "kong-plugins-skywalking"
-version = "master-0"
+package = "kong-plugin-skywalking"
+version = "0.5.0-0"
 source = {
-   url = "git://github.com/dmsolr/skywalking-nginx-lua",
-   branch = "kong",
+   url = "git://github.com/apache/skywalking-nginx-lua",
+   branch = "v0.5.0",
 }
 
 description = {
@@ -12,9 +12,7 @@ description = {
 }
 
 dependencies = {
-   "lua-resty-http >= 0.15",
-   "lua-resty-jit-uuid >= 0.0.7",
-   "skywalking-nginx-lua >= master"
+   "skywalking-nginx-lua >= 0.5.0"
 }
 
 build = {
