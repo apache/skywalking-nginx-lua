@@ -55,6 +55,7 @@ end
 function SkyWalkingHandler:body_filter(config)
     if ngx.arg[2] and kong.ctx.plugin.skywalking_sample then
         local entrySpan = ngx.ctx.entrySpan
+        Span.setComponentId(entrySpan, 6001)
         Span.tag(entrySpan, 'kong.node', kong.node.get_hostname())
 
         local service = kong.router.get_service()
@@ -68,6 +69,7 @@ function SkyWalkingHandler:body_filter(config)
                 Span.tag(entrySpan, "kong.service_name", service.name)
             end
         end
+        Span.setComponentId(ngx.ctx.exitSpan, 6001)
 
         tracer:finish()
     end
