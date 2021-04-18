@@ -13,8 +13,6 @@ Apache SkyWalking Nginx Agent
 This agent follows the SkyWalking tracing and header protocol. It reports tracing data to SkyWalking APM through HTTP protocol.
 All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
-[SkyWalking Kong plugin](/kong/README.md) built on SkyWalking Nginx Lua Agent to trace Kong API Gateway.
-
 # Setup Doc
 
 ```nginx

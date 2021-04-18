@@ -44,5 +44,3 @@ jobs:
         run: ./mvnw -f ./test/e2e/pom.xml package
       - name: Run Nginx Test
         run: ./mvnw -f ./test/e2e/e2e-test/nginx/pom.xml verify
-      - name: Run Kong Test
-        run: ./mvnw -f ./test/e2e/e2e-test/kong/pom.xml verify
