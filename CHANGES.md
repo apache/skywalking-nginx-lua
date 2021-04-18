@@ -2,7 +2,7 @@
 
 ## 0.5.0
 
-1. Provide Kong plugin.
+1. Adapt to Kong agent.
 2. Correct the version format luarock.
 
 ## 0.4.1
