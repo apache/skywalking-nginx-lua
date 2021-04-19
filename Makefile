@@ -37,7 +37,6 @@ help:
 .PHONY: release-src
 release-src:
 	tar -zcvf $(RELEASE_SRC).tgz \
-	    ./kong \
 		./examples \
 		./licenses \
 		./rockspec \
