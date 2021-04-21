@@ -29,5 +29,7 @@ header:
     - '.gitignore'
     - '.luacheckrc'
     - '.mvn'
+    - 'lib/resty'
+    - 'lib/skywalking/dependencies'
 
   comment: on-failure
