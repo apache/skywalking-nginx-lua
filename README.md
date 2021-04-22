@@ -45,8 +45,9 @@ http {
         skywalking_tracer = require("skywalking.tracer")
     }
 
-
-
+    server {
+        listen 8090;
+        
         location /ingress {
             default_type text/html;
 
@@ -109,7 +110,7 @@ Then you could
 
 ### Local Development and Unit Tests
 All codes in the `lib/skywalking` require the `*_test.lua` to do the UnitTest. To run that, you need to install
-- Lua 5.3
+- Lua 5.1
 - LuaRocks
 
 The following libs are required in runtime or test cases, please use `LuaRocks` to install them.
