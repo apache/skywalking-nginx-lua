@@ -36,7 +36,15 @@ http {
 
         -- set random seed
         require("skywalking.util").set_randomseed()
+        
+        -- start http backend reporter timer.
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
+        
+        -- open this section and remove http reporter timer if using Kafka reporter timer
+        -- local broker_list = {
+        --    { host = "127.0.0.1", port = 9092 },
+        -- }
+        -- require("skywalking.kafka.client"):start_backend_timer(broker_list)
 
         -- If there is a bug of this `tablepool` implementation, we can
         -- disable it in this way
@@ -75,6 +83,8 @@ http {
 
             log_by_lua_block {
                 skywalking_tracer:prepareForReport()
+                -- open following line code and close above line if kafka reporter was enabled.
+                -- require("skywalking.kafka.client").report()
             }
         }
     }

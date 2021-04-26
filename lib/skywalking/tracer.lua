@@ -86,7 +86,7 @@ function Tracer:finish()
     if ngx.ctx.exitSpan ~= nil then
         local upstream_status = tonumber(ngx.var.upstream_status)
         if upstream_status then
-            Span.tag(ngx.ctx.exitSpan, 'http.status', upstream_status)
+            Span.tag(ngx.ctx.exitSpan, 'http.status', ngx.var.upstream_status)
         end
         Span.finish(ngx.ctx.exitSpan, ngx.now() * 1000)
         ngx.ctx.exitSpan = nil
