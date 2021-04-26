@@ -13,7 +13,8 @@ description = {
 
 dependencies = {
    "lua-resty-http >= 0.15",
-   "lua-resty-jit-uuid >= 0.0.7"
+   "lua-resty-jit-uuid >= 0.0.7",
+   "lua-resty-kafka = 0.09",
 }
 
 build = {
@@ -30,5 +31,7 @@ build = {
       ["skywalking.tracer"] = "lib/skywalking/tracer.lua",
       ["skywalking.tracing_context"] = "lib/skywalking/tracing_context.lua",
       ["skywalking.util"] = "lib/skywalking/util.lua",
+      ["skywalking.kafka.client"] = "lib/skywalking/kafka/client.lua",
+      ["skywalking.kafka.proto_util"] = "lib/skywalking/kafka/proto_util.lua",
    }
 }
