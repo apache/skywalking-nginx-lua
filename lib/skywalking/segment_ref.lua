@@ -59,14 +59,16 @@ end
 
 -- Return string to represent this ref.
 function _M.serialize(ref)
-    local encodedRef = '1'
-            .. '-' .. encode_base64(ref.trace_id)
-            .. '-' .. encode_base64(ref.segment_id)
-            .. '-' .. ref.span_id
-            .. '-' .. encode_base64(ref.parent_service)
-            .. '-' .. encode_base64(ref.parent_service_instance)
-            .. '-' .. encode_base64(ref.parent_endpoint)
-            .. '-' .. encode_base64(ref.address_used_at_client)
+    local encodedRef = table.concat(
+		'1',
+		'-', encode_base64(ref.trace_id),
+		'-', encode_base64(ref.segment_id),
+		'-', ref.span_id,
+		'-', encode_base64(ref.parent_service),
+		'-', encode_base64(ref.parent_service_instance),
+		'-', encode_base64(ref.parent_endpoint),
+		'-', encode_base64(ref.address_used_at_client)
+	)
 
     return encodedRef
 end
