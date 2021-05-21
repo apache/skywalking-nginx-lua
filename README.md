@@ -14,6 +14,9 @@ This agent follows the SkyWalking tracing and header protocol. It reports tracin
 All HTTP 1.1 requests go through Nginx could be collected by this agent.
 
 # Setup Doc
+The following setup is targeting for OpenResty, if you want SkyWalking integrated Gateway, you could jump to 
+1. [APISIX documentation.](https://apisix.apache.org/docs/apisix/plugins/skywalking)
+2. [Kong plugin documentation.](https://github.com/apache/skywalking-kong)
 
 ```nginx
 http {
