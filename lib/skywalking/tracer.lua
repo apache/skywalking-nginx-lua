@@ -79,6 +79,7 @@ function Tracer:start(upstream_name, correlation)
     ctx.tracingContext = tracingContext
     ctx.entrySpan = entrySpan
     ctx.exitSpan = exitSpan
+    ctx.is_called_finish = false
 end
 
 function Tracer:finish()
@@ -91,9 +92,13 @@ function Tracer:finish()
         Span.finish(ngx.ctx.exitSpan, ngx.now() * 1000)
         ngx.ctx.exitSpan = nil
     end
+    ngx.ctx.is_called_finish = true
 end
 
 function Tracer:prepareForReport()
+    if not ngx.ctx.is_called_finish then
+        self.finish()
+    end
     local entrySpan = ngx.ctx.entrySpan
     if not entrySpan then
         return
