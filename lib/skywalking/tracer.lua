@@ -84,15 +84,15 @@ end
 
 function Tracer:finish()
     -- Finish the exit span when received the first response package from upstream
-    if ngx.ctx.exitSpan ~= nil then
+    if ngx.ctx.exitSpan ~= nil and not ngx.ctx.is_finished then
         local upstream_status = tonumber(ngx.var.upstream_status)
         if upstream_status then
             Span.tag(ngx.ctx.exitSpan, 'http.status', upstream_status)
         end
         Span.finish(ngx.ctx.exitSpan, ngx.now() * 1000)
         ngx.ctx.exitSpan = nil
+        ngx.ctx.is_finished = true
     end
-    ngx.ctx.is_finished = true
 end
 
 function Tracer:prepareForReport()
