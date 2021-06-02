@@ -1,5 +1,9 @@
 # Changes
 
+## 0.6.0
+
+1. fix: `skywalking_tracer:finish()` will not be called in some case such as upstream timeout.
+
 ## 0.5.0
 
 1. Adapt to Kong agent.

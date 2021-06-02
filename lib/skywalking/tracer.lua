@@ -79,21 +79,26 @@ function Tracer:start(upstream_name, correlation)
     ctx.tracingContext = tracingContext
     ctx.entrySpan = entrySpan
     ctx.exitSpan = exitSpan
+    ctx.is_finished = false
 end
 
 function Tracer:finish()
     -- Finish the exit span when received the first response package from upstream
-    if ngx.ctx.exitSpan ~= nil then
+    if ngx.ctx.exitSpan ~= nil and not ngx.ctx.is_finished then
         local upstream_status = tonumber(ngx.var.upstream_status)
         if upstream_status then
             Span.tag(ngx.ctx.exitSpan, 'http.status', upstream_status)
         end
         Span.finish(ngx.ctx.exitSpan, ngx.now() * 1000)
         ngx.ctx.exitSpan = nil
+        ngx.ctx.is_finished = true
     end
 end
 
 function Tracer:prepareForReport()
+    if not ngx.ctx.is_finished then
+        self.finish()
+    end
     local entrySpan = ngx.ctx.entrySpan
     if not entrySpan then
         return
