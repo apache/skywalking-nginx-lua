@@ -40,6 +40,10 @@ http {
         -- set random seed
         require("skywalking.util").set_randomseed()
         require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")
+        -- the backend url can also be set later, and just start backend timer:
+        -- require("skywalking.client"):startBackendTimer()
+        -- metadata_buffer:set('backendHttpUri', 'http://127.0.0.1:8080')
+        -- backendHttpUri can also be set in other places.
 
         -- If there is a bug of this `tablepool` implementation, we can
         -- disable it in this way

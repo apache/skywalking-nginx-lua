@@ -42,14 +42,16 @@ function Client:startBackendTimer(backend_http_uri)
 
     check = function(premature)
         if not premature and not self.stopped then
-            local instancePropertiesSubmitted = metadata_buffer:get('instancePropertiesSubmitted')
-            if (instancePropertiesSubmitted == nil or instancePropertiesSubmitted == false) then
-                self:reportServiceInstance(metadata_buffer, backend_http_uri)
-            else
-                self:ping(metadata_buffer, backend_http_uri)
+            backend_http_uri = metadata_buffer:get('backendHttpUri') or backend_http_uri
+            if backend_http_uri ~= nil then
+                local instancePropertiesSubmitted = metadata_buffer:get('instancePropertiesSubmitted')
+                if (instancePropertiesSubmitted == nil or instancePropertiesSubmitted == false) then
+                    self:reportServiceInstance(metadata_buffer, backend_http_uri)
+                else
+                    self:ping(metadata_buffer, backend_http_uri)
+                end
+                self:reportTraces(metadata_buffer, backend_http_uri)
             end
-
-            self:reportTraces(metadata_buffer, backend_http_uri)
 
             -- do the health check
             local ok, err = new_timer(self.backendTimerDelay, check)
