@@ -177,12 +177,11 @@ function _M.string_split(str, sep)
         if string.sub(str, -(#sep)) == sep then
             items[1 + #items] = ""
         end
-        return items
     else
-        local pattern = string.format("([^%s]+)", sep)
+        local pattern = string.format("([^%s]*)", sep)
         str:gsub(pattern, function (c) items[#items + 1] = c end)
-        return items
     end
+    return items
 end
 
 return _M

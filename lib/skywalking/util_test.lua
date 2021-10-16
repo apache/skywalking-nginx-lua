@@ -34,7 +34,7 @@ TestUtil = {}
         lu.assertEquals(Util.string_split("a,b,c", ","), {"a", "b", "c"})
         lu.assertEquals(Util.string_split("a,b,", ","), {"a", "b", ""})
         lu.assertEquals(Util.string_split("a", ","), {"a"})
-        lu.assertEquals(Util.string_split("", ","), {""})
+        lu.assertEquals(Util.string_split(",a,", ","), {"","a",""})
     end
 -- end TestUtil
 
