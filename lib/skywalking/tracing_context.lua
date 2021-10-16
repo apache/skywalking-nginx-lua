@@ -179,7 +179,7 @@ end
 -- Delegate to Span.createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
 function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier, correlation)
-    if tracingContext.is_noop then
+    if tracingContext.is_noop or parent.is_noop then
         return Span.newNoOP()
     end
 

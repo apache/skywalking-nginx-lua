@@ -40,9 +40,9 @@ function Tracer:start(upstream_name, correlation)
     local ignorePrefix = metadata_shdict:get('ignorePrefix')
     local tracingConfig = {
         sampleRatio = sampleRatio,
-        ignoreArray = Util.string_split(ignore, ","),
-        ignoreSuffix = Util.string_split(ignoreSuffix, ","),
-        ignorePrefix = Util.string_split(ignorePrefix, ","),
+        ignoreArray = Util.split(ignore, ","),
+        ignoreSuffix = Util.split(ignoreSuffix, ","),
+        ignorePrefix = Util.split(ignorePrefix, ","),
     }
     local tracingContext = TC.new(serviceName, serviceInstanceName, tracingConfig)
 

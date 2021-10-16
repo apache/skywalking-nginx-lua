@@ -29,13 +29,6 @@ TestUtil = {}
         local id = Util.timestamp()
         lu.assertNotNil(id)
     end
-
-    function TestUtil.testStringSplit()
-        lu.assertEquals(Util.string_split("a,b,c", ","), {"a", "b", "c"})
-        lu.assertEquals(Util.string_split("a,b,", ","), {"a", "b", ""})
-        lu.assertEquals(Util.string_split("a", ","), {"a"})
-        lu.assertEquals(Util.string_split(",a,", ","), {"","a",""})
-    end
 -- end TestUtil
 
 
