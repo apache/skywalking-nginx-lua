@@ -170,5 +170,19 @@ function _M.disable_tablepool()
     _M.tablepool_release = function () return true end
 end
 
+function _M.string_split(str, sep)
+    local items = {}
+    if ngx then
+        items = require("ngx.re").split(str, sep)
+        if string.sub(str, -(#sep)) == sep then
+            items[1 + #items] = ""
+        end
+        return items
+    else
+        local pattern = string.format("([^%s]+)", sep)
+        str:gsub(pattern, function (c) items[#items + 1] = c end)
+        return items
+    end
+end
 
 return _M
