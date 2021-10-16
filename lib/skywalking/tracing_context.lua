@@ -68,6 +68,34 @@ local function finishSpan(internal, span)
     return internal.owner
 end
 
+local function isOperationIgnored(operationName, ignoreArray, ignoreSuffixArray, ignorePrefixArray)
+    if type(operationName) ~= "string" then
+        return false
+    end
+    if type(ignoreArray) == "table" then
+        for _, ignore in ipairs(ignoreArray) do
+            if type(ignore) == "string" and operationName == ignore then
+                return true
+            end
+        end
+    end
+    if type(ignoreSuffixArray) == "table" then
+        for _, ignoreSuffix in ipairs(ignoreSuffixArray) do
+            if type(ignoreSuffix) == "string" and string.sub(operationName, -(#ignoreSuffix), -1) == ignoreSuffix then
+                return true
+            end
+        end
+    end
+    if type(ignorePrefixArray) == "table" then
+        for _, ignorePrefix in ipairs(ignorePrefixArray) do
+            if type(ignorePrefix) == "string" and string.sub(operationName, 1, #ignorePrefix) == ignorePrefix then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 -- Generate the next span ID.
 local function nextSpanID(internal)
     local nextSpanId = internal.span_id_seq
@@ -107,11 +135,15 @@ function _M.newNoOP()
     return {is_noop = true}
 end
 
-function _M.new(serviceName, serviceInstanceName)
+function _M.new(serviceName, serviceInstanceName, config)
     if serviceInstanceName == nil or serviceName == nil then
         return _M.newNoOP()
     end
-
+    if type(config) == "table" then
+        if not (config.sampleRatio == nil or type(config.sampleRatio) ~= "number" or config.sampleRatio == 100 or math.random() * 100 < config.sampleRatio) then
+            return _M.newNoOP()
+        end
+    end
     local tracing_context = Util.tablepool_fetch()
     tracing_context.trace_id = Util.newID()
     tracing_context.segment_id = tracing_context.trace_id
@@ -119,6 +151,7 @@ function _M.new(serviceName, serviceInstanceName)
     tracing_context.service_instance = serviceInstanceName
     tracing_context.internal = Internal.new()
     tracing_context.internal.owner = tracing_context
+    tracing_context.config = config
     return tracing_context
 end
 
@@ -128,7 +161,9 @@ function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrie
     if tracingContext.is_noop then
         return Span.newNoOP()
     end
-
+    if isOperationIgnored(operationName, tracingContext.ignoreArray, tracingContext.ignoreSuffixArray, tracingContext.ignorePrefixArray) then
+        return Span.newNoOP()
+    end
     local correlationData = ''
     if contextCarrier then
         correlationData = contextCarrier[CONTEXT_CORRELATION_KEY]

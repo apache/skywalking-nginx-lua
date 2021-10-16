@@ -34,7 +34,17 @@ function Tracer:start(upstream_name, correlation)
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local includeHostInEntrySpan = metadata_shdict:get('includeHostInEntrySpan')
-    local tracingContext = TC.new(serviceName, serviceInstanceName)
+    local sampleRatio = metadata_shdict:get('sampleRatio')
+    local ignore = metadata_shdict:get('ignore')
+    local ignoreSuffix = metadata_shdict:get('ignoreSuffix')
+    local ignorePrefix = metadata_shdict:get('ignorePrefix')
+    local tracingConfig = {
+        sampleRatio = sampleRatio,
+        ignoreArray = util.string_split(ignore, ","),
+        ignoreSuffix = util.string_split(ignoreSuffix, ","),
+        ignorePrefix = util.string_split(ignorePrefix, ","),
+    }
+    local tracingContext = TC.new(serviceName, serviceInstanceName, tracingConfig)
 
     -- Constant pre-defined in SkyWalking main repo
     -- 6000 represents Nginx
