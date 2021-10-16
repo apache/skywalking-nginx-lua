@@ -143,6 +143,8 @@ function _M.new(serviceName, serviceInstanceName, config)
         if not (config.sampleRatio == nil or type(config.sampleRatio) ~= "number" or config.sampleRatio == 100 or math.random() * 100 < config.sampleRatio) then
             return _M.newNoOP()
         end
+    else
+        config = {}
     end
     local tracing_context = Util.tablepool_fetch()
     tracing_context.trace_id = Util.newID()
@@ -161,7 +163,8 @@ function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrie
     if tracingContext.is_noop then
         return Span.newNoOP()
     end
-    if isOperationIgnored(operationName, tracingContext.ignoreArray, tracingContext.ignoreSuffixArray, tracingContext.ignorePrefixArray) then
+    local config = tracingContext.config or {}
+    if isOperationIgnored(operationName, config.ignoreArray, config.ignoreSuffixArray, config.ignorePrefixArray) then
         return Span.newNoOP()
     end
     local correlationData = ''
