@@ -171,6 +171,9 @@ function _M.disable_tablepool()
 end
 
 function _M.string_split(str, sep)
+    if str == nil or sep == nil then
+        return nil
+    end
     local items = {}
     if ngx then
         items = require("ngx.re").split(str, sep)
