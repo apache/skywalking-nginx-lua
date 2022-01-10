@@ -38,10 +38,11 @@ public class DataAssertITCase {
     private String validationEntry;
     private String serviceEntry;
     private String healthCheckEntry;
-
+    private String suffixEntry;
     @Before
     public void setup() throws IOException {
         serviceEntry = System.getProperty("service.entry");
+        suffixEntry = System.getProperty("suffix.entry");
         validationEntry = System.getProperty("validation.entry");
         healthCheckEntry = System.getProperty("healthcheck.entry");
     }
@@ -61,6 +62,10 @@ public class DataAssertITCase {
         } while (++times <= MAX_RETRY_TIMES);
 
         try (CloseableHttpResponse response = client.execute(new HttpGet(serviceEntry))) {
+            Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+        }
+
+        try (CloseableHttpResponse response = client.execute(new HttpGet(suffixEntry))) {
             Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         }
 
