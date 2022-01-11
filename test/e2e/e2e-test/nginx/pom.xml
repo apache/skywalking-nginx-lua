@@ -72,7 +72,7 @@
                                             http://${docker.host.address}:${nginx.port}
                                         </url>
                                     </http>
-                                    <time>130000</time>
+                                    <time>30000</time>
                                 </wait>
                                 <cmd>bash /opt/bin/startup.sh</cmd>
                             </run>
@@ -88,7 +88,7 @@
                                     <http>
                                         <url>http://${docker.host.address}:${collector.port}/receiveData</url>
                                     </http>
-                                    <time>130000</time>
+                                    <time>30000</time>
                                 </wait>
                             </run>
                         </image>
