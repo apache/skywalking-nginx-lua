@@ -35,7 +35,7 @@ function Tracer:start(upstream_name, correlation)
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local includeHostInEntrySpan = metadata_shdict:get('includeHostInEntrySpan')
     local tracingContext = TC.new(serviceName, serviceInstanceName)
-
+    local ignore_suffix = metadata_shdict:get("ignoreSuffix")
     -- Constant pre-defined in SkyWalking main repo
     -- 6000 represents Nginx
 
@@ -51,6 +51,11 @@ function Tracer:start(upstream_name, correlation)
     else
         entrySpan = TC.createEntrySpan(tracingContext, req_uri, nil, contextCarrier)
     end
+
+    if (Util.checkIgnoreSuffix(req_uri, ignore_suffix)) then
+        tracingContext.is_noop = true
+    end
+
     Span.start(entrySpan, time_now)
     Span.setComponentId(entrySpan, nginxComponentId)
     Span.setLayer(entrySpan, Layer.HTTP)

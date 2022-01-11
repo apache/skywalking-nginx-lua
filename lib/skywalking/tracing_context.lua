@@ -20,6 +20,7 @@ local Span = require('skywalking.span')
 local CorrelationContext = require('skywalking.correlation_context')
 
 local CONTEXT_CORRELATION_KEY = 'sw8-correlation'
+
 -------------- Internal Object-------------
 local Internal = {}
 -- Internal Object hosts the methods for SkyWalking LUA internal APIs only.
@@ -90,34 +91,6 @@ function Internal.new()
     return internal
 end
 
-local function split(input, sep)
-    if sep == nil then
-        sep = "%s"
-    end
-    local t={}
-    for str in string.gmatch(input, "([^"..sep.."]+)") do
-        table.insert(t, str)
-    end
-    return t
-end
-
-local function checkIgnoreSuffix(operationName)
-    local metadata_shdict = ngx.shared.tracing_buffer
-    local ignore_suffix = metadata_shdict:get("ignoreSuffix")
-    if ignore_suffix ~= nil then
-        local ignore_suffix_table = split(ignore_suffix, ",")
-        for _, suffix in ipairs(ignore_suffix_table) do
-            local l = string.find(operationName, suffix, string.len(operationName)  - string.len(suffix))
-            if l ~= nil then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
-
 
 local _M = {}
 
@@ -152,10 +125,6 @@ end
 -- Delegate to Span.createEntrySpan
 -- @param contextCarrier could be nil if there is no downstream propagated context
 function _M.createEntrySpan(tracingContext, operationName, parent, contextCarrier)
-    if  checkIgnoreSuffix(operationName) then
-        tracingContext.is_noop = true
-    end
-
     if tracingContext.is_noop then
         return Span.newNoOP()
     end
@@ -172,11 +141,7 @@ end
 -- Delegate to Span.createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
 function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier, correlation)
-    if  checkIgnoreSuffix(operationName) then
-        tracingContext.is_noop = true
-    end
-
-    if tracingContext.is_noop or checkIgnoreSuffix(operationName) then
+    if tracingContext.is_noop then
         return Span.newNoOP()
     end
 
@@ -192,9 +157,6 @@ function _M.createExitSpan(tracingContext, operationName, parent, peer, contextC
 
     return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
 end
-
-
-
 
 -- After all active spans finished, this segment will be treated as finished status.
 -- Notice, it is different with Java agent, a finished context is still able to recreate new span, and be checked as finished again.

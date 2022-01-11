@@ -28,6 +28,21 @@ local split = function(str, delimiter)
     return t
 end
 
+
+local checkIgnoreSuffix = function(operationName, ignoreSuffix)
+    if ignoreSuffix ~= nil then
+        local ignore_suffix_table = split(ignoreSuffix, ",")
+        for _, suffix in ipairs(ignore_suffix_table) do
+            local l = string.find(operationName, suffix, string.len(operationName)  - string.len(suffix))
+            if l ~= nil then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 local timestamp = function()
     local _, b = math.modf(os.clock())
     if b == 0 then
@@ -52,6 +67,7 @@ end
 _M.split = split
 _M.timestamp = timestamp
 _M.is_ngx_lua = ok
+_M.checkIgnoreSuffix = checkIgnoreSuffix
 
 
 local MAX_ID_PART2 = 1000000000
