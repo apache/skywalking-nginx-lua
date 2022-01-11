@@ -39,6 +39,7 @@ public class DataAssertITCase {
     private String serviceEntry;
     private String healthCheckEntry;
     private String suffixEntry;
+    
     @Before
     public void setup() throws IOException {
         serviceEntry = System.getProperty("service.entry");

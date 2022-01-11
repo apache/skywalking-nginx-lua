@@ -15,6 +15,16 @@
 -- limitations under the License.
 --
 
+-- source: https://github.com/apache/apisix/blob/master/apisix/core/string.lua#L18
+local type = type
+local ffi         = require("ffi")
+local C           = ffi.C
+local ffi_cast    = ffi.cast
+-- source: https://github.com/apache/apisix/blob/master/apisix/core/string.lua#L26
+ffi.cdef[[
+    int memcmp(const void *s1, const void *s2, size_t n);
+]]
+
 local _M = {}
 
 -- for pure Lua
@@ -28,13 +38,22 @@ local split = function(str, delimiter)
     return t
 end
 
+-- source: https://github.com/apache/apisix/blob/master/apisix/core/string.lua#L58
+local has_suffix = function(s, suffix)
+    if type(s) ~= "string" or type(suffix) ~= "string" then
+        error("unexpected type: s:" .. type(s) .. ", suffix:" .. type(suffix))
+    end
+    if #s < #suffix then
+        return false
+    end
+    local rc = C.memcmp(ffi_cast("char *", s) + #s - #suffix, suffix, #suffix)
+    return rc == 0
+end
 
-local checkIgnoreSuffix = function(operationName, ignoreSuffix)
-    if ignoreSuffix ~= nil then
-        local ignore_suffix_table = split(ignoreSuffix, ",")
-        for _, suffix in ipairs(ignore_suffix_table) do
-            local l = string.find(operationName, suffix, string.len(operationName)  - string.len(suffix))
-            if l ~= nil then
+local checkIgnoreSuffix = function(operationName)
+    if _M.ignore_suffix_table ~= nil then
+        for _, suffix in ipairs(_M.ignore_suffix_table) do
+            if has_suffix(operationName, suffix) then
                 return true
             end
         end
@@ -105,6 +124,9 @@ _M.set_randomseed = function ()
     math.randomseed(random_seed())
 end
 
+_M.set_ignore_suffix=function (ignore_suffix)
+    _M.ignore_suffix_table = split(ignore_suffix, ",")
+end
 
 local newID
 -- for Nginx Lua
