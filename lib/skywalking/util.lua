@@ -15,12 +15,12 @@
 -- limitations under the License.
 --
 
--- source: https://github.com/apache/apisix/blob/master/apisix/core/string.lua#L18
+--  copied from: https://github.com/apache/apisix/blob/b9e36d093bbdafb6d70d332b90679ad13724c2a1/apisix/core/string.lua#L18-L23
 local type = type
 local ffi         = require("ffi")
 local C           = ffi.C
 local ffi_cast    = ffi.cast
--- source: https://github.com/apache/apisix/blob/master/apisix/core/string.lua#L26
+--  copied from: https://github.com/apache/apisix/blob/b9e36d093bbdafb6d70d332b90679ad13724c2a1/apisix/core/string.lua#L26-L28
 ffi.cdef[[
     int memcmp(const void *s1, const void *s2, size_t n);
 ]]
@@ -38,7 +38,7 @@ local split = function(str, delimiter)
     return t
 end
 
--- source: https://github.com/apache/apisix/blob/master/apisix/core/string.lua#L58
+--  copied from: https://github.com/apache/apisix/blob/b9e36d093bbdafb6d70d332b90679ad13724c2a1/apisix/core/string.lua#L58-L67
 local has_suffix = function(s, suffix)
     if type(s) ~= "string" or type(suffix) ~= "string" then
         error("unexpected type: s:" .. type(s) .. ", suffix:" .. type(suffix))
