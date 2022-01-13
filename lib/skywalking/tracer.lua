@@ -34,10 +34,7 @@ function Tracer:start(upstream_name, correlation)
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local req_uri = ngx.var.uri
-    if serviceInstanceName == nil or serviceName == nil or (Util.checkIgnoreSuffix(req_uri)) then
-        if serviceInstanceName == nil or serviceName == nil then
-            log(WARN, "ServiceInstanceName or ServiceName not set, Agent not be activated.", WARN)
-        end
+    if (Util.checkIgnoreSuffix(req_uri)) then
         local tracingContext =  TC.newNoOP()
         local ctx = ngx.ctx
         ctx.tracingContext = tracingContext

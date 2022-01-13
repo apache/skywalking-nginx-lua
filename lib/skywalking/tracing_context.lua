@@ -108,6 +108,10 @@ function _M.newNoOP()
 end
 
 function _M.new(serviceName, serviceInstanceName)
+    if serviceInstanceName == nil or serviceName == nil then
+        return _M.newNoOP()
+    end
+
     local tracing_context = Util.tablepool_fetch()
     tracing_context.trace_id = Util.newID()
     tracing_context.segment_id = tracing_context.trace_id
