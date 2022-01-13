@@ -103,6 +103,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <service.entry>http://${nginx.host}:${nginx.port}/ingress</service.entry>
+                        <suffix.entry>http://${nginx.host}:${nginx.port}/suffix/suffix.js</suffix.entry>
                         <validation.entry>http://${collector.host}:${collector.port}/dataValidate</validation.entry>
                         <healthcheck.entry>http://${collector.host}:${collector.port}/status</healthcheck.entry>
                     </systemPropertyVariables>

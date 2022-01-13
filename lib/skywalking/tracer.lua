@@ -25,22 +25,29 @@ local json = require('cjson.safe')
 local metadata_shdict = ngx.shared.tracing_buffer
 local ngx = ngx
 local nginxComponentId = 6000
-
-
 local Tracer = {}
 
 
 function Tracer:start(upstream_name, correlation)
+    local log = ngx.log
+    local WARN = ngx.WARN
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
+    local req_uri = ngx.var.uri
+    if (Util.checkIgnoreSuffix(req_uri)) then
+        local tracingContext =  TC.newNoOP()
+        local ctx = ngx.ctx
+        ctx.tracingContext = tracingContext
+        ctx.entrySpan = Span.newNoOP()
+        ctx.exitSpan = Span.newNoOP()
+        ctx.is_finished = false
+        return
+    end
+
     local includeHostInEntrySpan = metadata_shdict:get('includeHostInEntrySpan')
     local tracingContext = TC.new(serviceName, serviceInstanceName)
-
     -- Constant pre-defined in SkyWalking main repo
     -- 6000 represents Nginx
-
-    local req_uri = ngx.var.uri
-
     local contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     contextCarrier["sw8"] = ngx.var.http_sw8
     contextCarrier["sw8-correlation"] = ngx.var.http_sw8_correlation
@@ -51,6 +58,7 @@ function Tracer:start(upstream_name, correlation)
     else
         entrySpan = TC.createEntrySpan(tracingContext, req_uri, nil, contextCarrier)
     end
+
     Span.start(entrySpan, time_now)
     Span.setComponentId(entrySpan, nginxComponentId)
     Span.setLayer(entrySpan, Layer.HTTP)
