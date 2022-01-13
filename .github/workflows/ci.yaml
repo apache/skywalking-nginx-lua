@@ -43,23 +43,17 @@ jobs:
         uses: apache/skywalking-eyes@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Install Lua'
-        shell: bash
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y lua5.3 lua5.3-dev
-          sudo ln /usr/bin/lua5.3 /usr/bin/lua
       - name: 'Install LuaRocks'
         run: |
-          wget https://luarocks.org/releases/luarocks-3.3.0.tar.gz
-          tar zxpf luarocks-3.3.0.tar.gz
-          cd luarocks-3.3.0
+          wget https://luarocks.org/releases/luarocks-3.8.0.tar.gz
+          tar zxpf luarocks-3.8.0.tar.gz
+          cd luarocks-3.8.0
           ./configure && make && sudo make install
           cd ..
       - name: 'Install Dependencies'
         run: |
           sudo luarocks install luaunit
-          sudo luarocks install lua-cjson 2.1.0-1
+          sudo luarocks install lua-cjson2
           sudo luarocks install lua-resty-jit-uuid
       - name: "Install OpenResty"
         run: |
@@ -77,11 +71,11 @@ jobs:
       - name: 'Run Lua Tests'
         run: |
           cd lib
-          lua skywalking/util_test.lua
-          lua skywalking/span_test.lua
-          lua skywalking/tracing_context_test.lua
-          lua skywalking/segment_ref_test.lua
-          lua skywalking/correlation_context_test.lua
+          /usr/local/openresty-debug/luajit/bin/luajit skywalking/util_test.lua
+          /usr/local/openresty-debug/luajit/bin/luajit skywalking/span_test.lua
+          /usr/local/openresty-debug/luajit/bin/luajit skywalking/tracing_context_test.lua
+          /usr/local/openresty-debug/luajit/bin/luajit skywalking/segment_ref_test.lua
+          /usr/local/openresty-debug/luajit/bin/luajit skywalking/correlation_context_test.lua
           cd ..
       - name: 'Run Nginx Lua Tests'
         run: |
