@@ -43,8 +43,11 @@ jobs:
         uses: apache/skywalking-eyes@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      - name: 'Install Lua'
+        shell: bash
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y lua5.1 lua5.1-dev
       - name: 'Install LuaRocks'
         run: |
           wget https://luarocks.org/releases/luarocks-3.8.0.tar.gz
