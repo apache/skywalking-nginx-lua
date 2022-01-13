@@ -36,7 +36,7 @@ http {
         metadata_buffer:set('serviceInstanceName', 'User Service Instance Name')
         -- type 'boolean', mark the entrySpan include host/domain
         metadata_buffer:set('includeHostInEntrySpan', false)
-        -- set ignoreSuffix, If the operation name of the first span is included in this set, this segment should be ignored. Multiple values should be separated by ','
+        -- set ignoreSuffix, If the operation name(HTTP URI) of the entry span includes suffixes in this set, this segment would be ignored. Multiple values should be separated by a comma(',').
         -- require("skywalking.util").set_ignore_suffix(".jpg,.jpeg,.js,.css,.png,.bmp,.gif,.ico,.mp3,.mp4,.svg")
 
         -- set random seed
