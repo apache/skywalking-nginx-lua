@@ -28,9 +28,7 @@ local nginxComponentId = 6000
 local Tracer = {}
 
 
-function Tracer:start(upstream_name, correlation)
-    local log = ngx.log
-    local WARN = ngx.WARN
+function Tracer:start(upstream_name, correlation, is_propagation)
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local req_uri = ngx.var.uri
@@ -78,8 +76,9 @@ function Tracer:start(upstream_name, correlation)
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
 
-    for name, value in pairs(contextCarrier) do
-        ngx.req.set_header(name, value)
+    -- is_progagation default is nil
+    if is_propagation == nil or is_propagation then
+        TC.propagate(tracingContext, exitSpan, contextCarrier)
     end
 
     -- Push the data in the context

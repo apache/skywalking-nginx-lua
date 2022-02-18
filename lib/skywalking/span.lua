@@ -90,27 +90,27 @@ function _M.createExitSpan(operationName, context, parent, peer, contextCarrier)
     local span = _M.new(operationName, context, parent)
     span.is_exit = true
     span.peer = peer
-
-    if contextCarrier ~= nil then
-        -- if there is contextCarrier container, the Span will inject the value based on the current tracing context
-        local injectableRef = SegmentRef.new()
-        injectableRef.trace_id = context.trace_id
-        injectableRef.segment_id = context.segment_id
-        injectableRef.span_id = span.span_id
-        injectableRef.address_used_at_client = peer
-        injectableRef.parent_service = context.service
-        injectableRef.parent_service_instance = context.service_instance
-
-        local firstSpan = context.internal.first_span
-        local parentEndpointName
-        parentEndpointName = firstSpan.operation_name
-        injectableRef.parent_endpoint = parentEndpointName
-
-        contextCarrier[CONTEXT_CARRIER_KEY] = SegmentRef.serialize(injectableRef)
-    end
-
     return span
 end
+
+-- Create an injectable reference
+function _M.createInjectableRef(context, parent, span)
+    local injectableRef = SegmentRef.new()
+    injectableRef.trace_id = context.trace_id
+    injectableRef.segment_id = context.segment_id
+    injectableRef.span_id = span.span_id
+    injectableRef.address_used_at_client = span.peer
+    injectableRef.parent_service = context.service
+    injectableRef.parent_service_instance = context.service_instance
+
+    local firstSpan = context.internal.first_span
+    local parentEndpointName
+    parentEndpointName = firstSpan.operation_name
+    injectableRef.parent_endpoint = parentEndpointName
+
+    return injectableRef
+end
+
 
 -- Create an local span. Local span is usually not used.
 -- Typically, only one entry span and one exit span in the Nginx tracing segment.

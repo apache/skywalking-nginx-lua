@@ -158,6 +158,17 @@ function _M.createExitSpan(tracingContext, operationName, parent, peer, contextC
     return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
 end
 
+
+function _M.propagate(tracingContext, exitSpan, contextCarrier)
+    local injectableRef = Span.createInjectableRef(tracingContext, exitSpan, contextCarrier)
+    contextCarrier["sw8"] = SegmentRef.serialize(injectableRef)
+
+    for name, value in pairs(contextCarrier) do
+        ngx.req.set_header(name, value)
+    end
+end
+
+
 -- After all active spans finished, this segment will be treated as finished status.
 -- Notice, it is different with Java agent, a finished context is still able to recreate new span, and be checked as finished again.
 -- This gives the end user more flexibility. Unless it is a real reasonable case, don't call #drainAfterFinished multiple times.
