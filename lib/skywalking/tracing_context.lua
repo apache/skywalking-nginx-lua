@@ -17,8 +17,10 @@
 
 local Util = require('skywalking.util')
 local Span = require('skywalking.span')
+local SegmentRef = require("skywalking.segment_ref")
 local CorrelationContext = require('skywalking.correlation_context')
 
+local CONTEXT_CARRIER_KEY = 'sw8'
 local CONTEXT_CORRELATION_KEY = 'sw8-correlation'
 
 -------------- Internal Object-------------
@@ -140,34 +142,28 @@ end
 
 -- Delegate to Span.createExitSpan
 -- @param contextCarrier could be nil if don't need to inject any context to propagate
-function _M.createExitSpan(tracingContext, operationName, parent, peer, contextCarrier, correlation)
+function _M.createExitSpan(tracingContext, operationName, parent, peer)
     if tracingContext.is_noop then
         return Span.newNoOP()
     end
 
-    if contextCarrier then
-        if correlation then
-            for name, value in pairs(correlation) do
-                CorrelationContext.put(tracingContext.correlation, name, value)
-            end
+    return Span.createExitSpan(operationName, tracingContext, parent, peer)
+end
+
+-- create injectable reference and inject?
+-- @param
+function _M.inject(tracingContext, exitSpan, correlation)
+    local injectableRef = SegmentRef.createInjectableRef(tracingContext, exitSpan, correlation)
+    local correlationData = tracingContext.correlation
+    if correlation then
+        for name, value in pairs(correlation) do
+            CorrelationContext.put(correlationData, name, value)
         end
-
-        contextCarrier[CONTEXT_CORRELATION_KEY] = CorrelationContext.serialize(tracingContext.correlation)
     end
 
-    return Span.createExitSpan(operationName, tracingContext, parent, peer, contextCarrier)
+    ngx.req.set_header(CONTEXT_CARRIER_KEY, SegmentRef.serialize(injectableRef))
+    ngx.req.set_header(CONTEXT_CORRELATION_KEY, CorrelationContext.serialize(correlationData))
 end
-
-
-function _M.propagate(tracingContext, exitSpan, contextCarrier)
-    local injectableRef = Span.createInjectableRef(tracingContext, exitSpan, contextCarrier)
-    contextCarrier["sw8"] = SegmentRef.serialize(injectableRef)
-
-    for name, value in pairs(contextCarrier) do
-        ngx.req.set_header(name, value)
-    end
-end
-
 
 -- After all active spans finished, this segment will be treated as finished status.
 -- Notice, it is different with Java agent, a finished context is still able to recreate new span, and be checked as finished again.

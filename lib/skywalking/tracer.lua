@@ -28,7 +28,7 @@ local nginxComponentId = 6000
 local Tracer = {}
 
 
-function Tracer:start(upstream_name, correlation, is_propagation)
+function Tracer:start(upstream_name)
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local req_uri = ngx.var.uri
@@ -65,21 +65,16 @@ function Tracer:start(upstream_name, correlation, is_propagation)
     Span.tag(entrySpan, 'http.params',
              ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri )
 
+    ------------------------------------------------------
     contextCarrier = Util.tablepool_fetch("sw_contextCarrier")
     -- Use the same URI to represent incoming and forwarding requests
     -- Change it if you need.
     local upstreamServerName = upstream_name
-    ------------------------------------------------------
     local exitSpan = TC.createExitSpan(tracingContext, req_uri, entrySpan,
-                        upstreamServerName, contextCarrier, correlation)
+                        upstreamServerName)
     Span.start(exitSpan, time_now)
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
-
-    -- is_progagation default is nil
-    if is_propagation == nil or is_propagation then
-        TC.propagate(tracingContext, exitSpan, contextCarrier)
-    end
 
     -- Push the data in the context
     local ctx = ngx.ctx
@@ -87,6 +82,11 @@ function Tracer:start(upstream_name, correlation, is_propagation)
     ctx.entrySpan = entrySpan
     ctx.exitSpan = exitSpan
     ctx.is_finished = false
+end
+
+function Tracer:inject(span, correlation)
+    local ctx = ngx.ctx
+    TC.inject(ngx.ctx.tracingContext, span, correlation)
 end
 
 function Tracer:finish()
