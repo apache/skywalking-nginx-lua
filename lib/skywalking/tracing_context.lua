@@ -17,7 +17,7 @@
 
 local Util = require('skywalking.util')
 local Span = require('skywalking.span')
-local SegmentRef = require("skywalking.segment_ref")
+local SegmentRef = require('skywalking.segment_ref')
 local CorrelationContext = require('skywalking.correlation_context')
 
 local CONTEXT_CARRIER_KEY = 'sw8'
@@ -150,10 +150,8 @@ function _M.createExitSpan(tracingContext, operationName, parent, peer)
     return Span.createExitSpan(operationName, tracingContext, parent, peer)
 end
 
--- create injectable reference and inject?
--- @param
 function _M.inject(tracingContext, exitSpan, correlation)
-    local injectableRef = SegmentRef.createInjectableRef(tracingContext, exitSpan, correlation)
+    local injectableRef = SegmentRef.createInjectableRef(tracingContext, exitSpan)
     local correlationData = tracingContext.correlation
     if correlation then
         for name, value in pairs(correlation) do

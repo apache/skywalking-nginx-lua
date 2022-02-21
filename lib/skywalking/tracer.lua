@@ -28,7 +28,9 @@ local nginxComponentId = 6000
 local Tracer = {}
 
 
-function Tracer:start(upstream_name)
+function Tracer:start(upstream_name, correlation)
+    local log = ngx.log
+    local WARN = ngx.WARN
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local req_uri = ngx.var.uri
@@ -70,8 +72,7 @@ function Tracer:start(upstream_name)
     -- Use the same URI to represent incoming and forwarding requests
     -- Change it if you need.
     local upstreamServerName = upstream_name
-    local exitSpan = TC.createExitSpan(tracingContext, req_uri, entrySpan,
-                        upstreamServerName)
+    local exitSpan = TC.createExitSpan(tracingContext, req_uri, entrySpan, upstreamServerName)
     Span.start(exitSpan, time_now)
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
@@ -84,9 +85,13 @@ function Tracer:start(upstream_name)
     ctx.is_finished = false
 end
 
-function Tracer:inject(span, correlation)
+function Tracer:inject(exitSpan, correlation)
     local ctx = ngx.ctx
-    TC.inject(ngx.ctx.tracingContext, span, correlation)
+    local context = ctx.tracingContext
+
+    if not context.is_noop and exitSpan ~= nil and not ctx.is_finished then
+        TC.inject(context, exitSpan, correlation)
+    end
 end
 
 function Tracer:finish()

@@ -65,11 +65,7 @@ function _M.createInjectableRef(context, span)
     injectableRef.address_used_at_client = span.peer
     injectableRef.parent_service = context.service
     injectableRef.parent_service_instance = context.service_instance
-
-    local firstSpan = context.internal.first_span
-    local parentEndpointName
-    parentEndpointName = firstSpan.operation_name
-    injectableRef.parent_endpoint = parentEndpointName
+    injectableRef.parent_endpoint = span.parent_endpoint_name
 
     return injectableRef
 end
