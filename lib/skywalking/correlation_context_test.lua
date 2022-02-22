@@ -96,7 +96,17 @@ TestCorelationContext = {}
         TC.createEntrySpan(context, 'operation_name', nil, header)
         lu.assertNotNil(context.correlation)
         local contextCarrier = {}
-        TC.createExitSpan(context, 'operation_name', nil, 'peer', contextCarrier)
+
+        -- mock ngx.req.set_header(k, v)
+        ngx = {
+            req = {
+                set_header = function(k, v)
+                    contextCarrier[k] = v
+                end
+            }
+        }
+        local exitSpan = TC.createExitSpan(context, 'operation_name', nil, 'peer', contextCarrier)
+        TC.inject(context, exitSpan, context.correlation)
         lu.assertNotNil(contextCarrier['sw8-correlation'])
         local correlation = correlationContext.fromSW8Value(contextCarrier['sw8-correlation'])
         lu.assertEquals(correlation["test1"], "t1")

@@ -77,6 +77,7 @@ function Tracer:start(upstream_name, correlation)
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
 
+
     -- Push the data in the context
     local ctx = ngx.ctx
     ctx.tracingContext = tracingContext

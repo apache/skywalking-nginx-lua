@@ -72,9 +72,6 @@ TestSpan = {}
         lu.assertEquals(span1.is_exit, true)
         lu.assertEquals(span1.layer, SpanLayer.NONE)
         lu.assertEquals(span1.peer, '127.0.0.1:80')
-
-        lu.assertEquals(#(context.internal.active_spans), 1)
-        lu.assertNotNil(contextCarrier['sw8'])
     end
 
     function TestSpan:testNew()
