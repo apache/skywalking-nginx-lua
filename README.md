@@ -57,14 +57,8 @@ http {
             default_type text/html;
 
             rewrite_by_lua_block {
-                ------------------------------------------------------
-                -- NOTICE, this should be changed manually
-                -- This variable represents the upstream logic address
-                -- Please set them as service logic name or DNS name
-                --
-                -- Currently, we can not have the upstream real network address
-                ------------------------------------------------------
-                skywalking_tracer:start("upstream service")
+                -- API since v1.0.0
+                skywalking_tracer:start()
                 skywalking_tracer:inject(ngx.ctx.exitSpan)
                 -- If you want correlation custom data to the downstream service
                 -- skywalking_tracer:inject(ngx.ctx.exitSpan, {custom = "custom_value"})
@@ -132,7 +126,7 @@ The following APIs are for developers or using this lib out of the Nginx case.
 ## Nginx APIs
 - **startTimer**, `require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
 - **destroyBackendTimer**, `require("skywalking.client"):destroyBackendTimer()`. Stop the timer created by `startBackendTimer`, and clean unreported data.
-- **start**, `require("skywalking.tracer"):start("upstream service")`. Begin the tracing before the upstream begin.
+- **start**, `require("skywalking.tracer"):start()`. Begin the tracing before the upstream beginning.
 - **inject**, `require("skywalking.tracer"):inject(exitSpan, correlation)`. Inject an exit span context and correlation context into carrier. The custom data (table type) can be injected as the second parameter, and then they will be propagated to the downstream service.
 - **finish**, `require("skywalking.tracer"):finish()`. Finish the tracing for this HTTP request.
 - **prepareForReport**, `require("skywalking.tracer"):prepareForReport()`. Prepare the finished segment for further report.
@@ -146,7 +140,7 @@ The following APIs are for developers or using this lib out of the Nginx case.
 
 Create 2 kinds of span
 - `TracingContext.createEntrySpan(operationName, parent, contextCarrier)`
-- `TracingContext.createExitSpan(operationName, parent, peer)`
+- `TracingContext.createExitSpan(operationName, parent)`
 
 # Contact Us
 * Submit an [issue](https://github.com/apache/skywalking/issues) with `[NIGNX-LUA]` as the issue title prefix.

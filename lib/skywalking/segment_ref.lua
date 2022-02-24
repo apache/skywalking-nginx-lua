@@ -57,6 +57,7 @@ function _M.fromSW8Value(value)
     return ref
 end
 
+-- Create and initialize an injectable reference
 function _M.createInjectableRef(context, span)
     local injectableRef = _M.new()
     injectableRef.trace_id = context.trace_id
