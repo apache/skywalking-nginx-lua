@@ -65,13 +65,11 @@ TestSpan = {}
         local context = TC.new("service", "instance")
         lu.assertNotNil(context)
 
-        local contextCarrier = {}
-        local span1 = Span.createExitSpan("operation_name", context, nil, '127.0.0.1:80', contextCarrier)
+        local span1 = Span.createExitSpan("operation_name", context, nil)
         lu.assertNotNil(span1)
         lu.assertEquals(span1.is_entry, false)
         lu.assertEquals(span1.is_exit, true)
         lu.assertEquals(span1.layer, SpanLayer.NONE)
-        lu.assertEquals(span1.peer, '127.0.0.1:80')
     end
 
     function TestSpan:testNew()
