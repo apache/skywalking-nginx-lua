@@ -89,7 +89,7 @@ end
 function _M.createExitSpan(operationName, context, parent)
     local span = _M.new(operationName, context, parent)
     span.is_exit = true
-		span.peer = ""
+    span.peer = ""
 
     local firstSpan = context.internal.first_span
     span.parent_endpoint_name = firstSpan.operation_name
