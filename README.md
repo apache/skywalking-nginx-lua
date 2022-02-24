@@ -123,7 +123,7 @@ This LUA tracing lib is originally designed for Nginx+LUA/OpenResty ecosystems. 
 If you just use this in the Ngnix, [Setup Doc](#setup-doc) should be good enough.
 The following APIs are for developers or using this lib out of the Nginx case.
 
-## Nginx APIs
+## Nginx APIs v1
 - **startTimer**, `require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
 - **destroyBackendTimer**, `require("skywalking.client"):destroyBackendTimer()`. Stop the timer created by `startBackendTimer`, and clean unreported data.
 - **start**, `require("skywalking.tracer"):start()`. Begin the tracing before the upstream beginning.
