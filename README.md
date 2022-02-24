@@ -57,11 +57,16 @@ http {
             default_type text/html;
 
             rewrite_by_lua_block {
-                -- API since v1.0.0
-                skywalking_tracer:start()
-                skywalking_tracer:inject(ngx.ctx.exitSpan)
+                ------------------------------------------------------
+                -- NOTICE, this should be changed manually
+                -- This variable represents the upstream logic address
+                -- Please set them as service logic name or DNS name
+                --
+                -- Currently, we can not have the upstream real network address
+                ------------------------------------------------------
+                skywalking_tracer:start("upstream service")
                 -- If you want correlation custom data to the downstream service
-                -- skywalking_tracer:inject(ngx.ctx.exitSpan, {custom = "custom_value"})
+                -- skywalking_tracer:start("upstream service", {custom = "custom_value"})
             }
 
             -- Target upstream service
@@ -123,11 +128,10 @@ This LUA tracing lib is originally designed for Nginx+LUA/OpenResty ecosystems. 
 If you just use this in the Ngnix, [Setup Doc](#setup-doc) should be good enough.
 The following APIs are for developers or using this lib out of the Nginx case.
 
-## Nginx APIs v1
+## Nginx APIs
 - **startTimer**, `require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
 - **destroyBackendTimer**, `require("skywalking.client"):destroyBackendTimer()`. Stop the timer created by `startBackendTimer`, and clean unreported data.
-- **start**, `require("skywalking.tracer"):start()`. Begin the tracing before the upstream beginning.
-- **inject**, `require("skywalking.tracer"):inject(exitSpan, correlation)`. Inject an exit span context and correlation context into carrier. The custom data (table type) can be injected as the second parameter, and then they will be propagated to the downstream service.
+- **start**, `require("skywalking.tracer"):start("upstream service", correlation)`. Begin the tracing before the upstream beginning. The custom data (table type) can be injected as the second parameter, and then they will be propagated to the downstream service.
 - **finish**, `require("skywalking.tracer"):finish()`. Finish the tracing for this HTTP request.
 - **prepareForReport**, `require("skywalking.tracer"):prepareForReport()`. Prepare the finished segment for further report.
 
@@ -136,9 +140,13 @@ The following APIs are for developers or using this lib out of the Nginx case.
 - `TracingContext.new(serviceId, serviceInstID)`, create an active tracing context.
 - `TracingContext.newNoOP()`, create a no OP tracing context.
 - `TracingContext.drainAfterFinished()`, fetch the segment includes all finished spans.
-- `TracingContext.inject(exitSpan, correlation)`, Inject an exit span context and correlation context into carrier, and then they will be propagated to the downstream service by outgoing HTTP request.
+- `TracingContext.inject(exitSpan, correlation)`, inject an exit span context and correlation context into carrier, and then they will be propagated to the downstream service by outgoing HTTP request. (**Since v1.0**, advanced API, called when you update the peer of exit span.)
 
 Create 2 kinds of span
+- `TracingContext.createEntrySpan(operationName, parent, contextCarrier)`
+- `TracingContext.createExitSpan(operationName, parent, peer, contextCarrier)`
+
+Create 2 kinds of span API v1
 - `TracingContext.createEntrySpan(operationName, parent, contextCarrier)`
 - `TracingContext.createExitSpan(operationName, parent)`
 

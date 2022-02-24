@@ -28,7 +28,7 @@ local nginxComponentId = 6000
 local Tracer = {}
 
 
-function Tracer:start()
+function Tracer:start(upstream_name, correlation)
     local serviceName = metadata_shdict:get("serviceName")
     local serviceInstanceName = metadata_shdict:get('serviceInstanceName')
     local req_uri = ngx.var.uri
@@ -74,6 +74,12 @@ function Tracer:start()
     Span.setComponentId(exitSpan, nginxComponentId)
     Span.setLayer(exitSpan, Layer.HTTP)
 
+    local upstreamServerName = upstream_name
+    if upstreamServerName then
+        Span.setPeer(exitSpan ,upstreamServerName)
+        TC.inject(tracingContext, exitSpan, correlation)
+    end
+
     -- Push the data in the context
     local ctx = ngx.ctx
     ctx.tracingContext = tracingContext
@@ -82,6 +88,8 @@ function Tracer:start()
     ctx.is_finished = false
 end
 
+-- inject an exit span context and correlation context into carrier
+-- since v1.0.0
 function Tracer:inject(exitSpan, correlation)
     local ctx = ngx.ctx
     local context = ctx.tracingContext

@@ -89,7 +89,6 @@ end
 function _M.createExitSpan(operationName, context, parent)
     local span = _M.new(operationName, context, parent)
     span.is_exit = true
-    span.peer = ""
 
     local firstSpan = context.internal.first_span
     span.parent_endpoint_name = firstSpan.operation_name
@@ -233,6 +232,15 @@ function _M.log(span, timestamp, keyValuePairs)
     logEntity.data = keyValuePairs
 
     table.insert(span.logs, logEntity)
+    return span
+end
+
+function _M.setPeer(span, peer)
+    if span.is_noop then
+        return span
+    end
+    span.peer = peer
+
     return span
 end
 

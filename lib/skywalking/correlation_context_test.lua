@@ -105,7 +105,8 @@ TestCorelationContext = {}
                 end
             }
         }
-        local exitSpan = TC.createExitSpan(context, 'operation_name', nil, 'peer', contextCarrier)
+        local exitSpan = TC.createExitSpan(context, 'operation_name', nil)
+        Span.setPeer(exitSpan, 'peer')
         TC.inject(context, exitSpan, context.correlation)
         lu.assertNotNil(contextCarrier['sw8-correlation'])
         local correlation = correlationContext.fromSW8Value(contextCarrier['sw8-correlation'])
