@@ -20,8 +20,8 @@ local correlationContext = require('skywalking.correlation_context')
 local TC = require('skywalking.tracing_context')
 local Span = require("skywalking.span")
 
-TestCorelationContext = {}
-    function TestCorelationContext:testFromSW8Value()
+TestCorrelationContext = {}
+    function TestCorrelationContext:testFromSW8Value()
         -- simple analyze
         local context = correlationContext.fromSW8Value('dGVzdDE=:dDE=,dGVzdDI=:dDI=')
         lu.assertNotNil(context)
@@ -39,7 +39,7 @@ TestCorelationContext = {}
         lu.assertNotNil(#context == 0)
     end
 
-    function TestCorelationContext:testSerialize()
+    function TestCorrelationContext:testSerialize()
         -- serialize empty correlation
         local context = correlationContext.fromSW8Value('')
         local encode_context = correlationContext.serialize(context)
@@ -65,7 +65,7 @@ TestCorelationContext = {}
         lu.assertEquals(encode_context, "")
     end
 
-    function TestCorelationContext:testPut()
+    function TestCorrelationContext:testPut()
         -- put with empty key and value
         local context = correlationContext.fromSW8Value('')
         correlationContext.put(context, nil, nil)
@@ -89,7 +89,7 @@ TestCorelationContext = {}
         lu.assertEquals(context["test3"], "t3")
     end
 
-    function TestCorelationContext:testTracingContext()
+    function TestCorrelationContext:testTracingContext()
         -- transform data
         local context = TC.new("service", "instance")
         local header = {}
