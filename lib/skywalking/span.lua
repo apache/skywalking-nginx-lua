@@ -86,29 +86,12 @@ function _M.createEntrySpan(operationName, context, parent, contextCarrier)
 end
 
 -- Create an exit span. Represent the HTTP outgoing request.
-function _M.createExitSpan(operationName, context, parent, peer, contextCarrier)
+function _M.createExitSpan(operationName, context, parent)
     local span = _M.new(operationName, context, parent)
     span.is_exit = true
-    span.peer = peer
 
-    if contextCarrier ~= nil then
-        -- if there is contextCarrier container, the Span will inject the value based on the current tracing context
-        local injectableRef = SegmentRef.new()
-        injectableRef.trace_id = context.trace_id
-        injectableRef.segment_id = context.segment_id
-        injectableRef.span_id = span.span_id
-        injectableRef.address_used_at_client = peer
-        injectableRef.parent_service = context.service
-        injectableRef.parent_service_instance = context.service_instance
-
-        local firstSpan = context.internal.first_span
-        local parentEndpointName
-        parentEndpointName = firstSpan.operation_name
-        injectableRef.parent_endpoint = parentEndpointName
-
-        contextCarrier[CONTEXT_CARRIER_KEY] = SegmentRef.serialize(injectableRef)
-    end
-
+    local firstSpan = context.internal.first_span
+    span.parent_endpoint_name = firstSpan.operation_name
     return span
 end
 
@@ -249,6 +232,15 @@ function _M.log(span, timestamp, keyValuePairs)
     logEntity.data = keyValuePairs
 
     table.insert(span.logs, logEntity)
+    return span
+end
+
+function _M.setPeer(span, peer)
+    if span.is_noop then
+        return span
+    end
+    span.peer = peer
+
     return span
 end
 

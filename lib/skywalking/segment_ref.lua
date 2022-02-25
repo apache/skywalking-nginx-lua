@@ -57,6 +57,20 @@ function _M.fromSW8Value(value)
     return ref
 end
 
+-- Create and initialize an injectable reference
+function _M.createInjectableRef(context, span)
+    local injectableRef = _M.new()
+    injectableRef.trace_id = context.trace_id
+    injectableRef.segment_id = context.segment_id
+    injectableRef.span_id = span.span_id
+    injectableRef.address_used_at_client = span.peer
+    injectableRef.parent_service = context.service
+    injectableRef.parent_service_instance = context.service_instance
+    injectableRef.parent_endpoint = span.parent_endpoint_name
+
+    return injectableRef
+end
+
 -- Return string to represent this ref.
 function _M.serialize(ref)
     local encodedRef = '1'
