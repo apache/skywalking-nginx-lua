@@ -89,7 +89,7 @@ TestCorelationContext = {}
         lu.assertEquals(context["test3"], "t3")
     end
 
-    function TestCorrelationContext:testTracingContext()
+    function TestCorelationContext:testTracingContext()
         -- transform data
         local context = TC.new("service", "instance")
         local header = {}
