@@ -76,8 +76,7 @@ function Tracer:start(upstream_name, correlation)
 
     local upstreamServerName = upstream_name
     if upstreamServerName then
-        Span.setPeer(exitSpan ,upstreamServerName)
-        TC.inject(tracingContext, exitSpan, correlation)
+        TC.inject(tracingContext, exitSpan, upstreamServerName, correlation)
     end
 
     -- Push the data in the context
@@ -90,12 +89,12 @@ end
 
 -- inject an exit span context and correlation context into carrier
 -- since v1.0.0
-function Tracer:inject(exitSpan, correlation)
+function Tracer:inject(exitSpan, peer, correlation)
     local ctx = ngx.ctx
     local context = ctx.tracingContext
 
     if not context.is_noop and exitSpan ~= nil and not ctx.is_finished then
-        TC.inject(context, exitSpan, correlation)
+        TC.inject(context, exitSpan, peer, correlation)
     end
 end
 

@@ -107,15 +107,15 @@ TestCorrelationContext = {}
             }
         }
         local exitSpan = TC.createExitSpan(context, 'operation_name', nil)
-        Span.setPeer(exitSpan, 'peer')
-        TC.inject(context, exitSpan, context.correlation)
+        TC.inject(context, exitSpan, 'peer', context.correlation)
         lu.assertNotNil(contextCarrier['sw8-correlation'])
         local correlation = correlationContext.fromSW8Value(contextCarrier['sw8-correlation'])
         lu.assertEquals(correlation["test1"], "t1")
         lu.assertEquals(correlation["test2"], "t2")
 
         -- transform data with adding data
-        TC.createExitSpan(context, 'operation_name', nil, 'peer', contextCarrier, {
+        exitSpan = TC.createExitSpan(context, 'operation_name', nil)
+        TC.inject(context, exitSpan, 'peer', {
             test3 = "t3"
         })
         lu.assertNotNil(contextCarrier['sw8-correlation'])

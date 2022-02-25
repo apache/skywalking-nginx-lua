@@ -152,7 +152,9 @@ end
 
 -- Inject an exit span context and correlation context into context carrier to propagate
 -- @param correlation is used to transport custom data to downstream service
-function _M.inject(tracingContext, exitSpan, correlation)
+function _M.inject(tracingContext, exitSpan, peer, correlation)
+    Span.setPeer(exitSpan, peer)
+
     local injectableRef = SegmentRef.createInjectableRef(tracingContext, exitSpan)
     local correlationData = tracingContext.correlation
     if correlation then
