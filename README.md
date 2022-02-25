@@ -132,6 +132,7 @@ The following APIs are for developers or using this lib out of the Nginx case.
 - **startTimer**, `require("skywalking.client"):startBackendTimer("http://127.0.0.1:8080")`. Start the backend timer. This timer register the metadata and report traces to the backend.
 - **destroyBackendTimer**, `require("skywalking.client"):destroyBackendTimer()`. Stop the timer created by `startBackendTimer`, and clean unreported data.
 - **start**, `require("skywalking.tracer"):start("upstream service", correlation)`. Begin the tracing before the upstream beginning. The custom data (table type) can be injected as the second parameter, and then they will be propagated to the downstream service.
+- **inject**, `require("skywalking.tracer"):inject(exitSpan, correlation)`. Inject an exit span context and correlation context into carrier, and then they will be propagated to the downstream service. (**Since v1.0**, advanced API, called when you update the peer of exit span.)
 - **finish**, `require("skywalking.tracer"):finish()`. Finish the tracing for this HTTP request.
 - **prepareForReport**, `require("skywalking.tracer"):prepareForReport()`. Prepare the finished segment for further report.
 
