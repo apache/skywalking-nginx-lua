@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# ----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,13 +17,11 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+# ----------------------------------------------------------------------------
 
-apt update
-apt install -y luarocks
-
-luarocks make rockspec/skywalking-nginx-lua-master-0.rockspec
-
-COLLECTOR=$(grep "skywalking-collector" /etc/hosts |awk -F" " '{print $1}')
-sed -e "s%\${collector}%${COLLECTOR}%g" /var/nginx/conf.d/nginx.conf > /var/run/nginx.conf
-
-/usr/bin/openresty -c /var/run/nginx.conf
+if ! command -v yq &> /dev/null; then
+  mkdir -p $BASE_DIR/yq && cd $BASE_DIR/yq
+  curl -kLo yq.tar.gz https://github.com/mikefarah/yq/archive/v4.11.1.tar.gz
+  tar -zxf yq.tar.gz --strip=1
+  go install && go build -ldflags -s && cp yq $BIN_DIR/
+fi

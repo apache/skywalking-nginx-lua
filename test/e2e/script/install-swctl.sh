@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+
+# ----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,16 +17,12 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+# ----------------------------------------------------------------------------
 
-FROM openjdk:8
-
-WORKDIR /usr/local/skywalking-nginx-lua
-
-COPY run.sh /
-RUN chmod +x /run.sh
-
-COPY skywalking-validator.jar ./agent-test-tools/skywalking-validator-tool.jar
-ADD skywalking-mock-collector.tar.gz agent-test-tools/
-RUN chmod +x ./agent-test-tools/skywalking-mock-collector/bin/collector-startup.sh
-
-CMD ["./agent-test-tools/skywalking-mock-collector/bin/collector-startup.sh"]
+if ! command -v swctl &> /dev/null; then
+  mkdir -p $BASE_DIR/swctl && cd $BASE_DIR/swctl
+  curl -kLo skywalking-cli.tar.gz https://github.com/apache/skywalking-cli/archive/${SW_CTL_COMMIT}.tar.gz
+  tar -zxf skywalking-cli.tar.gz --strip=1
+  utype=$(uname | awk '{print tolower($0)}')
+  make $utype && mv bin/swctl-*-$utype-amd64 $BIN_DIR/swctl
+fi
