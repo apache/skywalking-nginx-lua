@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,21 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-WORK_DIRECTORY=$1
-RESPOSITORY=$2
-COMMIT_ID=$3
-DIST_DIRECTORY=$4
+FROM openresty/openresty:1.17.8.2-5-alpine-fat
 
-HOME_DIR="$(cd "$(dirname $0)"; pwd)"
+WORKDIR /skywalking-nginx-lua
 
-git clone $RESPOSITORY $WORK_DIRECTORY
+COPY ./lib ./lib
+COPY ./rockspec ./rockspec
+COPY ./Makefile ./Makefile
+COPY ./test/e2e/nginx-lua/conf.d/nginx.conf ./conf.d/nginx.conf
 
-cd $WORK_DIRECTORY
+RUN luarocks make rockspec/skywalking-nginx-lua-master-0.rockspec
 
-git checkout $COMMIT_ID
-
-mvn -B package -DskipTests
-
-[[ -d $DIST_DIRECTORY ]] || mkdir -p $DIST_DIRECTORY
-
-cp $WORK_DIRECTORY/dist/* $DIST_DIRECTORY/
+CMD ["/bin/bash", "-c", "openresty -c /skywalking-nginx-lua/conf.d/nginx.conf"]
