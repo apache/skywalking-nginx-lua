@@ -43,4 +43,4 @@ jobs:
       - name: Build E2E Docker
         run: ./mvnw -f ./test/e2e/pom.xml package
       - name: Run Nginx Test
-        run: ./mvnw -f ./test/e2e/e2e-test/nginx/pom.xml verify
+        run: ./mvnw -f ./test/e2e/pom.xml verify
