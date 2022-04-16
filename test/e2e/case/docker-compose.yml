@@ -35,7 +35,7 @@ services:
   nginx:
     build:
       context: ../../../
-      dockerfile: ./test/e2e/nginx-lua/Dockerfile
+      dockerfile: ./test/e2e/nginx/Dockerfile
     ports:
       - 8080
     networks:

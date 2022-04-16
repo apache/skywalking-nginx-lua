@@ -114,9 +114,16 @@ function _M.new(serviceName, serviceInstanceName)
         return _M.newNoOP()
     end
 
+    -- use request_id as trace_id if it is present
+    local trace_id = Util.newID()
+    local segment_id = trace_id
+    if ngx.var.http_request_id then
+        trace_id = ngx.var.http_request_id
+    end
+
     local tracing_context = Util.tablepool_fetch()
-    tracing_context.trace_id = Util.newID()
-    tracing_context.segment_id = tracing_context.trace_id
+    tracing_context.trace_id = trace_id
+    tracing_context.segment_id = segment_id
     tracing_context.service = serviceName
     tracing_context.service_instance = serviceInstanceName
     tracing_context.internal = Internal.new()
