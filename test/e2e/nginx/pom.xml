@@ -22,12 +22,16 @@
 
     <parent>
         <groupId>org.apache.skywalking.plugin.nginx-lua</groupId>
-        <artifactId>e2e-test</artifactId>
+        <artifactId>e2e</artifactId>
         <version>1.0.0</version>
     </parent>
-    
+
     <artifactId>nginx</artifactId>
     <packaging>jar</packaging>
+
+    <properties>
+        <mock-collector.version>092c6a3c753684b5a301baf5bcb1965f2dfaf79d</mock-collector.version>
+    </properties>
 
     <build>
         <plugins>
@@ -40,12 +44,8 @@
                         <image>
                             <name>openresty-with-skywalking</name>
                             <build>
-                                <from>openresty/openresty</from>
+                                <from>openresty/openresty:1.17.8.2-5-alpine-fat</from>
                                 <workdir>/skywalking-nginx-lua</workdir>
-                                <cmd>
-                                    <shell>apt update</shell>
-                                    <shell>apt install -y luarocks</shell>
-                                </cmd>
                             </build>
                             <run>
                                 <dependsOn>
@@ -59,7 +59,7 @@
                                         <volume>${project.basedir}/docker/conf.d:/var/nginx/conf.d</volume>
                                         <volume>${project.basedir}/docker/bin:/opt/bin</volume>
                                         <volume>
-                                            ${project.basedir}/../../../..:/skywalking-nginx-lua/
+                                            ${project.basedir}/../../../:/skywalking-nginx-lua/
                                         </volume>
                                     </bind>
                                 </volumes>
@@ -78,7 +78,7 @@
                             </run>
                         </image>
                         <image>
-                            <name>skywalking-collector:${project.version}</name>
+                            <name>ghcr.io/apache/skywalking-agent-test-tool/mock-collector:${mock-collector.version}</name>
                             <alias>skywalking-collector</alias>
                             <run>
                                 <ports>

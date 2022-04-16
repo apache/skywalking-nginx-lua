@@ -31,8 +31,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>agent-test-tools</module>
-        <module>e2e-test</module>
+        <module>nginx</module>
     </modules>
 
     <properties>
@@ -53,11 +52,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-        <docker-maven-plugin.version>0.4.13</docker-maven-plugin.version>
+        <docker-maven-plugin.version>0.30.0</docker-maven-plugin.version>
 
         <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-        <docker-maven-plugin.version>0.30.0</docker-maven-plugin.version>
         <surefire.version>3.0.0-M4</surefire.version>
     </properties>
 
@@ -216,6 +214,13 @@
                         <imagePullPolicy>IfNotPresent</imagePullPolicy>
                     </configuration>
                     <executions>
+                        <execution>
+                            <id>build</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
                         <execution>
                             <id>start</id>
                             <phase>pre-integration-test</phase>
