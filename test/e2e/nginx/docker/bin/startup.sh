@@ -1,3 +1,4 @@
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,15 +16,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-FROM openjdk:8
+COLLECTOR=$(grep "skywalking-collector" /etc/hosts |awk -F" " '{print $1}')
+sed -e "s%\${collector}%${COLLECTOR}%g" /var/nginx/conf.d/nginx.conf > /var/run/nginx.conf
 
-WORKDIR /usr/local/skywalking-nginx-lua
+luarocks make /skywalking-nginx-lua/rockspec/skywalking-nginx-lua-master-0.rockspec
 
-COPY run.sh /
-RUN chmod +x /run.sh
-
-COPY skywalking-validator.jar ./agent-test-tools/skywalking-validator-tool.jar
-ADD skywalking-mock-collector.tar.gz agent-test-tools/
-RUN chmod +x ./agent-test-tools/skywalking-mock-collector/bin/collector-startup.sh
-
-CMD ["./agent-test-tools/skywalking-mock-collector/bin/collector-startup.sh"]
+openresty -c /var/run/nginx.conf

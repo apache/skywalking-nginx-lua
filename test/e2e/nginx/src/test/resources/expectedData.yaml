@@ -14,13 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-registryItems:
-  applications:
-    - {'e2e-test-with-mock-collector': 2}
-  instances:
-    - {'e2e-test-with-mock-collector': 1}
-  operationNames:
-    - e2e-test-with-mock-collector: [/tier2/lb, /ingress]
 segmentItems:
   - serviceName: e2e-test-with-mock-collector
     segmentSize: eq 2
@@ -38,13 +31,17 @@ segmentItems:
             peer: 'e2e-test-with-mock-collector:upstream_ip2:port2'
             spanLayer: Http
             tags:
-              - {key: http.status, value: '200'}
+              - key: http.status
+                value: '200'
           - operationName: /tier2/lb
             startTime: gt 0
             tags:
-              - {key: http.method, value: GET}
-              - {key: http.params, value: 'http://127.0.0.1/tier2/lb'}
-              - {key: http.status, value: '200'}
+              - key: http.method
+                value: GET
+              - key: http.params
+                value: 'http://127.0.0.1/tier2/lb'
+              - key: http.status
+                value: '200'
             endTime: gt 0
             spanType: Entry
             spanId: 0
@@ -52,10 +49,14 @@ segmentItems:
             parentSpanId: -1
             componentId: 6000
             refs:
-              - {parentEndpoint: /ingress, parentTraceSegmentId: not null, refType: 'CrossProcess',
-                 networkAddress: 'e2e-test-with-mock-collector:upstream_ip:port', parentSpanId: 1,
-                 parentServiceInstance: 'e2e-test-with-mock-collector-instanceA', traceId: not null,
-                 parentService: 'e2e-test-with-mock-collector'}
+              - parentEndpoint: /ingress
+                parentTraceSegmentId: not null
+                refType: 'CrossProcess'
+                networkAddress: 'e2e-test-with-mock-collector:upstream_ip:port'
+                parentSpanId: 1
+                parentServiceInstance: 'e2e-test-with-mock-collector-instanceA'
+                traceId: not null
+                parentService: 'e2e-test-with-mock-collector'
             spanLayer: Http
       - segmentId: not null
         spans:
@@ -70,13 +71,17 @@ segmentItems:
             peer: 'e2e-test-with-mock-collector:upstream_ip:port'
             spanLayer: Http
             tags:
-              - {key: http.status, value: '200'}
+              - key: http.status
+                value: '200'
           - operationName: /ingress
             startTime: gt 0
             tags:
-              - {key: http.method, value: GET}
-              - {key: http.params, value: 'not null'}
-              - {key: http.status, value: '200'}
+              - key: http.method
+                value: GET
+              - key: http.params
+                value: 'not null'
+              - key: http.status
+                value: '200'
             endTime: gt 0
             spanType: Entry
             spanId: 0
