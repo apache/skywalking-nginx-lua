@@ -40,7 +40,5 @@ jobs:
           java-version: 8
       - name: Set environment
         run: export MAVEN_OPTS='-Dmaven.repo.local=~/.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-      - name: Build E2E Docker
-        run: ./mvnw -f ./test/e2e/pom.xml package
       - name: Run Nginx Test
         run: ./mvnw -f ./test/e2e/pom.xml verify

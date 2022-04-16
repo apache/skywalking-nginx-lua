@@ -78,8 +78,7 @@
                             </run>
                         </image>
                         <image>
-                            <name>ghcr.io/apache/skywalking-agent-test-tool/mock-collector:${mock-collector.version}
-                            </name>
+                            <name>ghcr.io/apache/skywalking-agent-test-tool/mock-collector:${mock-collector.version}</name>
                             <alias>skywalking-collector</alias>
                             <run>
                                 <ports>

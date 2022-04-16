@@ -215,6 +215,13 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>build</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                        <execution>
                             <id>start</id>
                             <phase>pre-integration-test</phase>
                             <goals>
