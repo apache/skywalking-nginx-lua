@@ -1,0 +1,143 @@
+segmentItems:
+- serviceName: e2e-service-consumer
+  segmentSize: ge 1
+  segments:
+  - segmentId: not null
+    spans:
+    - operationName: /info
+      parentSpanId: 0
+      spanId: 1
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 13
+      isError: false
+      spanType: Exit
+      peer: nginx:8080
+      skipAnalysis: false
+      tags:
+      - key: url
+        value: 'http://nginx:8080/info'
+      - key: http.method
+        value: POST
+    - operationName: POST:/info
+      parentSpanId: -1
+      spanId: 0
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 1
+      isError: false
+      spanType: Entry
+      peer: ''
+      skipAnalysis: false
+      tags:
+      - key: url
+        value: 'http://consumer:9092/info'
+      - key: http.method
+        value: POST
+- serviceName: skywalking-nginx
+  segmentSize: ge 2
+  segments:
+  - segmentId: not null
+    spans:
+    - operationName: /info
+      parentSpanId: 0
+      spanId: 1
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 6000
+      isError: false
+      spanType: Exit
+      peer: 172.16.238.13:9092
+      skipAnalysis: false
+      tags:
+      - key: http.status
+        value: '200'
+    - operationName: /info
+      parentSpanId: -1
+      spanId: 0
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 6000
+      isError: false
+      spanType: Entry
+      peer: ''
+      skipAnalysis: false
+      tags:
+      - key: http.method
+        value: POST
+      - key: http.params
+        value: 'http://nginx/info'
+      - key: http.status
+        value: '200'
+      refs:
+      - parentEndpoint: 'POST:/info'
+        networkAddress: 'nginx:8080'
+        refType: CrossProcess
+        parentSpanId: 1
+        parentTraceSegmentId: not null
+        parentServiceInstance: consumer1
+        parentService: e2e-service-consumer
+        traceId: not null
+  - segmentId: not null
+    spans:
+    - operationName: /suffix
+      parentSpanId: 0
+      spanId: 1
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 6000
+      isError: false
+      spanType: Exit
+      peer: '172.16.238.13:9092'
+      skipAnalysis: false
+    - operationName: /suffix
+      parentSpanId: -1
+      spanId: 0
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 6000
+      isError: false
+      spanType: Entry
+      peer: ''
+      skipAnalysis: false
+      tags:
+      - key: http.method
+        value: GET
+      - key: http.params
+        value: 'http://nginx/suffix'
+      - key: http.status
+        value: '200'
+- serviceName: e2e-service-provider
+  segmentSize: gt 1
+  segments:
+  - segmentId: not nul
+    spans:
+    - operationName: POST:/info
+      parentSpanId: -1
+      spanId: 0
+      spanLayer: Http
+      startTime: gt 0
+      endTime: gt 0
+      componentId: 1
+      isError: false
+      spanType: Entry
+      peer: ''
+      skipAnalysis: false
+      tags:
+      - {key: url, value: 'http://provider:9090/info'}
+      - {key: http.method, value: POST}
+      refs:
+      - parentEndpoint: /info
+        networkAddress: '172.16.238.13:9092'
+        refType: CrossProcess
+        parentSpanId: 1
+        parentTraceSegmentId: not null
+        parentServiceInstance: e2e
+        parentService: skywalking-nginx
+        traceId: not null
