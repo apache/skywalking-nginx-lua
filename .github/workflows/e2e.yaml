@@ -36,12 +36,12 @@ jobs:
         with:
           java-version: 8
       - run: |
-          docker-compose --env-file ./test/e2e/.env -f ./test/e2e/docker-compose.yml run -d -- user
+          docker-compose --env-file ./test/e2e/.env -f ./test/e2e/docker-compose.yml run -d user
           docker wait $(docker ps -qa --filter Name=e2e_user)
           status="$?"
           docker-compose -f ./test/e2e/docker-compose.yml logs
           if [ $status -eq 0 ]; then
-            docker cp "$(docker ps -qa --filter Name=e2e_user)):/response" ./response
+            docker cp "$(docker ps -qa --filter Name=e2e_user):/response" ./response
             cat ./response
           fi
           docker-compose -f ./test/e2e/docker-compose.yml kill
