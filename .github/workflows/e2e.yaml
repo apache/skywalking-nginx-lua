@@ -19,26 +19,29 @@ name: E2E
 on:
   pull_request:
   push:
-    branches: 
+    branches:
       - master
     tags:
       - 'v*'
 
 jobs:
   nginx:
-    runs-on: ubuntu-18.04
-    timeout-minutes: 180
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
-      - name: checkout submodules
-        shell: bash
-        run: |
-          git submodule sync --recursive
-          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
       - uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Set environment
-        run: export MAVEN_OPTS='-Dmaven.repo.local=~/.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-      - name: Run Nginx Test
-        run: ./mvnw -f ./test/e2e/pom.xml verify
+      - run: |
+          docker-compose --env-file ./test/e2e/.env -f ./test/e2e/docker-compose.yml run -d user
+          docker wait $(docker ps -qa --filter Name=e2e_user)
+          status="$?"
+          docker-compose -f ./test/e2e/docker-compose.yml logs
+          if [ $status -eq 0 ]; then
+            docker cp "$(docker ps -qa --filter Name=e2e_user):/response" ./response
+            cat ./response
+          fi
+          docker-compose -f ./test/e2e/docker-compose.yml kill

@@ -1,0 +1,134 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+version: '2.1'
+
+services:
+  skywalking-collector:
+    image: ghcr.io/apache/skywalking-agent-test-tool/mock-collector:${MOCK_COLLECTOR_VERSION}
+    expose:
+      - 19876
+      - 12800
+    ports:
+      - 12800:12800
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/12800"]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+    networks:
+      e2e:
+        ipv4_address: 172.16.238.10
+
+  nginx:
+    build:
+      context: ../../
+      dockerfile: ./test/e2e/nginx/Dockerfile
+    expose:
+      - 8080
+    networks:
+      e2e:
+        ipv4_address: 172.16.238.11
+    depends_on:
+      skywalking-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/8080"]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+
+  provider:
+    build:
+      context: ./
+      args:
+        E2E_SERVICE_NAME: e2e-service-provider
+        E2E_SERVICE_VERSION: ${E2E_SERVICE_VERSION}
+    networks:
+      e2e:
+        ipv4_address: 172.16.238.12
+    expose:
+      - 9090
+    environment:
+      SW_AGENT_COLLECTOR_BACKEND_SERVICES: skywalking-collector:19876
+      SW_LOGGING_OUTPUT: CONSOLE
+      SW_AGENT_NAME: e2e-service-provider
+      SW_AGENT_INSTANCE_NAME: provider1
+    depends_on:
+      skywalking-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9090"]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+
+  consumer:
+    build:
+      context: ./
+      args:
+        E2E_SERVICE_NAME: e2e-service-consumer
+        E2E_SERVICE_VERSION: ${E2E_SERVICE_VERSION}
+    networks:
+      e2e:
+        ipv4_address: 172.16.238.13
+    expose:
+      - 9092
+    environment:
+      SW_AGENT_COLLECTOR_BACKEND_SERVICES: skywalking-collector:19876
+      SW_LOGGING_OUTPUT: CONSOLE
+      PROVIDER_URL: http://nginx:8080
+      SW_AGENT_NAME: e2e-service-consumer
+      SW_AGENT_INSTANCE_NAME: consumer1
+    depends_on:
+      skywalking-collector:
+        condition: service_healthy
+      nginx:
+        condition: service_healthy
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9092"]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+
+  user:
+    build:
+      context: ./user
+    volumes:
+      - ./user/expectedData.yaml:/expectedData.yaml
+    environment:
+      MAX_RETRY_TIMES: 3
+      SUFFIX_ENTRY: http://nginx:8080/suffix
+      SERVICE_ENTRY: http://consumer:9092/info
+      VALIDATION_ENTRY: http://skywalking-collector:12800/dataValidate
+    networks:
+      e2e:
+        ipv4_address: 172.16.238.14
+    depends_on:
+      consumer:
+        condition: service_healthy
+      skywalking-collector:
+        condition: service_healthy
+
+networks:
+  e2e:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1
