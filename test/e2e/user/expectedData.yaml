@@ -65,7 +65,7 @@ segmentItems:
       componentId: 6000
       isError: false
       spanType: Exit
-      peer: 172.16.238.13:9092
+      peer: 'e2e-test-with-mock-collector:upstream_ip:port'
       skipAnalysis: false
       tags:
       - key: http.status
@@ -108,7 +108,7 @@ segmentItems:
       componentId: 6000
       isError: false
       spanType: Exit
-      peer: '172.16.238.13:9092'
+      peer: 'e2e-test-with-mock-collector:upstream_ip:port'
       skipAnalysis: false
     - operationName: /suffix
       parentSpanId: -1
@@ -149,7 +149,7 @@ segmentItems:
       - {key: http.method, value: POST}
       refs:
       - parentEndpoint: /info
-        networkAddress: '172.16.238.13:9092'
+        networkAddress: 'e2e-test-with-mock-collector:upstream_ip:port'
         refType: CrossProcess
         parentSpanId: 1
         parentTraceSegmentId: not null
