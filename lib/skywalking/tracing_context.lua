@@ -114,11 +114,11 @@ function _M.new(serviceName, serviceInstanceName, requestId)
         return _M.newNoOP()
     end
 
+    local segment_id = Util.newID()
     -- use request_id as trace_id if it is present
-    local trace_id = Util.newID()
-    local segment_id = trace_id
-    if requestId ~= nil then
-        trace_id = requestId
+    local trace_id = requestId
+    if trace_id == nil then
+        trace_id = segment_id
     end
 
     local tracing_context = Util.tablepool_fetch()
