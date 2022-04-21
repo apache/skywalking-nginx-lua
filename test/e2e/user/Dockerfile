@@ -21,6 +21,5 @@ RUN wget https://github.com/mikefarah/yq/releases/download/v4.24.5/yq_linux_amd6
     && chmod +x /usr/bin/yq
 
 COPY execute_and_validate.sh /execute_and_validate.sh
-COPY skywalking-validator.jar /validator.jar
 
 CMD ["sh", "/execute_and_validate.sh"]
