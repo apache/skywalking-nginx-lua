@@ -129,7 +129,7 @@ segmentItems:
       - key: http.status
         value: '200'
 - serviceName: e2e-service-provider
-  segmentSize: gt 1
+  segmentSize: ge 1
   segments:
   - segmentId: not nul
     spans:
