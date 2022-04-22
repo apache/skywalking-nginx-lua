@@ -13,13 +13,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-FROM eclipse-temurin:8-jre-alpine
-
-RUN apk add --no-cache curl
-RUN wget https://github.com/mikefarah/yq/releases/download/v4.24.5/yq_linux_amd64 -O /usr/bin/yq \
-    && chmod +x /usr/bin/yq
-
-COPY execute_and_validate.sh /execute_and_validate.sh
-
-CMD ["sh", "/execute_and_validate.sh"]
+scenarios:
+  - name: basic
+    expected: /expected/basic.yaml
+    entries:
+      - url: http://consumer:9092/info
+        method: POST
+      - url: http://nginx:8080/suffix
+  - name: request_id
+    expected: /expected/requestId.yaml
+    entries:
+      - url: http://nginx:8080/info
+        method: POST
+        headers:
+          - Request-Id: skywalking-e2e-request-id

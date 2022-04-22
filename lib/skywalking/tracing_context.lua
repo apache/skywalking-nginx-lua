@@ -109,14 +109,21 @@ function _M.newNoOP()
     return {is_noop = true}
 end
 
-function _M.new(serviceName, serviceInstanceName)
+function _M.new(serviceName, serviceInstanceName, requestId)
     if serviceInstanceName == nil or serviceName == nil then
         return _M.newNoOP()
     end
 
+    local segment_id = Util.newID()
+    -- use request_id as trace_id if it is present
+    local trace_id = requestId
+    if trace_id == nil then
+        trace_id = segment_id
+    end
+
     local tracing_context = Util.tablepool_fetch()
-    tracing_context.trace_id = Util.newID()
-    tracing_context.segment_id = tracing_context.trace_id
+    tracing_context.trace_id = trace_id
+    tracing_context.segment_id = segment_id
     tracing_context.service = serviceName
     tracing_context.service_instance = serviceInstanceName
     tracing_context.internal = Internal.new()
