@@ -204,8 +204,13 @@ function Client:reportTraces(metadata_buffer, backend_http_uri)
         end
 
         segmentTransform = segmentTransform .. segment
-        segment = queue:rpop(Const.segment_queue)
         count = count + 1
+
+        if ngx.worker.exiting() then
+            break
+        end
+
+        segment = queue:rpop(Const.segment_queue)
 
         if count >= SEGMENT_BATCH_COUNT then
             if sendSegments('[' .. segmentTransform .. ']', backend_http_uri) then
