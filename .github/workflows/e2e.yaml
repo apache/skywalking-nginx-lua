@@ -36,6 +36,6 @@ jobs:
         with:
           java-version: 8
       - name: Run E2E Tests
-          uses: apache/skywalking-infra-e2e@cf589b4a0b9f8e6f436f78e9cfd94a1ee5494180
-          with:
-            e2e-file: test/e2e/e2e.yaml
+        uses: apache/skywalking-infra-e2e@cf589b4a0b9f8e6f436f78e9cfd94a1ee5494180
+        with:
+          e2e-file: test/e2e/e2e.yaml
