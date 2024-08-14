@@ -103,7 +103,7 @@ function Tracer:finish()
     if ngx.ctx.exitSpan ~= nil and not ngx.ctx.is_finished then
         local upstream_status = tonumber(ngx.var.upstream_status)
         if upstream_status then
-            Span.tag(ngx.ctx.exitSpan, 'http.status', upstream_status)
+            Span.tag(ngx.ctx.exitSpan, 'http.status_code', upstream_status)
         end
         Span.finish(ngx.ctx.exitSpan, ngx.now() * 1000)
         ngx.ctx.exitSpan = nil
@@ -121,7 +121,7 @@ function Tracer:prepareForReport()
     end
 
     local ngxstatus = ngx.var.status
-    Span.tag(entrySpan, 'http.status', ngxstatus)
+    Span.tag(entrySpan, 'http.status_code', ngxstatus)
     if tonumber(ngxstatus) >= 500 then
         Span.errorOccurred(entrySpan)
     end

@@ -68,7 +68,7 @@ segmentItems:
       peer: 'e2e-test-with-mock-collector:upstream_ip:port'
       skipAnalysis: false
       tags:
-      - key: http.status
+      - key: http.status_code
         value: '200'
     - operationName: /info
       parentSpanId: -1
@@ -86,7 +86,7 @@ segmentItems:
         value: POST
       - key: http.params
         value: 'http://nginx/info'
-      - key: http.status
+      - key: http.status_code
         value: '200'
       refs:
       - parentEndpoint: 'POST:/info'
@@ -126,7 +126,7 @@ segmentItems:
         value: GET
       - key: http.params
         value: 'http://nginx/suffix'
-      - key: http.status
+      - key: http.status_code
         value: '200'
 - serviceName: e2e-service-provider
   segmentSize: ge 1
