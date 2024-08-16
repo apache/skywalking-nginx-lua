@@ -1,5 +1,15 @@
 # Changes
 
+## 1.0.0
+
+1. Add IgnoreSuffix feature.
+2. CI run lua test cases with luajit.
+3. Feat support update the peer before requesting outgoing.
+4. Use agent-test-tool docker image instead of building from source.
+5. Support to try to use `request-id` as `trace-id` when trace context absent.
+6. Stop reporting traces after the worker process begins to exit.
+7. Fix tag key from `http.status` to `http.status_code`.
+
 ## 0.6.0
 
 1. fix: `skywalking_tracer:finish()` will not be called in some case such as upstream timeout.
