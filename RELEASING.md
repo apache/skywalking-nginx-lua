@@ -53,7 +53,7 @@ Release Tag :
 
 Release CommitID :
 
- * https://dist.apache.org/repos/dist/dev/skywalking/nginx-lua/${RELEASE_VERSION}/
+ * https://dist.apache.org/repos/dist/dev/skywalking/nginx-lua/${COMMIT_ID}
 
 Keys to verify the Release Candidate :
 
