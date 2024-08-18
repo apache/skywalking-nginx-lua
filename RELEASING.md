@@ -71,7 +71,9 @@ Voting will start now (Date) and will remain open for at least
 
 8. Upload the rockspec to LuaRocks
 
-> luarocks upload skywalking-nginx-lua-${RELEASE_VERSION}-0.rockspec
+// As a release manager, you could ask the luarocks account in the private mail list, and get this API key to upload the new release.
+
+> luarocks upload skywalking-nginx-lua-${RELEASE_VERSION}-0.rockspec --api-key=xxx
 
 9. Move the source tar from svn dev folder to the release folder. 
 
