@@ -11,24 +11,11 @@ Release manager could follow this doc to build and upload a release for this age
 4. Build the source tars with ASC sign and SHA512
 
 ```shell
-> export RELEASE_VERSION=x.y.z
-
-> tar czf skywalking-nginx-lua-${RELEASE_VERSION}-src.tgz \
-    --exclude .git \
-    --exclude .DS_Store \
-    --exclude .github \
-    --exclude .gitignore \
-    --exclude .gitmodules \
-    --exclude .mvn/wrapper/maven-wrapper.jar \
-    skywalking-nginx-lua
-
-> gpg --armor --detach-sig skywalking-nginx-lua-${RELEASE_VERSION}-src.tgz
-
-> shasum -a 512 skywalking-nginx-lua-${RELEASE_VERSION}-src.tgz > skywalking-nginx-lua-${RELEASE_VERSION}-src.tgz.sha512
-
+> export VERSION=x.y.z
+> make release-src
 ```
 
-5. Upload `*-src.tgz`, `*-src.tgz.asc` and `*-src.tgz.sha512` to SVN `https://dist.apache.org/repos/dist/release/skywalking/nginx-lua/${RELEASE_VERSION}`
+5. Upload `*-src.tgz`, `*-src.tgz.asc` and `*-src.tgz.sha512` in the `release` folder to SVN `https://dist.apache.org/repos/dist/release/skywalking/nginx-lua/${RELEASE_VERSION}`
 
 6. Call for vote through `dev@skywalking.apache.org` mailing list.
 
