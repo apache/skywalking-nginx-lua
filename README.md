@@ -158,7 +158,7 @@ Create 2 kinds of span API v1
 * For Chinese speaker, send `[CN] Request to join SkyWalking slack` mail to the mail list(`dev@skywalking.apache.org`), we will invite you in.
 
 # Release Guide
-All committers should follow [Release Guide](release.md) to publish the official release.
+All committers should follow [Release Guide](RELEASING.md) to publish the official release.
 
 # License
 Apache 2.0
