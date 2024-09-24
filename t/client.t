@@ -143,7 +143,8 @@ Go keepAlive
 ok
 true
 ok
---- error_log
+--- grep_error_log: running timer
+--- grep_error_log_out
 running timer
 running timer
 running timer
