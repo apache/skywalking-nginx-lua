@@ -114,3 +114,37 @@ true
 --- no_error_log
 language: lua
 Go keepAlive
+
+
+
+=== TEST 3: start backend timer then destory then restart backend timer
+--- config
+    location /t {
+        content_by_lua_block {
+            local client = require("skywalking.client")
+            client.backendTimerDelay = 0.1
+            client:startBackendTimer("http://127.0.0.1:" .. ngx.var.server_port)
+            ngx.sleep(0.1)
+            ngx.say('ok')
+
+            local ok, err = client:destroyBackendTimer()
+            if not err then
+                ngx.say(ok)
+            else
+                ngx.say(err)
+            end
+
+            client:startBackendTimer("http://127.0.0.1:" .. ngx.var.server_port)
+            ngx.sleep(0.1)
+            ngx.say('ok')
+        }
+    }
+--- response_body
+ok
+true
+ok
+--- grep_error_log: running timer
+--- grep_error_log_out
+running timer
+running timer
+running timer
