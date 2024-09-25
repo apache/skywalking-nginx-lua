@@ -1,5 +1,9 @@
 # Changes
 
+## 1.0.1
+
+1. fix: allow timer to restart
+
 ## 1.0.0
 
 1. Add IgnoreSuffix feature.
