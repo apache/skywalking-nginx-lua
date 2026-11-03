@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openresty/openresty:1.17.8.2-5-alpine-fat
+FROM openresty/openresty:1.31.8.1-0-alpine-fat
 
 WORKDIR /skywalking-nginx-lua
 
