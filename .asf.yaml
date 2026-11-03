@@ -16,6 +16,7 @@
 #
 
 github:
+    dependabot_updates: false
     description: The Nginx Lua agent for Apache SkyWalking
     homepage: https://skywalking.apache.org/
     labels:
